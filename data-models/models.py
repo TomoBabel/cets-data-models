@@ -379,6 +379,11 @@ class CTFMetadata(ConfiguredBaseModel):
     defocus_angle: Optional[float] = Field(
         default=None, description="""Estimated angle of astigmatism."""
     )
+    defocus_handedness: Optional[int] = Field(
+        default=-1,
+        description="""It is the handedness of the tilt geometry and it is used to describe 
+        whether the focus increases or decreases as a function of Z distance."""
+    )
 
 
 class AcquisitionMetadataMixin(ConfiguredBaseModel):
