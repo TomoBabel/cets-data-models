@@ -30,6 +30,7 @@ classifiers = [
 
 dependencies = [
     "pydantic>=2",
+    "mrcfile"
 ]
 
 optional-dependencies.dev = [
