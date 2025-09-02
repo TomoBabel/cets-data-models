@@ -23,8 +23,9 @@ class Tomogram(Image3D):
         default=None, description="""Sampling rate in angstroms / voxel"""
     )
     ctf_corrected: Optional[bool] = Field(
-        default=None, description="""Flag to indicate if the tomogram was reconstructed 
-        from a tilt-series with the ctf corrected."""
+        default=None,
+        description="""Flag to indicate if the tomogram was reconstructed 
+        from a tilt-series with the ctf corrected.""",
     )
     even_path: Optional[str] = Field(
         default=None, description="""Path of the even tomogram file."""
