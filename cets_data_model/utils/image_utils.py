@@ -194,7 +194,7 @@ def get_mrc_info(in_mrc: str) -> ImageInfo:
             mode_desc=mode_desc,
             apix_x=head.cella.x / head.mx,
             apix_y=head.cella.y / head.my,
-            apix_z=None if int(head.nz) == 1 else head.cella.z / head.mz,
+            apix_z=None if head.nz == 1 else head.cella.x / head.mx,  # assume cubic
         )
 
 

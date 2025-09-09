@@ -59,7 +59,20 @@ class UtilsTests(CetsDataModelTest):
             "mode_desc": "16-bit float (IEEE754)",
             "apix_x": 3.5399999618530273,
             "apix_y": 3.5399999618530273,
-            "apix_z": 1.0,
+            "apix_z": 3.5399999618530273,
+        }
+
+    def test_get_image_stats_mrc_single(self):
+        img = self.test_data / "single.mrc"
+        assert get_image_info(img).__dict__ == {
+            "size_x": 100,
+            "size_y": 100,
+            "size_z": 1,
+            "mode": "2",
+            "mode_desc": "32-bit signed real",
+            "apix_x": 1.0499999237060547,
+            "apix_y": 1.0499999237060547,
+            "apix_z": None,
         }
 
     def test_get_image_stats_tiff(self):
