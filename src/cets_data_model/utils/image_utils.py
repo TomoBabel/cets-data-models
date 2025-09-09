@@ -1,20 +1,22 @@
 import mrcfile
+import os
 from dataclasses import dataclass
 from PIL import UnidentifiedImageError, Image
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 from warnings import warn
 from pathlib import Path
 
 
-def check_file_is_mrc(file: str) -> bool:
+def check_file_is_mrc(file: Union[str, os.PathLike]) -> bool:
     """Validate that a file is a mrc file
 
     Args:
-        file (str): The path for the file to check, relative to the project directory
+        file (Union[str, os.PathLike]): The path for the file to check, relative to the project directory
 
     Retuns:
         bool: The file is a valid mrc
     """
+    file = str(file)
     try:
         mrcfile.open(file, header_only=True)
         return True
@@ -22,15 +24,17 @@ def check_file_is_mrc(file: str) -> bool:
         return False
 
 
-def check_file_is_tif(file: str) -> bool:
+def check_file_is_tif(file: Union[str, os.PathLike]) -> bool:
     """Validate that a file is a tif file
 
     Args:
-        file (str): The path for the file to check, relative to the project directory
+        file (Union[str, os.PathLike]): The path for the file to check, relative to
+            the project directory
 
     Retuns:
         bool: The file is a valid tif
     """
+    file = str(file)
     try:
         with Image.open(file) as im:
             imgformat = im.format
@@ -41,42 +45,45 @@ def check_file_is_tif(file: str) -> bool:
     return False
 
 
-def get_mrc_dims(in_mrc: str) -> Tuple[int, int, int]:
+def get_mrc_dims(in_mrc: Union[str, os.PathLike]) -> Tuple[int, int, int]:
     """Get the shape of a mrc file
 
     Args:
-        in_mrc (str): The name of the file
+        in_mrc (Union[str, os.PathLike]): The name of the file
     Returns:
         Tuple[int, int, int]: x,y,z size in pixels
 
     """
+    in_mrc = str(in_mrc)
     with mrcfile.open(in_mrc, header_only=True) as mrc:
         return int(mrc.header.nx), int(mrc.header.ny), int(mrc.header.nz)
 
 
-def get_tiff_dims(in_tiff: str) -> Tuple[int, int, int]:
+def get_tiff_dims(in_tiff: Union[str, os.PathLike]) -> Tuple[int, int, int]:
     """Get the shape of a tiff file
 
     Args:
-        in_tiff (str): The name of the file
+        in_tiff (Union[str, os.PathLike]): The name of the file
     Returns:
         Tuple[int, int, int]: x,y,z size in pixels
 
     """
-    with Image.open(in_tiff) as tif:
+    in_tiff = str(in_tiff)
+    with Image.open(str(in_tiff)) as tif:
         height, width = tif.size[:2]
         return width, height, tif.n_frames
 
 
-def get_image_dims(in_img: str) -> Tuple[int, int, int]:
+def get_image_dims(in_img: Union[str, os.PathLike]) -> Tuple[int, int, int]:
     """Get dimensions of an image that might be tiff or mrc
 
     Args:
-        in_img (str): Path to the image
+        in_img (Union[str, os.PathLike]): Path to the image
 
     Returns:
         Tuple[int, int, int]: x,y,z size in pixels
     """
+    in_img = str(in_img)
     if not Path(in_img).is_file():
         raise ValueError(f"File not found: {in_img}")
     if check_file_is_mrc(in_img):
@@ -101,15 +108,16 @@ class ImageInfo:
     apix_z: Optional[float]
 
 
-def get_tiff_info(in_tiff: str) -> ImageInfo:
+def get_tiff_info(in_tiff: Union[str, os.PathLike]) -> ImageInfo:
     """Get statistics on a tif file
 
     Args:
-        in_tiff (str): The name of the file
+        in_tiff (Union[str, os.PathLike]): The name of the file
 
     Returns:
         ImageInfo: The requested info
     """
+    in_tiff = str(in_tiff)
     tiff_modes = {
         "1": "1-bit pixels, black and white, stored with one pixel per byte",
         "L": "8-bit unsigned pixels, grayscale",
@@ -160,16 +168,16 @@ def get_tiff_info(in_tiff: str) -> ImageInfo:
     )
 
 
-def get_mrc_info(in_mrc: str) -> ImageInfo:
+def get_mrc_info(in_mrc: Union[str, os.PathLike]) -> ImageInfo:
     """Get statistics on a mrc file
 
     Args:
-        in_mrc (str): The name of the file
+        in_mrc (Union[str, os.PathLike]): The name of the file
 
     Returns:
         ImageInfo: The requested info
     """
-
+    in_mrc = str(in_mrc)
     modes = {
         "0": "8-bit signed integer (range -128 to 127)",
         "1": "16-bit signed integer",
@@ -198,11 +206,11 @@ def get_mrc_info(in_mrc: str) -> ImageInfo:
         )
 
 
-def get_image_info(img_name: str) -> ImageInfo:
+def get_image_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
     """Get info about a mrc or tiff image
 
     Args:
-        img_name (str): Path to the image file
+        img_name (Union[str, os.PathLike]): Path to the image file
 
     Returns:
         ImageInfo: Info about the image
@@ -210,7 +218,6 @@ def get_image_info(img_name: str) -> ImageInfo:
     Raises:
         ValueError: If the image is not a valid mrc or tiff
     """
-
     if check_file_is_mrc(img_name):
         return get_mrc_info(img_name)
     elif check_file_is_tif(img_name):
