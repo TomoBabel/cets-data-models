@@ -6,11 +6,12 @@ build-backend = "setuptools.build_meta"
 include-package-data = false
 
 [tool.setuptools.packages.find]
-include = ["datamodels*"]
+where = ["src"]
+include = ["cets_data_model*"]
 namespaces = false
 
 [project]
-name = "CETS_DATA_MODELS"
+name = "cets_data_model"
 version = "0.1"
 description = "Universal data standard for cryoET"
 license = {file = "LICENSE"}

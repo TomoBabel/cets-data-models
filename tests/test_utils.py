@@ -1,4 +1,4 @@
-from cets_data_model.utils.image_utils import (
+from src.cets_data_model.utils.image_utils import (
     get_image_dims,
     get_tiff_dims,
     get_mrc_dims,
