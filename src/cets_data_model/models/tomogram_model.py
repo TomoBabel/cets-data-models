@@ -1,7 +1,11 @@
 from pydantic import Field
 from typing import Optional
 
-from datamodels.models.models import Image3D, CoordinateSystem, CoordinateTransformation
+from cets_data_model.models.models import (
+    Image3D,
+    CoordinateSystem,
+    CoordinateTransformation,
+)
 
 
 class Tomogram(Image3D):
