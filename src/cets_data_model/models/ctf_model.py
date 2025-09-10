@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 from pydantic import Field
-from datamodels import ConfiguredBaseModel
+from cets_data_model.models.models import ConfiguredBaseModel
 
 
 class CTFMetadata(ConfiguredBaseModel):
