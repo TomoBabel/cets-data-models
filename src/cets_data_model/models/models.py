@@ -295,7 +295,7 @@ class Affine(CoordinateTransformation):
         conlist(
             min_length=3,
             max_length=3,
-            item_type=conlist(min_length=3, max_length=3, item_type=int),
+            item_type=conlist(min_length=3, max_length=3, item_type=float),
         )
     ] = Field(default=None, description="""The affine matrix""")
     name: Optional[str] = Field(
