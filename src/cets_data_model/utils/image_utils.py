@@ -70,8 +70,7 @@ def get_tiff_dims(in_tiff: Union[str, os.PathLike]) -> Tuple[int, int, int]:
     """
     in_tiff = str(in_tiff)
     with Image.open(str(in_tiff)) as tif:
-        height, width = tif.size[:2]
-        return width, height, tif.n_frames
+        return tif.width, tif.height, tif.n_frames
 
 
 def get_image_dims(in_img: Union[str, os.PathLike]) -> Tuple[int, int, int]:
