@@ -492,7 +492,7 @@ class ProjectionImage(AcquisitionMetadataMixin, Image2D):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
