@@ -25,13 +25,13 @@ class ConfiguredBaseModel(BaseModel):
 
 
 # -----------------------------------------------------------------------------
-# Type Aliases (usando Annotated para validación)
+# Type Aliases (using Annotated for validation)
 # -----------------------------------------------------------------------------
-# Alias para Vectores
+# Alias for vectors
 Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
 Vector3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
 
-# Alias para Matrices
+# Alias for matrices
 Matrix2x2: TypeAlias = Annotated[list[Vector2D], Field(min_length=2, max_length=2)]
 Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=3)]
 
@@ -431,7 +431,6 @@ class SubProjectionImage(ProjectionImage):
     particle_index: Optional[int] = Field(
         default=None, description="Index of a particle inside a tomogram."
     )
-    # section field is inherited from ProjectionImage with the correct type (Optional[int])
 
 
 # -----------------------------------------------------------------------------
