@@ -640,7 +640,6 @@ class Annotation(ConfiguredBaseModel):
     A primitive annotation.
     """
 
-    type: Literal["annotation"] = "annotation"
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
@@ -735,7 +734,6 @@ class PointSet2D(Annotation, CoordMetaMixin):
     A set of 2D point annotations.
     """
 
-    type: Literal["point_set_2D"] = "point_set_2D"
     origin2D: Optional[
         conlist(
             min_length=1, item_type=conlist(min_length=2, max_length=2, item_type=float)
@@ -755,7 +753,6 @@ class PointSet3D(Annotation, CoordMetaMixin):
     A set of 3D point annotations.
     """
 
-    type: Literal["point_set_3D"] = "point_set_3D"
     origin3D: Optional[
         conlist(
             min_length=1, item_type=conlist(min_length=3, max_length=3, item_type=float)
@@ -902,12 +899,6 @@ class TriMesh(Annotation, CoordMetaMixin):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
-AnnotationType = Annotated[
-    Union[Annotation, PointSet3D, PointSet2D],
-    Field(discriminator='type')
-]
-
-
 class Region(ConfiguredBaseModel):
     """
     Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of a specimen.
@@ -925,7 +916,7 @@ class Region(ConfiguredBaseModel):
     tomograms: Optional[list[Tomogram]] = Field(
         default=None, description="""The tomograms"""
     )
-    annotations: Optional[list[AnnotationType]] = Field(
+    annotations: Optional[list[Union[PointSet3D, PointSet2D, Annotation]]] = Field(
         default=None,
         description="""The annotations for this region"""
     )
