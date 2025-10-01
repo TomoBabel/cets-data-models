@@ -287,7 +287,9 @@ class ProjectionImage(_BaseProjectionImage):
 class TiltImage(_BaseProjectionImage):
     """A projection image that belongs to a tilt-series."""
 
-    type: Literal["tilt"] = Field("tilt", description="The type of projection image.")
+    type: Literal["tilt_image"] = Field(
+        "tilt_image", description="The type of projection image."
+    )
     ts_id: Optional[str] = Field(
         None,
         description="Identifier of the tilt-series, normally the base name of the stack file.",
