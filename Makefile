@@ -7,7 +7,7 @@ install:
 .PHONY: gen-python
 gen-python:
 	@echo "Generating Python code from linkml files"
-	 gen-pydantic --meta None schema/linkml/entities.yaml > src/cryoet_metadata/_base/_models.py
+	 gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/models.py
 
 .PHONY: linkml-docs
 linkml-docs:

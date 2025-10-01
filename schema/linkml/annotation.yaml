@@ -15,92 +15,123 @@ imports:
 - ./coordinate_systems
 - ./coordinate_transforms
 
+enums:
+  AnnotationTypeEnum:
+    permissible_values:
+      annotation:
+        description: Base annotation type.
+      segmentation_mask_2D:
+        description: 2D segmentation mask annotation.
+      segmentation_mask_3D:
+        description: 3D segmentation mask annotation.
+      probability_map_2D:
+        description: 2D probability map annotation.
+      probability_map_3D:
+        description: 3D probability map annotation
+      point_set_2D:
+        description: 2D point set annotation.
+      point_set_3D:
+        description: 3D point set annotation.
+      point_vector_set_2D:
+        description: 2D point vector set annotation.
+      point_vector_set_3D:
+        description: 3D point vector set annotation.
+      point_matrix_set_2D:
+        description: 2D point matrix set annotation.
+      point_matrix_set_3D:
+        description: 3D point matrix set annotation.
+      tri_mesh:
+        description: Triangluated mesh annotation.
+      
 slots:
-  - origin2D:
-      description: Location on a 2D image (Nx2).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xy
-            exact_cardinality: 2
-  - translation2D:
-      description: Offset from the origin of a point on a 2D image (Nx2).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xy
-            exact_cardinality: 2
-  - vector2D:
-      description: Orientation vector associated with a point on a 2D image (Nx2).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xy
-            exact_cardinality: 2
-  - matrix2D:
-      description: Rotation matrix associated with a point on a 2D image (Nx2x2).
-      range: float
-      array:
-        exact_number_dimensions: 3
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xy
-            exact_cardinality: 2
-          - alias: xy
-            exact_cardinality: 2
-
-  - origin3D:
-      description: Location on a 3D image (Nx3).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xyz
-            exact_cardinality: 3
-  - translation3D:
-      description: Offset from the origin of a point on a 3D image (Nx3).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xyz
-            exact_cardinality: 3
-  - vector3D:
-      description: Orientation vector associated with a point on a 3D image (Nx3).
-      range: float
-      array:
-        exact_number_dimensions: 2
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xyz
-            exact_cardinality: 3
-  - matrix3D:
-      description: Rotation matrix associated with a point on a 3D image (Nx3x3).
-      range: float
-      array:
-        exact_number_dimensions: 3
-        dimensions:
-          - alias: N
-            minimum_cardinality: 1
-          - alias: xyz
-            exact_cardinality: 3
-          - alias: xyz
-            exact_cardinality: 3
+  type:
+    description: The type of annotation.
+    range: AnnotationTypeEnum
+    required: true
+  origin2D:
+    description: Location on a 2D image (Nx2).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xy
+          exact_cardinality: 2
+  translation2D:
+    description: Offset from the origin of a point on a 2D image (Nx2).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xy
+          exact_cardinality: 2
+  vector2D:
+    description: Orientation vector associated with a point on a 2D image (Nx2).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xy
+          exact_cardinality: 2
+  matrix2D:
+    description: Rotation matrix associated with a point on a 2D image (Nx2x2).
+    range: float
+    array:
+      exact_number_dimensions: 3
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xy
+          exact_cardinality: 2
+        - alias: xy
+          exact_cardinality: 2
+  origin3D:
+    description: Location on a 3D image (Nx3).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xyz
+          exact_cardinality: 3
+  translation3D:
+    description: Offset from the origin of a point on a 3D image (Nx3).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xyz
+          exact_cardinality: 3
+  vector3D:
+    description: Orientation vector associated with a point on a 3D image (Nx3).
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xyz
+          exact_cardinality: 3
+  matrix3D:
+    description: Rotation matrix associated with a point on a 3D image (Nx3x3).
+    range: float
+    array:
+      exact_number_dimensions: 3
+      dimensions:
+        - alias: N
+          minimum_cardinality: 1
+        - alias: xyz
+          exact_cardinality: 3
+        - alias: xyz
+          exact_cardinality: 3
 
 classes:
   CoordMetaMixin:
@@ -112,31 +143,51 @@ classes:
   Annotation:
     description: A primitive annotation.
     slots:
+      - type
       - path
+    slot_usage:
+      type:
+        ifabsent: string(annotation)
 
   SegmentationMask2D:
     is_a: Annotation
     mixins:
       - Image2D
     description: An annotation image with categorical labels.
+    slot_usage:
+      type:
+        ifabsent: string(segmentation_mask_2D)
+        equals_string: segmentation_mask_2D
 
   SegmentationMask3D:
     is_a: Annotation
     mixins:
       - Image3D
     description: An annotation volume with categorical labels.
+    slot_usage:
+      type:
+        ifabsent: string(segmentation_mask_3D)
+        equals_string: segmentation_mask_3D
 
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
       - Image2D
     description: An annotation image with real-valued labels.
+    slot_usage:
+      type:
+        ifabsent: string(probability_map_2D)
+        equals_string: probability_map_2D
 
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
       - Image3D
     description: An annotation volume with real-valued labels.
+    slot_usage:
+      type:
+        ifabsent: string(probability_map_3D)
+        equals_string: probability_map_3D
 
   PointSet2D:
     is_a: Annotation
@@ -145,6 +196,10 @@ classes:
     description: A set of 2D point annotations.
     slots:
       - origin2D
+    slot_usage:
+      type:
+        ifabsent: string(point_set_2D)
+        equals_string: point_set_2D
 
   PointSet3D:
     is_a: Annotation
@@ -153,6 +208,10 @@ classes:
     description: A set of 3D point annotations.
     slots:
       - origin3D
+    slot_usage:
+      type:
+        ifabsent: string(point_set_3D)
+        equals_string: point_set_3D
 
   PointVectorSet2D:
     is_a: Annotation
@@ -162,6 +221,10 @@ classes:
     slots:
       - origin2D
       - vector2D
+    slot_usage:
+      type:
+        ifabsent: string(point_vector_set_2D)
+        equals_string: point_vector_set_2D
 
   PointVectorSet3D:
     is_a: Annotation
@@ -171,6 +234,10 @@ classes:
     slots:
       - origin3D
       - vector3D
+    slot_usage:
+      type:
+        ifabsent: string(point_vector_set_3D)
+        equals_string: point_vector_set_3D
 
   PointMatrixSet2D:
     is_a: Annotation
@@ -180,6 +247,10 @@ classes:
     slots:
       - origin2D
       - matrix2D
+    slot_usage:
+      type:
+        ifabsent: string(point_matrix_set_2D)
+        equals_string: point_matrix_set_2D
 
   PointMatrixSet3D:
     is_a: Annotation
@@ -189,11 +260,17 @@ classes:
     slots:
       - origin3D
       - matrix3D
+    slot_usage:
+      type:
+        ifabsent: string(point_matrix_set_3D)
+        equals_string: point_matrix_set_3D
 
   TriMesh:
     is_a: Annotation
     mixins:
       - CoordMetaMixin
     description: A mesh annotation.
-
-
+    slot_usage:
+      type:
+        ifabsent: string(tri_mesh)
+        equals_string: tri_mesh

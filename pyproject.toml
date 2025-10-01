@@ -33,6 +33,8 @@ dependencies = [
     "pydantic>=2",
     "mrcfile",
     "pillow",
+    "linkml>=1.7.0", 
+    "linkml-runtime>=1.7.0",  
 ]
 
 optional-dependencies.dev = [
