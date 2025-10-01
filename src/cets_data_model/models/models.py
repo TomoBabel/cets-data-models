@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Literal, Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, conlist
 
@@ -295,7 +295,7 @@ class Affine(CoordinateTransformation):
         conlist(
             min_length=3,
             max_length=3,
-            item_type=conlist(min_length=3, max_length=3, item_type=int),
+            item_type=conlist(min_length=3, max_length=3, item_type=float),
         )
     ] = Field(default=None, description="""The affine matrix""")
     name: Optional[str] = Field(
@@ -640,6 +640,7 @@ class Annotation(ConfiguredBaseModel):
     A primitive annotation.
     """
 
+    type: Literal["annotation"] = "annotation"
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
@@ -734,6 +735,7 @@ class PointSet2D(Annotation, CoordMetaMixin):
     A set of 2D point annotations.
     """
 
+    type: Literal["point_set_2D"] = "point_set_2D"
     origin2D: Optional[
         conlist(
             min_length=1, item_type=conlist(min_length=2, max_length=2, item_type=float)
@@ -753,6 +755,7 @@ class PointSet3D(Annotation, CoordMetaMixin):
     A set of 3D point annotations.
     """
 
+    type: Literal["point_set_3D"] = "point_set_3D"
     origin3D: Optional[
         conlist(
             min_length=1, item_type=conlist(min_length=3, max_length=3, item_type=float)
@@ -858,11 +861,11 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     A set of 3D points with an associated rotation matrix.
     """
 
-    origin3D: Optional[
-        conlist(
-            min_length=1, item_type=conlist(min_length=3, max_length=3, item_type=float)
-        )
-    ] = Field(default=None, description="""Location on a 3D image (Nx3).""")
+    origin3D: Annotated[
+        list[list[float]] | None, 
+        conlist(min_length=1, item_type=conlist(min_length=3, max_length=3, item_type=float)), 
+        Field(default=None, description="""Location on a 3D image (Nx3).""")
+    ] = None 
     matrix3D: Optional[
         conlist(
             min_length=1,
@@ -899,6 +902,12 @@ class TriMesh(Annotation, CoordMetaMixin):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
+AnnotationType = Annotated[
+    Union[Annotation, PointSet3D, PointSet2D],
+    Field(discriminator='type')
+]
+
+
 class Region(ConfiguredBaseModel):
     """
     Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of a specimen.
@@ -916,8 +925,9 @@ class Region(ConfiguredBaseModel):
     tomograms: Optional[list[Tomogram]] = Field(
         default=None, description="""The tomograms"""
     )
-    annotations: Optional[list[Annotation]] = Field(
-        default=None, description="""The annotations for this region"""
+    annotations: Optional[list[AnnotationType]] = Field(
+        default=None,
+        description="""The annotations for this region"""
     )
 
 
