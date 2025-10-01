@@ -332,10 +332,10 @@ class MovieStackSeries(ConfiguredBaseModel):
 
 
 class TiltSeries(ConfiguredBaseModel):
+    path: Optional[str] = None
     images: Optional[list[AnyProjectionImage]] = Field(
         None, description="The projections in the stack"
     )
-    path: Optional[str] = None
 
 
 # -----------------------------------------------------------------------------
