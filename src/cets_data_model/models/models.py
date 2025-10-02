@@ -298,16 +298,6 @@ class TiltImage(_BaseProjectionImage):
     pixel_size: Optional[float] = Field(
         None, description="Sampling rate in angstroms / pixel"
     )
-    # ctf_corrected: Optional[bool] = Field(
-    #     None,
-    #     description="Flag to indicate if the tilt-series was reconstructed from a tilt-series with the ctf corrected.",
-    # )
-    # even_path: Optional[str] = Field(
-    #     None, description="Path of the even tilt-series file."
-    # )
-    # odd_path: Optional[str] = Field(
-    #     None, description="Path of the odd tilt-series file."
-    # )
 
 
 class SubProjectionImage(_BaseProjectionImage):
