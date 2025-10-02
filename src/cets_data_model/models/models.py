@@ -298,16 +298,16 @@ class TiltImage(_BaseProjectionImage):
     pixel_size: Optional[float] = Field(
         None, description="Sampling rate in angstroms / pixel"
     )
-    ctf_corrected: Optional[bool] = Field(
-        None,
-        description="Flag to indicate if the tilt-series was reconstructed from a tilt-series with the ctf corrected.",
-    )
-    even_path: Optional[str] = Field(
-        None, description="Path of the even tilt-series file."
-    )
-    odd_path: Optional[str] = Field(
-        None, description="Path of the odd tilt-series file."
-    )
+    # ctf_corrected: Optional[bool] = Field(
+    #     None,
+    #     description="Flag to indicate if the tilt-series was reconstructed from a tilt-series with the ctf corrected.",
+    # )
+    # even_path: Optional[str] = Field(
+    #     None, description="Path of the even tilt-series file."
+    # )
+    # odd_path: Optional[str] = Field(
+    #     None, description="Path of the odd tilt-series file."
+    # )
 
 
 class SubProjectionImage(_BaseProjectionImage):
@@ -332,7 +332,24 @@ class MovieStackSeries(ConfiguredBaseModel):
 
 
 class TiltSeries(ConfiguredBaseModel):
-    path: Optional[str] = None
+    path: Optional[str] = Field(None, description="Path to the stack file.")
+    ts_id: Optional[str] = Field(
+        None,
+        description="Identifier of the tilt-series, normally the base name of the stack file.",
+    )
+    pixel_size: Optional[float] = Field(
+        None, description="Sampling rate in angstroms / pixel"
+    )
+    ctf_corrected: Optional[bool] = Field(
+        None,
+        description="Flag to indicate if the tilt-series was reconstructed from a tilt-series with the ctf corrected.",
+    )
+    even_path: Optional[str] = Field(
+        None, description="Path of the even tilt-series file."
+    )
+    odd_path: Optional[str] = Field(
+        None, description="Path of the odd tilt-series file."
+    )
     images: Optional[list[AnyProjectionImage]] = Field(
         None, description="The projections in the stack"
     )
@@ -343,8 +360,12 @@ class TiltSeries(ConfiguredBaseModel):
 # -----------------------------------------------------------------------------
 class Tomogram(Image3D):
     path: Optional[str] = Field(None, description="Path to a file.")
+    tomo_id: Optional[str] = Field(
+        None,
+        description="Identifier of the tomogram, normally the base name of the tomogram file.",
+    )
     voxel_size: Optional[float] = Field(
-        None, description="Sampling rate in angstroms / voxel"
+        None, description="Sampling rate in angstroms / voxel."
     )
     ctf_corrected: Optional[bool] = Field(
         None,
