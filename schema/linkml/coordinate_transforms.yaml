@@ -12,24 +12,6 @@ imports:
 - linkml:types
 - ./coordinate_systems
 
-enums:
-  CoordinateTransformationTypeEnum:
-    permissible_values:
-      coordinate_transformation:
-        description: Base coordinate transformation type.
-      identity:
-        description: The identity transformation.
-      map_axis:
-        description: Axis permutation transformation
-      translation:
-        description: A translation transformation.
-      scale:
-        description: A scaling transformation.
-      affine:
-        description: An affine transformation
-      sequence:
-        description: A sequence of transformations
-
 slots:
   transformation_type:
     description: The type of transformation.
@@ -164,3 +146,21 @@ classes:
       transformation_type:
         ifabsent: string(sequence)
         equals_string: sequence
+
+enums:
+  CoordinateTransformationTypeEnum:
+    permissible_values:
+      coordinate_transformation:
+        description: Base coordinate transformation type.
+      identity:
+        description: The identity transformation.
+      map_axis:
+        description: Axis permutation transformation
+      translation:
+        description: A translation transformation.
+      scale:
+        description: A scaling transformation.
+      affine:
+        description: An affine transformation
+      sequence:
+        description: A sequence of transformations

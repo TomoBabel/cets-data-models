@@ -11,6 +11,7 @@ default_prefix: image
 imports:
 - linkml:types
 - ./coordinate_systems
+- ./coordinate_transforms
 
 slots:
   width:
@@ -27,9 +28,15 @@ slots:
     range: CoordinateSystem
     multivalued: true
   coordinate_transformations:
-    description: Named coordinate systems for this entity
-    range: CoordinateTransformation
+    description: Named coordinate transformations for this entity
     multivalued: true
+    any_of:
+      - range: Identity
+      - range: MapAxis
+      - range: Translation
+      - range: Scale
+      - range: Affine
+      - range: Sequence
 
 classes:
   Image2D:
