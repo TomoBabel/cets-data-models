@@ -5,7 +5,7 @@ description: Schema for cryoET alignments
 prefixes:
   linkml: https://w3id.org/linkml/
   image: https://w3id.org/cetmd/image/
-  annotations: https://w3id.org/cetmd/annotation/
+  annotation: https://w3id.org/cetmd/annotation/
 
 default_prefix: annotation
 
@@ -48,6 +48,17 @@ slots:
     description: The type of annotation.
     range: AnnotationTypeEnum
     required: true
+  coordinate_transformations:
+    description: Named coordinate transformations for this entity
+    any_of:
+      - range: Sequence
+      - range: Affine
+      - range: Scale
+      - range: Translation
+      - range: MapAxis
+      - range: Identity
+      - range: CoordinateTransformation
+    multivalued: true
   origin2D:
     description: Location on a 2D image (Nx2).
     range: float

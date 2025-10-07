@@ -7,7 +7,9 @@ install:
 .PHONY: gen-python
 gen-python:
 	@echo "Generating Python code from linkml files"
-	 gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/models.py
+	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/models.py
+	@echo "Adding discriminators to Union fields"
+	@python scripts/post_model_gen_additions.py src/cets_data_model/models/models.py
 
 .PHONY: linkml-docs
 linkml-docs:

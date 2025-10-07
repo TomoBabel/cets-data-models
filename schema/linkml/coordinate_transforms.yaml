@@ -12,123 +12,14 @@ imports:
 - linkml:types
 - ./coordinate_systems
 
-classes:
-  CoordinateTransformation:
-    description: A coordinate transformation
-    attributes:
-      name:
-        description: The name of the coordinate transformation
-        range: string
-      input:
-        description: The source coordinate system name
-        range: string
-      output:
-        description: The target coordinate system name
-        range: string
-      type:
-        description: The type of transformation
-        range: TransformationType
-
-
-  Identity:
-    description: The identity transformation
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: identity
-
-
-  AxisNameMapping:
-    description: Axis name to Axis name mapping
-    attributes:
-      axis1_name:
-        description: The type of transformation
-        range: string
-      axis2_name:
-        description: The mapping of the axis names
-        range: string
-
-
-  MapAxis:
-    description: Axis permutation transformation
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: mapAxis
-      mapAxis:
-        description: The permutation of the axes
-        range: AxisNameMapping
-        inlined: true
-        multivalued: true
-
-  Translation:
-    description: A translation transformation
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: translation
-      translation:
-        description: The translation vector
-        range: float
-        multivalued: true
-
-  Scale:
-    description: A scaling transformation
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: scale
-      scale:
-        description: The scaling vector
-        range: float
-        multivalued: true
-
-  Affine:
-    description: An affine transformation
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: affine
-      affine:
-        description: The affine matrix
-        range: float
-        array:
-          exact_number_dimensions: 2
-          dimensions:
-            - alias: exact_card
-              exact_cardinality: 3
-            - alias: exact_card
-              exact_cardinality: 3
-
-  Sequence:
-    description: A sequence of transformations
-    is_a: CoordinateTransformation
-    attributes:
-      type:
-        description: The type of transformation
-        range: TransformationType
-        ifabsent: sequence
-      sequence:
-        description: The sequence of transformations
-        range: CoordinateTransformation
-        multivalued: true
-
 enums:
-  TransformationType:
+  CoordinateTransformationTypeEnum:
     permissible_values:
+      coordinate_transformation:
+        description: Base coordinate transformation type.
       identity:
         description: The identity transformation.
-      mapAxis:
+      map_axis:
         description: Axis permutation transformation
       translation:
         description: A translation transformation.
@@ -138,3 +29,138 @@ enums:
         description: An affine transformation
       sequence:
         description: A sequence of transformations
+
+slots:
+  transformation_type:
+    description: The type of transformation.
+    range: CoordinateTransformationTypeEnum
+    required: true
+    
+  name:
+    description: The name of the coordinate transformation
+    range: string
+    
+  input:
+    description: The source coordinate system name
+    range: string
+    
+  output:
+    description: The target coordinate system name
+    range: string
+    
+  axis1_name:
+    description: The type of transformation
+    range: string
+    
+  axis2_name:
+    description: The mapping of the axis names
+    range: string
+    
+  mapAxis:
+    description: The permutation of the axes
+    range: AxisNameMapping
+    inlined: true
+    multivalued: true
+    
+  translation:
+    description: The translation vector
+    range: float
+    multivalued: true
+    
+  scale:
+    description: The scaling vector
+    range: float
+    multivalued: true
+    
+  affine:
+    description: The affine matrix
+    range: float
+    array:
+      exact_number_dimensions: 2
+      dimensions:
+        - alias: exact_card
+          exact_cardinality: 3
+        - alias: exact_card
+          exact_cardinality: 3
+          
+  sequence:
+    description: The sequence of transformations
+    range: CoordinateTransformation
+    multivalued: true
+
+classes:
+  CoordinateTransformation:
+    description: A coordinate transformation
+    slots:
+      - name
+      - input
+      - output
+      - transformation_type
+    slot_usage:
+      transformation_type:
+        ifabsent: string(coordinate_transformation)
+        equals_string: coordinate_transformation
+
+  Identity:
+    description: The identity transformation
+    is_a: CoordinateTransformation
+    slot_usage:
+      transformation_type:
+        ifabsent: string(identity)
+        equals_string: identity
+
+  AxisNameMapping:
+    description: Axis name to Axis name mapping
+    slots:
+      - axis1_name
+      - axis2_name
+
+  MapAxis:
+    description: Axis permutation transformation
+    is_a: CoordinateTransformation
+    slots:
+      - mapAxis
+    slot_usage:
+      transformation_type:
+        ifabsent: string(map_axis)
+        equals_string: map_axis
+
+  Translation:
+    description: A translation transformation
+    is_a: CoordinateTransformation
+    slots:
+      - translation
+    slot_usage:
+      transformation_type:
+        ifabsent: string(translation)
+        equals_string: translation
+
+  Scale:
+    description: A scaling transformation
+    is_a: CoordinateTransformation
+    slots:
+      - scale
+    slot_usage:
+      transformation_type:
+        ifabsent: string(scale)
+        equals_string: scale
+
+  Affine:
+    description: An affine transformation
+    is_a: CoordinateTransformation
+    slots:
+      - affine
+    slot_usage:
+      transformation_type:
+        ifabsent: string(affine)
+        equals_string: affine
+
+  Sequence:
+    description: A sequence of transformations
+    is_a: CoordinateTransformation
+    slots:
+      - sequence
+    slot_usage:
+      transformation_type:
+        ifabsent: string(sequence)
+        equals_string: sequence
