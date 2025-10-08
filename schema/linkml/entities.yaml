@@ -21,6 +21,10 @@ classes:
     description: Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of
       a specimen.
     attributes:
+      name:
+        description: The name for the region
+        range: string
+        multivalued: false
       movie_stack_collections:
         description: The movie stack
         range: MovieStackCollection

@@ -102,6 +102,10 @@ classes:
   MovieStackSeries:
     description: A group of movie stacks that belong to a single tilt series.
     attributes:
+      name:
+        description: The name of stack series
+        range: string
+        multivalued: false
       stacks:
         description: The movie stacks.
         range: MovieStack
@@ -110,6 +114,10 @@ classes:
   TiltSeries:
     description: A stack of projection images.
     attributes:
+      name:
+        description: The name of the tilt series
+        range: string
+        multivalued: false
       images:
         description: The projections in the stack
         range: ProjectionImage
