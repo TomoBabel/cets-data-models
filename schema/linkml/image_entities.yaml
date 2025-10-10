@@ -43,6 +43,9 @@ slots:
   ctf_metadata:
     description: A set of CTF patameters for an image.
     range: CTFMetadata
+  defocus_handedness:
+    description: The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.
+    range: integer
 
 classes:
   CTFMetadata:
@@ -51,6 +54,10 @@ classes:
       - defocus_u
       - defocus_v
       - defocus_angle
+      - defocus_handedness
+    slot_usage:
+      defocus_handedness:
+        ifabsent: -1
 
   AcquisitionMetadataMixin:
     description: Metadata concerning the acquisition process.

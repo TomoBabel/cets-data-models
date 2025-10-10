@@ -266,6 +266,7 @@ class CTFMetadata(ConfiguredBaseModel):
     defocus_u: Optional[float] = Field(default=None, description="""Estimated defocus U for this image in Angstrom, underfocus positive.""")
     defocus_v: Optional[float] = Field(default=None, description="""Estimated defocus V for this image in Angstrom, underfocus positive.""")
     defocus_angle: Optional[float] = Field(default=None, description="""Estimated angle of astigmatism.""")
+    defocus_handedness: Optional[int] = Field(default=-1, description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""")
 
 
 class AcquisitionMetadataMixin(ConfiguredBaseModel):
