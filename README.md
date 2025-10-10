@@ -10,6 +10,8 @@ are required for model generation:
 
     make gen-python
 
+**NOTE:** currently the generated models will be created at `src/cets_data_model/models/gen_models.py`, leaving *models.py* (i.e. at `src/cets_data_model/models/models.py`) untouched. This will be replaced in future iterations once tests are in place for validation of generated models. 
+
 ## Update process
 1. PR on main data model repository.  
     *PR description has to mention all changed or added fields.*

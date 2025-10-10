@@ -12,7 +12,7 @@ install-dev:
 .PHONY: gen-python
 gen-python:
 	@echo "Generating Python code from linkml files"
-	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/models.py
+	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/gen_models.py
 
 .PHONY: linkml-docs
 linkml-docs:
