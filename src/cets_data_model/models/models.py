@@ -240,9 +240,6 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     acquisition_order: Optional[int] = Field(
         None, description="0-based acquisition order."
     )
-    pixel_size: Optional[float] = Field(
-        None, description="Sampling rate in angstroms / pixel"
-    )
 
 
 # -----------------------------------------------------------------------------
@@ -329,9 +326,6 @@ class TiltSeries(ConfiguredBaseModel):
         None,
         description="Identifier of the tilt-series, normally the base name of the stack file.",
     )
-    pixel_size: Optional[float] = Field(
-        None, description="Sampling rate in angstroms / pixel"
-    )
     ctf_corrected: Optional[bool] = Field(
         None,
         description="Flag to indicate if the tilt-series was reconstructed from a tilt-series with the ctf corrected.",
@@ -355,9 +349,6 @@ class Tomogram(Image3D):
     tomo_id: Optional[str] = Field(
         None,
         description="Identifier of the tomogram, normally the base name of the tomogram file.",
-    )
-    voxel_size: Optional[float] = Field(
-        None, description="Sampling rate in angstroms / voxel."
     )
     ctf_corrected: Optional[bool] = Field(
         None,
