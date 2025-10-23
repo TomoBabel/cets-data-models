@@ -22,15 +22,6 @@ class ConfiguredBaseModel(BaseModel):
 
 
 # -----------------------------------------------------------------------------
-# Type Aliases (using Annotated for validation)
-# -----------------------------------------------------------------------------
-Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
-Vector3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
-Matrix2x2: TypeAlias = Annotated[list[Vector2D], Field(min_length=2, max_length=2)]
-Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=3)]
-
-
-# -----------------------------------------------------------------------------
 # LinkML meta wrapper
 # -----------------------------------------------------------------------------
 class LinkMLMeta(RootModel):
@@ -71,47 +62,12 @@ class TransformationType(str, Enum):
 
 
 # -----------------------------------------------------------------------------
-# Core image models
+# Type Aliases (using Annotated for validation)
 # -----------------------------------------------------------------------------
-class Image2D(ConfiguredBaseModel):
-    width: Optional[int] = Field(
-        None, description="The width of the image (x-axis) in pixels"
-    )
-    height: Optional[int] = Field(
-        None, description="The height of the image (y-axis) in pixels"
-    )
-    coordinate_systems: Optional[list["CoordinateSystem"]] = Field(
-        None, description="Named coordinate systems for this entity"
-    )
-    coordinate_transformations: Optional[list["Transformation"]] = Field(
-        None, description="Named coordinate systems for this entity"
-    )
-
-
-class Image3D(ConfiguredBaseModel):
-    width: Optional[int] = Field(
-        None, description="The width of the image (x-axis) in pixels"
-    )
-    height: Optional[int] = Field(
-        None, description="The height of the image (y-axis) in pixels"
-    )
-    depth: Optional[int] = Field(
-        None, description="The depth of the image (z-axis) in pixels"
-    )
-    coordinate_systems: Optional[list["CoordinateSystem"]] = Field(
-        None, description="Named coordinate systems for this entity"
-    )
-    coordinate_transformations: Optional[list["Transformation"]] = Field(
-        None, description="Named coordinate systems for this entity"
-    )
-
-
-class ImageStack2D(ConfiguredBaseModel):
-    images: Optional[list[Image2D]] = Field(None, description="The images in the stack")
-
-
-class ImageStack3D(ConfiguredBaseModel):
-    images: Optional[list[Image3D]] = Field(None, description="The images in the stack")
+Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
+Vector3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
+Matrix2x2: TypeAlias = Annotated[list[Vector2D], Field(min_length=2, max_length=2)]
+Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=3)]
 
 
 # -----------------------------------------------------------------------------
@@ -195,6 +151,50 @@ Transformation = Annotated[
 
 class ProjectionAlignment(Sequence):
     pass
+
+
+# -----------------------------------------------------------------------------
+# Core image models
+# -----------------------------------------------------------------------------
+class Image2D(ConfiguredBaseModel):
+    width: Optional[int] = Field(
+        None, description="The width of the image (x-axis) in pixels"
+    )
+    height: Optional[int] = Field(
+        None, description="The height of the image (y-axis) in pixels"
+    )
+    coordinate_systems: Optional[list[CoordinateSystem]] = Field(
+        None, description="Named coordinate systems for this entity"
+    )
+    coordinate_transformations: Optional[list[Transformation]] = Field(
+        None, description="Named coordinate systems for this entity"
+    )
+
+
+class Image3D(ConfiguredBaseModel):
+    width: Optional[int] = Field(
+        None, description="The width of the image (x-axis) in pixels"
+    )
+    height: Optional[int] = Field(
+        None, description="The height of the image (y-axis) in pixels"
+    )
+    depth: Optional[int] = Field(
+        None, description="The depth of the image (z-axis) in pixels"
+    )
+    coordinate_systems: Optional[list[CoordinateSystem]] = Field(
+        None, description="Named coordinate systems for this entity"
+    )
+    coordinate_transformations: Optional[list[Transformation]] = Field(
+        None, description="Named coordinate systems for this entity"
+    )
+
+
+class ImageStack2D(ConfiguredBaseModel):
+    images: Optional[list[Image2D]] = Field(None, description="The images in the stack")
+
+
+class ImageStack3D(ConfiguredBaseModel):
+    images: Optional[list[Image3D]] = Field(None, description="The images in the stack")
 
 
 # -----------------------------------------------------------------------------
@@ -490,8 +490,20 @@ AnyAnnotation = Annotated[
 # -----------------------------------------------------------------------------
 # Region, averaging, and dataset
 # -----------------------------------------------------------------------------
+class MovieStackCollection(ConfiguredBaseModel):
+    movie_stacks: Optional[list[MovieStackSeries]] = Field(
+        None, description="The movie stacks in the collection"
+    )
+    gain_file: Optional[GainFile] = Field(
+        None, description="The gain file for the movie stacks"
+    )
+    defect_file: Optional[DefectFile] = Field(
+        None, description="The defect file for the movie stacks"
+    )
+
+
 class Region(ConfiguredBaseModel):
-    movie_stack_collections: Optional[list["MovieStackCollection"]] = Field(
+    movie_stack_collections: Optional[list[MovieStackCollection]] = Field(
         None, description="The movie stack"
     )
     tilt_series: Optional[list[TiltSeries]] = Field(None, description="The tilt series")
@@ -511,18 +523,6 @@ class Average(ConfiguredBaseModel):
     )
     annotations: Optional[list[AnyAnnotation]] = Field(
         None, description="The annotations"
-    )
-
-
-class MovieStackCollection(ConfiguredBaseModel):
-    movie_stacks: Optional[list[MovieStackSeries]] = Field(
-        None, description="The movie stacks in the collection"
-    )
-    gain_file: Optional[GainFile] = Field(
-        None, description="The gain file for the movie stacks"
-    )
-    defect_file: Optional[DefectFile] = Field(
-        None, description="The defect file for the movie stacks"
     )
 
 
