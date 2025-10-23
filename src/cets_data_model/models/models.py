@@ -237,6 +237,12 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     ctf_metadata: Optional[CTFMetadata] = Field(
         None, description="A set of CTF parameters for an image."
     )
+    acquisition_order: Optional[int] = Field(
+        None, description="0-based acquisition order."
+    )
+    pixel_size: Optional[float] = Field(
+        None, description="Sampling rate in angstroms / pixel"
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -293,10 +299,6 @@ class TiltImage(_BaseProjectionImage):
     ts_id: Optional[str] = Field(
         None,
         description="Identifier of the tilt-series, normally the base name of the stack file.",
-    )
-    acq_order: Optional[int] = Field(None, description="0-based acquisition order.")
-    pixel_size: Optional[float] = Field(
-        None, description="Sampling rate in angstroms / pixel"
     )
 
 
