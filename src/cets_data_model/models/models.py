@@ -61,6 +61,20 @@ class TransformationType(str, Enum):
     sequence = "sequence"
 
 
+class AxisUnit(str, Enum):
+    pixel = "pixel/voxel"
+    angstrom = "angstrom"
+
+
+class SpaceAxis(str, Enum):
+    X = "X"
+    Y = "Y"
+    Z = "Z"
+    XY = "XY"
+    XYZ = "XYZ"
+    # The rest of combinations?
+
+
 # -----------------------------------------------------------------------------
 # Type Aliases (using Annotated for validation)
 # -----------------------------------------------------------------------------
@@ -75,8 +89,8 @@ Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=
 # -----------------------------------------------------------------------------
 class Axis(ConfiguredBaseModel):
     name: str
-    axis_unit: Optional[str] = None
-    axis_type: Optional[str] = None
+    axis_unit: Optional[AxisUnit] = None
+    axis_type: Optional[AxisType] = None
 
 
 class CoordinateSystem(ConfiguredBaseModel):
@@ -119,9 +133,7 @@ class Translation(CoordinateTransformation):
     type: Literal["translation"] = Field(
         "translation", description="The type of transformation"
     )
-    translation: Optional[list[float]] = Field(
-        None, description="The translation vector"
-    )
+    translation: Optional[Vector3D] = Field(None, description="The translation vector")
 
 
 class Scale(CoordinateTransformation):
