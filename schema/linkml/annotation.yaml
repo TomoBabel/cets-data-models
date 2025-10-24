@@ -146,39 +146,42 @@ classes:
       - coordinate_systems
       - coordinate_transformations
 
+  AssociatedFileMixin:
+    description: File associated with this annotation
+    slots:
+      - path
+
   Annotation:
     description: A primitive annotation.
     slots:
       - name
 
-  FileAnnotation:
-    description: A primitive annotation for an annotation that refers to a file.
-    slots:
-      - name
-      - path
-
   SegmentationMask2D:
-    is_a: FileAnnotation
+    is_a: Annotation
     mixins:
       - Image2D
+      - AssociatedFile
     description: An annotation image with categorical labels.
 
   SegmentationMask3D:
-    is_a: FileAnnotation
+    is_a: Annotation
     mixins:
       - Image3D
+      - AssociatedFile
     description: An annotation volume with categorical labels.
 
   ProbabilityMap2D:
-    is_a: FileAnnotation
+    is_a: Annotation
     mixins:
       - Image2D
+      - AssociatedFile
     description: An annotation image with real-valued labels.
 
   ProbabilityMap3D:
-    is_a: FileAnnotation
+    is_a: Annotation
     mixins:
       - Image3D
+      - AssociatedFile
     description: An annotation volume with real-valued labels.
 
   PointSet2D:
@@ -303,9 +306,10 @@ classes:
           - origin3D
 
       DensityMap:
-        is_a: FileAnnotation
+        is_a: Annotation
         mixins:
           - Image3D
+          - AssociatedFile
         description: A density map fit into a volume
         slots:
           - matrix3D
