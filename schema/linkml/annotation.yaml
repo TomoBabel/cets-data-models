@@ -146,7 +146,7 @@ classes:
       - coordinate_systems
       - coordinate_transformations
 
-  AssociatedFileMixin:
+  AssociatedFile:
     description: File associated with this annotation
     slots:
       - path
