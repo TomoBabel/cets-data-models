@@ -187,7 +187,7 @@ def get_mrc_info(in_mrc: Union[str, os.PathLike]) -> ImageInfo:
         "12": "16-bit float (IEEE754)",
     }
 
-    with mrcfile.mmap(in_mrc) as mrc:
+    with mrcfile.open(in_mrc, header_only=True) as mrc:
         if not mrc.validate():
             warn(f"Validation errors were encountered reading {in_mrc}")
         head = mrc.header
