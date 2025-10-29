@@ -237,6 +237,9 @@ class CTFMetadata(ConfiguredBaseModel):
         -1,
         description="It is the handedness of the tilt geometry and it is used to describe whether the focus increases or decreases as a function of Z distance.",
     )
+    acquisition_order: Optional[int] = Field(
+        None, description="0-based acquisition order."
+    )
 
 
 class AcquisitionMetadataMixin(ConfiguredBaseModel):
