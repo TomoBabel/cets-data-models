@@ -16,7 +16,7 @@ version = "0.1"
 description = "Universal data standard for cryoET"
 license = {file = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <4.0"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
@@ -43,7 +43,9 @@ optional-dependencies.dev = [
     "pytest",
     "types-setuptools",
     "ruff==0.11.12", # this version should match the one in .pre-commit-config.yaml
-    "linkml>=1.7.0", 
+    # "linkml @ file:////Users/rookyard/projects/linkml"
+    # "linkml @ git+https://github.com/linkml/linkml.git"
+    "linkml==1.9.4", 
 ]
 
 optional-dependencies.docs = [

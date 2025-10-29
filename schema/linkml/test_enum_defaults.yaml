@@ -1,0 +1,35 @@
+name: test_enum_defaults
+id: https://example.org/test
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  test: https://example.org/test/
+
+default_prefix: test
+
+imports:
+  - linkml:types
+
+slots:
+  status:
+    description: The status value
+    range: StatusEnum
+
+enums:
+  StatusEnum:
+    permissible_values:
+      active:
+        description: Active status
+      inactive:
+        description: Inactive status
+
+classes:
+  BaseClass:
+    slots:
+      - status
+      
+  ActiveItem:
+    is_a: BaseClass
+    slot_usage:
+      status:
+        ifabsent: StatusEnum(active)

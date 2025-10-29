@@ -12,10 +12,29 @@ imports:
 - linkml:types
 - ./coordinate_systems
 
+
+enums:
+  TransformationType:
+    permissible_values:
+      identity:
+        description: The identity transformation.
+      map_axis:
+        description: Axis permutation transformation
+      translation:
+        description: A translation transformation.
+      scale:
+        description: A scaling transformation.
+      affine:
+        description: An affine transformation
+      sequence:
+        description: A sequence of transformations
+
+
 slots:
   type:
     description: The type of transformation.
     range: TransformationType
+
 
 classes:
   CoordinateTransformation:
@@ -38,7 +57,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(identity)
+        ifabsent: TransformationType(identity)
 
   AxisNameMapping:
     description: Axis name to Axis name mapping
@@ -55,7 +74,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(map_axis)
+        ifabsent: TransformationType(map_axis)
     attributes:
       map_axis:
         description: The permutation of the axes
@@ -68,7 +87,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(translation)
+        ifabsent: TransformationType(translation)
     attributes:
       translation:
         description: The translation vector
@@ -80,7 +99,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(scale)
+        ifabsent: TransformationType(scale)
     attributes:
       scale:
         description: The scaling vector
@@ -92,7 +111,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(affine)
+        ifabsent: TransformationType(affine)
     attributes:
       affine:
         description: The affine matrix
@@ -110,25 +129,9 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       type:
-        ifabsent: string(sequence)
+        ifabsent: TransformationType(sequence)
     attributes:
       sequence:
         description: The sequence of transformations
         range: CoordinateTransformation
         multivalued: true
-
-enums:
-  TransformationType:
-    permissible_values:
-      identity:
-        description: The identity transformation.
-      map_axis:
-        description: Axis permutation transformation
-      translation:
-        description: A translation transformation.
-      scale:
-        description: A scaling transformation.
-      affine:
-        description: An affine transformation
-      sequence:
-        description: A sequence of transformations
