@@ -57,7 +57,7 @@ def logical_coords(name: str) -> CoordinateSystem:
 
 
 # Align calibration image to movie
-def generate_aligned_calibration_image(
+def aligned_calibration_image_sequence(
     flip_matrix: Optional[List[List[int]]] = None,
     translation: Optional[List[float]] = None,
 ) -> Tuple[Sequence, List[CoordinateSystem]]:
@@ -67,10 +67,10 @@ def generate_aligned_calibration_image(
     a movie frame
 
     Args:
-        flip_matrix (Optional[List[List[int]]]): The matrix applied flips
+        flip_matrix (Optional[List[List[int]]]): The matrix for any applied flips
         translation (Optional[List[float]]): Translation vector
     Returns:
-        Tuple[Sequence, List[CoordinateSystem]]: The sequence if transformations and
+        Tuple[Sequence, List[CoordinateSystem]]: The sequence of transformations and
             CoordinateSystems for those transformations
     """
 
