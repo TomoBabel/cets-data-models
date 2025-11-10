@@ -105,6 +105,24 @@ classes:
             - alias: exact_card
               exact_cardinality: 3
 
+  Flip2D:
+    description: An 2D flip transformation
+    is_a: CoordinateTransformation
+    slot_usage:
+      type:
+        ifabsent: string(affine)
+    attributes:
+      affine:
+        description: The flip matrix
+        range: int
+        array:
+          exact_number_dimensions: 2
+          dimensions:
+            - alias: exact_card
+              exact_cardinality: 2
+            - alias: exact_card
+              exact_cardinality: 2
+
   Sequence:
     description: A sequence of transformations
     is_a: CoordinateTransformation
