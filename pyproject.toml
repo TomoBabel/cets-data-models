@@ -16,7 +16,7 @@ version = "0.1"
 description = "Universal data standard for cryoET"
 license = {file = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <4.0"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
@@ -60,6 +60,8 @@ Repository = "https://github.com/TomoBabel/cets-data-models"
 files = ["src"]
 python_version = "3.11"
 warn_unused_configs = true
+explicit_package_bases = true
+mypy_path = "src"
 
 [[tool.mypy.overrides]]
 module = ["gemmi", "mrcfile", "tiffile", "networkx", "matplotlib.pyplot"]
