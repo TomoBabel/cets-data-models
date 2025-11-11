@@ -16,10 +16,19 @@ imports:
 - ./image_entities
 - ./annotation
 
+
+slots:
+  name:
+    description: The name of the model object.
+    range: string
+
+
 classes:
   Region:
     description: Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of
       a specimen.
+    slots:
+      - name
     attributes:
       movie_stack_collections:
         description: The movie stack
@@ -44,10 +53,9 @@ classes:
 
   Average:
     description: A particle averaging experiment.
+    slots:
+      - name
     attributes:
-      name:
-        description: The name of the averaging experiment.
-        range: string
       particle_maps:
         description: The particle maps
         range: ParticleMap
@@ -73,10 +81,9 @@ classes:
 
   Dataset:
     description: A dataset
+    slots:
+      - name
     attributes:
-      name:
-        description: The name of the dataset
-        range: string
       regions:
         description: The regions in the dataset
         range: Region
