@@ -100,7 +100,7 @@ def aligned_calibration_image_sequence(
     return (
         Sequence(
             name="Align calibration image to movie",
-            input="base_logical_coords",
+            input="base_logical_coordinates",
             output="calibration_image_aligned",
             sequence=[
                 generate_flip_transformation(flip_matrix),
