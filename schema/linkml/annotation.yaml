@@ -109,7 +109,7 @@ slots:
         dimensions:
           - alias: N
             minimum_cardinality: 1
-          - alias: radius
+          - alias: radii
             minimum_cardinality: 1
   - dimensions2D:
       description: Dimensions of 2D objects (x, y).
@@ -133,12 +133,8 @@ slots:
             minimum_cardinality: 3
   - name:
       description: Name of the annotation
-      range: str
-      array:
-        exact_number_dimensions: 1
-        dimensions:
-          - alias: name
-            minimum_cardinality: 1
+      range: string
+
 classes:
   CoordMetaMixin:
     description: Coordinate system mixins for annotations.
@@ -249,7 +245,7 @@ classes:
     description: A set of spheres
     slots:
       - origin3D
-      - radius
+      - radii
 
   CircleSet:
     is_a: Annotation
@@ -258,7 +254,7 @@ classes:
     description: A set of circles
     slots:
       - origin2D
-      - radius
+      - radii
 
   CylinderSet:
     is_a: Annotation
@@ -289,27 +285,27 @@ classes:
       - matrix2D
       - dimensions2D
 
-    Spline2D:
+  Spline2D:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A 2D spline.
+    slots:
+      - origin2D
+
+    Spline3D:
       is_a: Annotation
       mixins:
         - CoordMetaMixin
-      description: A 2D spline.
+      description: A 3D spline.
       slots:
-        - origin2D
+        - origin3D
 
-      Spline3D:
-        is_a: Annotation
-        mixins:
-          - CoordMetaMixin
-        description: A 3D spline.
-        slots:
-          - origin3D
-
-      DensityMap:
-        is_a: Annotation
-        mixins:
-          - Image3D
-          - AssociatedFile
-        description: A density map fit into a volume
-        slots:
-          - matrix3D
+    DensityMap:
+      is_a: Annotation
+      mixins:
+        - Image3D
+        - AssociatedFile
+      description: A density map fit into a volume
+      slots:
+        - matrix3D
