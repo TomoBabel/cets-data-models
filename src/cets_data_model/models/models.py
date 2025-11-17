@@ -309,6 +309,32 @@ class Affine(CoordinateTransformation):
     )
 
 
+class Rotation2D(CoordinateTransformation):
+    """
+    A 2D rotation transformation
+    """
+
+    rotation2d: Optional[
+        conlist(
+            min_length=2,
+            max_length=2,
+            item_type=conlist(min_length=2, max_length=2, item_type=float),
+        )
+    ] = Field(default=None, description="""The rotation matrix""")
+    type: Optional[TransformationType] = Field(
+        default="affine", description="""The type of transformation."""
+    )
+    name: Optional[str] = Field(
+        default=None, description="""The name of the coordinate transformation"""
+    )
+    input: Optional[str] = Field(
+        default=None, description="""The source coordinate system name"""
+    )
+    output: Optional[str] = Field(
+        default=None, description="""The target coordinate system name"""
+    )
+
+
 class Flip2D(CoordinateTransformation):
     """
     A 2D flip transformation
@@ -322,7 +348,7 @@ class Flip2D(CoordinateTransformation):
         )
     ] = Field(default=None, description="""The flip matrix""")
     type: Optional[TransformationType] = Field(
-        default="flip2d", description="""The type of transformation."""
+        default="affine", description="""The type of transformation."""
     )
     name: Optional[str] = Field(
         default=None, description="""The name of the coordinate transformation"""
