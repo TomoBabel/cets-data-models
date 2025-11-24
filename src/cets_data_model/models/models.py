@@ -357,29 +357,6 @@ class TiltSeries(ConfiguredBaseModel):
 
 
 # -----------------------------------------------------------------------------
-# 3D volumes and maps
-# -----------------------------------------------------------------------------
-class Tomogram(Image3D):
-    path: Optional[str] = Field(None, description="Path to a file.")
-    tomo_id: Optional[str] = Field(
-        None,
-        description="Identifier of the tomogram, normally the base name of the tomogram file.",
-    )
-    ctf_corrected: Optional[bool] = Field(
-        None,
-        description="Flag to indicate if the tomogram was reconstructed from a tilt-series with the ctf corrected.",
-    )
-    even_path: Optional[str] = Field(
-        None, description="Path of the even tomogram file."
-    )
-    odd_path: Optional[str] = Field(None, description="Path of the odd tomogram file.")
-
-
-class ParticleMap(Image3D):
-    path: Optional[str] = Field(None, description="Path to a file.")
-
-
-# -----------------------------------------------------------------------------
 # Annotations and coordinate metadata mixin
 # -----------------------------------------------------------------------------
 class CoordMetaMixin(ConfiguredBaseModel):
@@ -435,28 +412,6 @@ class PointSet3D(_BaseAnnotation, CoordMetaMixin):
     )
 
 
-class PointVectorSet2D(_BaseAnnotation, CoordMetaMixin):
-    type: Literal["point_vector_set_2d"] = Field("point_vector_set_2d")
-    origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
-        None, description="Location on a 2D image (Nx2)."
-    )
-    vector2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
-        None,
-        description="Orientation vector associated with a point on a 2D image (Nx2).",
-    )
-
-
-class PointVectorSet3D(_BaseAnnotation, CoordMetaMixin):
-    type: Literal["point_vector_set_3d"] = Field("point_vector_set_3d")
-    origin3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
-        None, description="Location on a 3D image (Nx3)."
-    )
-    vector3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
-        None,
-        description="Orientation vector associated with a point on a 3D image (Nx3).",
-    )
-
-
 class PointMatrixSet2D(_BaseAnnotation, CoordMetaMixin):
     type: Literal["point_matrix_set_2d"] = Field("point_matrix_set_2d")
     origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
@@ -491,8 +446,6 @@ AnyAnnotation = Annotated[
         ProbabilityMap3D,
         PointSet2D,
         PointSet3D,
-        PointVectorSet2D,
-        PointVectorSet3D,
         PointMatrixSet2D,
         PointMatrixSet3D,
         TriMesh,
@@ -500,6 +453,40 @@ AnyAnnotation = Annotated[
     ],
     Field(discriminator="type"),
 ]
+
+
+# -----------------------------------------------------------------------------
+# 3D volumes and maps
+# -----------------------------------------------------------------------------
+class ParticleMap(Image3D):
+    path: Optional[str] = Field(None, description="Path to a file.")
+
+
+class CoordinateSet3D(PointSet3D):
+    subtomograms: Optional[list[ParticleMap]] = Field(
+        None,
+        description="List of subtomograms cropped from the tomogram "
+        "associated to a set of coordinates 3D.",
+    )
+
+
+class Tomogram(Image3D):
+    path: Optional[str] = Field(None, description="Path to a file.")
+    tomo_id: Optional[str] = Field(
+        None,
+        description="Identifier of the tomogram, normally the base name of the tomogram file.",
+    )
+    ctf_corrected: Optional[bool] = Field(
+        None,
+        description="Flag to indicate if the tomogram was reconstructed from a tilt-series with the ctf corrected.",
+    )
+    even_path: Optional[str] = Field(
+        None, description="Path of the even tomogram file."
+    )
+    odd_path: Optional[str] = Field(None, description="Path of the odd tomogram file.")
+    coordinates: Optional[CoordinateSet3D] = Field(
+        None, description="Coordinates picked on the tomogram."
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -593,8 +580,6 @@ ProbabilityMap2D.model_rebuild()
 ProbabilityMap3D.model_rebuild()
 PointSet2D.model_rebuild()
 PointSet3D.model_rebuild()
-PointVectorSet2D.model_rebuild()
-PointVectorSet3D.model_rebuild()
 PointMatrixSet2D.model_rebuild()
 PointMatrixSet3D.model_rebuild()
 TriMesh.model_rebuild()
@@ -602,3 +587,4 @@ Region.model_rebuild()
 Average.model_rebuild()
 MovieStackCollection.model_rebuild()
 Dataset.model_rebuild()
+CoordinateSet3D.model_rebuild()
