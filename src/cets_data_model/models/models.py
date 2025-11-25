@@ -407,9 +407,9 @@ class PointSet2D(_BaseAnnotation, CoordMetaMixin):
 
 class PointSet3D(CoordMetaMixin):
     type: Literal["point_set_3d"] = Field("point_set_3d")
-    origin3D: Optional[Annotated[Matrix3x3, Field(min_length=1, max_length=1)]] = Field(
-        None, description="Location on a 3D image (Nx3)."
-    )
+    # origin3D: Optional[Annotated[Vector3D, Field(min_length=1, max_length=1)]] = Field(
+    #     None, description="Reference point for the 3D coordinates (N×3)."
+    # )
 
 
 class PointMatrixSet2D(_BaseAnnotation, CoordMetaMixin):
@@ -462,8 +462,12 @@ class ParticleMap(Image3D):
     path: Optional[str] = Field(None, description="Path to a file.")
 
 
-class CoordinateSet3D(PointSet3D):
-    coordinates: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
+class Coordinate3D(Vector3D, CoordMetaMixin):
+    pass
+
+
+class CoordinateSet3D(ConfiguredBaseModel):
+    coordinates: Optional[Annotated[list[Coordinate3D], Field(min_length=1)]] = Field(
         None, description="List of coordinates picked."
     )
     subtomograms: Optional[list[ParticleMap]] = Field(
