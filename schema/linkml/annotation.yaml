@@ -263,7 +263,7 @@ classes:
     description: A set of cylinders
     slots:
       - vector3D
-      - radius
+      - radii
 
   CuboidSet:
     is_a: Annotation
