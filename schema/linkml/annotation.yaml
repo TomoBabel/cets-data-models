@@ -293,19 +293,19 @@ classes:
     slots:
       - origin2D
 
-    Spline3D:
-      is_a: Annotation
-      mixins:
-        - CoordMetaMixin
-      description: A 3D spline.
-      slots:
-        - origin3D
+  Spline3D:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A 3D spline.
+    slots:
+      - origin3D
 
-    DensityMap:
-      is_a: Annotation
-      mixins:
-        - Image3D
-        - AssociatedFile
-      description: A density map fit into a volume
-      slots:
-        - matrix3D
+  DensityMap:
+    is_a: Annotation
+    mixins:
+      - Image3D
+      - AssociatedFile
+    description: A density map fit into a volume
+    slots:
+      - matrix3D
