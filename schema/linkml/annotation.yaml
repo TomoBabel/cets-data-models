@@ -101,6 +101,39 @@ slots:
             exact_cardinality: 3
           - alias: xyz
             exact_cardinality: 3
+  - radii:
+      description: Radii of circles, spheres, or cylinders (N).
+      range: float
+      array:
+        exact_number_dimensions: 2
+        dimensions:
+          - alias: N
+            minimum_cardinality: 1
+          - alias: radii
+            minimum_cardinality: 1
+  - dimensions2D:
+      description: Dimensions of 2D objects (x, y).
+      range: float
+      array:
+        exact_number_dimensions: 2
+        dimensions:
+          - alias: N
+            minimum_cardinality: 1
+          - alias: xy
+            minimum_cardinality: 2
+  - dimensions3D:
+      description: Dimensions of 3D objects (x, y, z).
+      range: float
+      array:
+        exact_number_dimensions: 2
+        dimensions:
+          - alias: N
+            minimum_cardinality: 1
+          - alias: xyz
+            minimum_cardinality: 3
+  - name:
+      description: Name of the annotation
+      range: string
 
 classes:
   CoordMetaMixin:
@@ -109,33 +142,42 @@ classes:
       - coordinate_systems
       - coordinate_transformations
 
+  AssociatedFile:
+    description: File associated with this annotation
+    slots:
+      - path
+
   Annotation:
     description: A primitive annotation.
     slots:
-      - path
+      - name
 
   SegmentationMask2D:
     is_a: Annotation
     mixins:
       - Image2D
+      - AssociatedFile
     description: An annotation image with categorical labels.
 
   SegmentationMask3D:
     is_a: Annotation
     mixins:
       - Image3D
+      - AssociatedFile
     description: An annotation volume with categorical labels.
 
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
       - Image2D
+      - AssociatedFile
     description: An annotation image with real-valued labels.
 
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
       - Image3D
+      - AssociatedFile
     description: An annotation volume with real-valued labels.
 
   PointSet2D:
@@ -196,4 +238,74 @@ classes:
       - CoordMetaMixin
     description: A mesh annotation.
 
+  SphereSet:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A set of spheres
+    slots:
+      - origin3D
+      - radii
 
+  CircleSet:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A set of circles
+    slots:
+      - origin2D
+      - radii
+
+  CylinderSet:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A set of cylinders
+    slots:
+      - vector3D
+      - radii
+
+  CuboidSet:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A set of oriented 3D boxes.
+    slots:
+      - origin3D
+      - matrix3D
+      - dimensions3D
+
+  BoxSet:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A set of 2D boxes.
+    slots:
+      - origin2D
+      - matrix2D
+      - dimensions2D
+
+  Spline2D:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A 2D spline.
+    slots:
+      - origin2D
+
+  Spline3D:
+    is_a: Annotation
+    mixins:
+      - CoordMetaMixin
+    description: A 3D spline.
+    slots:
+      - origin3D
+
+  DensityMap:
+    is_a: Annotation
+    mixins:
+      - Image3D
+      - AssociatedFile
+    description: A density map fit into a volume
+    slots:
+      - matrix3D
