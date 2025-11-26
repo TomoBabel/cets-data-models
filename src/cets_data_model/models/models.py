@@ -72,6 +72,7 @@ class SpaceAxis(str, Enum):
     Z = "Z"
     XY = "XY"
     XYZ = "XYZ"
+    ZYZ = "ZYZ"
     # The rest of combinations?
 
 
@@ -462,15 +463,14 @@ class ParticleMap(Image3D):
     path: Optional[str] = Field(None, description="Path to a file.")
 
 
-class Coordinate3D(Vector3D, CoordMetaMixin):
-    pass
-
-
-class CoordinateSet3D(ConfiguredBaseModel):
-    coordinates: Optional[Annotated[list[Coordinate3D], Field(min_length=1)]] = Field(
-        None, description="List of coordinates picked."
+class Particle3D(ParticleMap):
+    position: Optional[Annotated[Vector3D, Field(min_length=3, max_length=3)]] = Field(
+        None, description="(X, Y, Z) position of a coordinate 3D."
     )
-    subtomograms: Optional[list[ParticleMap]] = Field(
+
+
+class Particle3DSet(CoordMetaMixin):
+    particles: Optional[list[Particle3D]] = Field(
         None,
         description="List of subtomograms cropped from the tomogram "
         "associated to a set of coordinates 3D.",
@@ -491,8 +491,8 @@ class Tomogram(Image3D):
         None, description="Path of the even tomogram file."
     )
     odd_path: Optional[str] = Field(None, description="Path of the odd tomogram file.")
-    coordinates: Optional[CoordinateSet3D] = Field(
-        None, description="Coordinates picked on the tomogram."
+    particle_set: Optional[Particle3DSet] = Field(
+        None, description="Particles extracted from the tomogram."
     )
 
 
@@ -594,4 +594,5 @@ Region.model_rebuild()
 Average.model_rebuild()
 MovieStackCollection.model_rebuild()
 Dataset.model_rebuild()
-CoordinateSet3D.model_rebuild()
+Particle3DSet.model_rebuild()
+Particle3D.model_rebuild()
