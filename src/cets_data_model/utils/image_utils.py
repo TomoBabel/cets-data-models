@@ -1,6 +1,10 @@
+import struct
+
 import mrcfile
 import os
 from dataclasses import dataclass
+
+import numpy as np
 from PIL import UnidentifiedImageError, Image
 from typing import Optional, Tuple, Union
 from warnings import warn
@@ -205,8 +209,65 @@ def get_mrc_info(in_mrc: Union[str, os.PathLike]) -> ImageInfo:
         )
 
 
-def get_image_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
-    """Get info about a mrc or tiff image
+def get_em_file_info(in_em_file: Union[str, os.PathLike]) -> ImageInfo:
+    """
+    Get statistics on a .em from the classic TOM toolbox (e.g. used by Dynamo)
+
+    Args:
+        in_em_file (Union[str, os.PathLike]): The name of the file
+
+    Returns:
+        ImageInfo: The requested info
+    """
+    with open(in_em_file, "rb") as f:
+        # Read the header (512 bytes)
+        header_binary = f.read(512)
+
+        # Byte 3: Data type
+        data_type_code = header_binary[3]
+
+        # Bytes 4-16: Dimensions X, Y, Z (integers of 4 bytes)
+        nx, ny, nz = struct.unpack("<3i", header_binary[4:16])
+
+        # Bytes 40, 44, and 48: physical dimensions (integers of 4 bytes)
+        phys_x, phys_y, phys_z = struct.unpack("<3i", header_binary[40:52])
+
+        # Sampling rate calculation:
+        if phys_x > 0 and nx > 0:
+            apix_x = phys_x / nx
+            apix_y = phys_y / ny
+            apix_z = phys_z / nz
+        else:
+            # Not stored in the header
+            apix_x, apix_y, apix_z = (None, None, None)
+
+        # Get the dtype
+        dtype = np.float32
+        if data_type_code == 1:
+            dtype = np.int8
+        elif data_type_code == 2:
+            dtype = np.int16
+        elif data_type_code == 4:
+            dtype = np.int32
+        elif data_type_code == 5:
+            dtype = np.float32
+        elif data_type_code == 8:
+            dtype = np.complex64
+
+        return ImageInfo(
+            size_x=nx,
+            size_y=ny,
+            size_z=nz,
+            mode=str(data_type_code),
+            mode_desc=str(dtype),
+            apix_x=apix_x,
+            apix_y=apix_y,
+            apix_z=apix_z,
+        )
+
+
+def get_em_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
+    """Get info about a mrc, em or tiff image
 
     Args:
         img_name (Union[str, os.PathLike]): Path to the image file
@@ -217,6 +278,8 @@ def get_image_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
     Raises:
         ValueError: If the image is not a valid mrc or tiff
     """
+    if not os.path.exists(img_name):
+        raise FileNotFoundError(f"File {img_name} does not exist.")
     if check_file_is_mrc(img_name):
         return get_mrc_info(img_name)
     elif check_file_is_tif(img_name):

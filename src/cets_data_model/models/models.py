@@ -73,6 +73,7 @@ class SpaceAxis(str, Enum):
     XY = "XY"
     XYZ = "XYZ"
     ZYZ = "ZYZ"
+    ZXZ = "ZXZ"
     # The rest of combinations?
 
 
