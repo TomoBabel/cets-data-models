@@ -29,4 +29,11 @@ ALIGN_MAP_COORDS = "aligned_map"
 ALIGN_ANNOTATION_TRANSFORMATION = "align_annotation_to_tomogram"
 ALIGN_ANNOTATION_COORDS = "aligned_annotation"
 
+# set pixel size of image
+IMAGE_PIXEL_SIZE_TRANSFORMATION = "image_pixel_size"
+IMAGE_PIXEL_SIZE_COORDS = "image_pixel_size"
+
+# set super res pixel size of image
+IMAGE_SUPER_RES_PIXEL_SIZE_TRANSFORMATION = "image_pixel_size"
+IMAGE_SUPER_RES_PIXEL_SIZE_COORDS = "image_pixel_size"
 
