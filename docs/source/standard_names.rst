@@ -72,17 +72,6 @@ Transformation Helper Functions
 -------------------------------
 
 Some helper functions are provided in ``cets_data_models.standard_transformations``
-to make it easy to generate the transformations and their associated coordinate systems
+to make it easy to generate the scale transformations and their associated coordinate systems
 wth the correct naming conventions.
-
-Each helper function returns a tuple with objects for the transformation and final
-coordinate system. Pixel size helper functions require only the pixel size as input.
-For other transformations a ``CoordinateTransform`` object is required. If multiple
-transformations were done the ``CoordinateTransformation`` input must be a ``Sequence``
-subclass of the object.
-
-Note the helper functions only return the final `CoordinateSystem` object if a
-``Sequence`` of multiple transformations was used the intermediate ``CoordinateSystem``
-objects must still be added to `coordinate_systems` entry in the CETS record manually.
-
 
