@@ -7,8 +7,8 @@ names for some transformations and coordinate systems have been established.
 Coorindate Systems
 ------------------
 
-The starting coordinate systems are named "base_logical_coordinates_2D" and
-base_logical_coordinates_3D. Global variables ``BASE_LOGICAL_COORDS_2D`` and
+The starting coordinate systems are named "base_logical_coordinates_2d" and
+base_logical_coordinates_3d. Global variables ``BASE_LOGICAL_COORDS_2D`` and
 ``BASE_LOGICAL_COORDS_3D`` contain these names. A helper function
 ``cets_data_model.standard_coordinate_systems.logical_coordinates()`` exists to
 generate ``CoordinateSystem`` objects. If called without a name the base logical
