@@ -6,6 +6,7 @@ from cets_data_model.models.models import (
 )
 from cets_data_model.standard_names import (
     BASE_LOGICAL_COORDS_2D,
+    BASE_LOGICAL_COORDS_3D,
     IMAGE_PIXEL_SIZE_COORDS,
     IMAGE_PIXEL_SIZE_XFROM,
     IMAGE_SUPER_RES_PIXEL_SIZE_XFROM,
@@ -20,8 +21,11 @@ from cets_data_model.standard_names import (
     ALIGN_SUBTOMOGRAM_COORDS,
     ALIGN_ANNOTATION_XFROM,
     ALIGN_ANNOTATION_COORDS,
+    ALIGN_PROJECTION_IMAGE_XFROM,
+    ALIGN_PROJECTION_IMAGE_COORDS,
 )
-from cets_data_model.standard_coordinate_systems import logical_coords
+from cets_data_model.standard_coordinate_systems import logical_coords, physical_coords
+
 
 # helper functions for generating transformations and their associated coordinate
 # systems with the correct naming conventions. Each one returns the transformation
@@ -40,7 +44,7 @@ def image_pixel_size(apix: float) -> Tuple[Scale, CoordinateSystem]:
             output=IMAGE_PIXEL_SIZE_COORDS,
             scale=[apix, apix],
         ),
-        logical_coords(dim=2),
+        physical_coords(name=IMAGE_PIXEL_SIZE_COORDS, dim=2),
     )
 
 
@@ -55,7 +59,7 @@ def image_super_res_pixel_size(apix: float) -> Tuple[Scale, CoordinateSystem]:
             output=IMAGE_SUPER_RES_PIXEL_SIZE_COORDS,
             scale=[apix, apix],
         ),
-        logical_coords(dim=2),
+        physical_coords(name=IMAGE_SUPER_RES_PIXEL_SIZE_COORDS, dim=2),
     )
 
 
@@ -81,6 +85,16 @@ def align_movie_frame_to_projection(
     transformation.input = BASE_LOGICAL_COORDS_2D
     transformation.output = ALIGN_MOVIE_FRAME_COORDS
     coords = logical_coords(ALIGN_MOVIE_FRAME_COORDS)
+    return transformation, coords
+
+
+def align_projection_image_to_tomogram(
+    transformation: CoordinateTransformation,
+) -> Tuple[CoordinateTransformation, CoordinateSystem]:
+    transformation.name = ALIGN_PROJECTION_IMAGE_XFROM
+    transformation.input = BASE_LOGICAL_COORDS_3D
+    transformation.output = ALIGN_PROJECTION_IMAGE_COORDS
+    coords = logical_coords(ALIGN_PROJECTION_IMAGE_COORDS)
     return transformation, coords
 
 
