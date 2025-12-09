@@ -4,15 +4,22 @@ Standard Transformation and Coordinate System Names
 In order to maintain interoperability between different software packages standardised
 names for some transformations and coordinate systems have been established.
 
-Coorindate Systems
+Coordinate Systems
 ------------------
 
 The starting coordinate systems are named "base_logical_coordinates_2d" and
 base_logical_coordinates_3d. Global variables ``BASE_LOGICAL_COORDS_2D`` and
-``BASE_LOGICAL_COORDS_3D`` contain these names. A helper function
-``cets_data_model.standard_coordinate_systems.logical_coordinates()`` exists to
-generate ``CoordinateSystem`` objects. If called without a name the base logical
-coordinates system is returned by default.
+``BASE_LOGICAL_COORDS_3D`` contain these names. Two helper functions are provided in
+``cets_data_model.standard_coordinate_systems`` to generate ``CoordinateSystem`` objects.
+
+.. code-block:: python
+
+    logical_coordinates(dim: int, name: Optional[str]=None)
+    physical_coordinates(dim: int, name: str)
+
+Each returns the coordinate system with the dimension specified in ``dim`` and correct
+name.  If ``logical_coordinates()`` is called without ``name`` it returns the base
+coordinates system name for the appropriate dimension.
 
 Transformations
 ---------------
@@ -25,7 +32,7 @@ the CETS data model objects recorded must conform to two rules:
  - The output coordinate system of the transformation (or final transformation in a
    sequence) must have the standard coordinate system name for that task.
 
-Global variables are to keep everything standarised.
+Global variables defined are to keep everything standarised.
 
 Standard tasks
 --------------
