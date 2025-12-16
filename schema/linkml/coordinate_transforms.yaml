@@ -11,9 +11,10 @@ default_prefix: coord_transforms
 imports:
 - linkml:types
 - ./coordinate_systems
+- ./common
 
 slots:
-  type:
+  transformation_type:
     description: The type of transformation.
     range: TransformationType
 
@@ -21,11 +22,9 @@ classes:
   CoordinateTransformation:
     description: A coordinate transformation
     slots:
-      - type
+      - transformation_type
+      - name
     attributes:
-      name:
-        description: The name of the coordinate transformation
-        range: string
       input:
         description: The source coordinate system name
         range: string
@@ -37,7 +36,7 @@ classes:
     description: The identity transformation
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(identity)
 
   AxisNameMapping:
@@ -54,7 +53,7 @@ classes:
     description: Axis permutation transformation
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(map_axis)
     attributes:
       map_axis:
@@ -67,7 +66,7 @@ classes:
     description: A translation transformation
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(translation)
     attributes:
       translation:
@@ -79,7 +78,7 @@ classes:
     description: A scaling transformation
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(scale)
     attributes:
       scale:
@@ -91,7 +90,7 @@ classes:
     description: An affine transformation
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(affine)
     attributes:
       affine:
@@ -109,7 +108,7 @@ classes:
     description: A sequence of transformations
     is_a: CoordinateTransformation
     slot_usage:
-      type:
+      transformation_type:
         ifabsent: string(sequence)
     attributes:
       sequence:

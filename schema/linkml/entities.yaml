@@ -15,16 +15,18 @@ imports:
 - linkml:types
 - ./image_entities
 - ./annotation
+- ./common
 
 classes:
   Region:
     description: Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of
       a specimen.
+    slots:
+      - id
     attributes:
-      movie_stack_collections:
+      movie_stack_collection:
         description: The movie stack
         range: MovieStackCollection
-        multivalued: true
       tilt_series:
         description: The tilt series
         range: TiltSeries
@@ -44,10 +46,9 @@ classes:
 
   Average:
     description: A particle averaging experiment.
+    slots:
+      - name
     attributes:
-      name:
-        description: The name of the averaging experiment.
-        range: string
       particle_maps:
         description: The particle maps
         range: ParticleMap
@@ -73,10 +74,9 @@ classes:
 
   Dataset:
     description: A dataset
+    slots:
+      - name
     attributes:
-      name:
-        description: The name of the dataset
-        range: string
       regions:
         description: The regions in the dataset
         range: Region
