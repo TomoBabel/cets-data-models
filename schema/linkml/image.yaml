@@ -27,7 +27,7 @@ slots:
     range: CoordinateSystem
     multivalued: true
   coordinate_transformations:
-    description: Named coordinate systems for this entity
+    description: Named coordinate transformations for this entity
     range: CoordinateTransformation
     multivalued: true
 

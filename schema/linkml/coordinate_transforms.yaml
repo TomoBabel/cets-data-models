@@ -37,7 +37,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(identity)
+        ifabsent: TransformationType(identity)
 
   AxisNameMapping:
     description: Axis name to Axis name mapping
@@ -54,7 +54,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(map_axis)
+        ifabsent: TransformationType(map_axis)
     attributes:
       map_axis:
         description: The permutation of the axes
@@ -67,7 +67,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(translation)
+        ifabsent: TransformationType(translation)
     attributes:
       translation:
         description: The translation vector
@@ -79,7 +79,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(scale)
+        ifabsent: TransformationType(scale)
     attributes:
       scale:
         description: The scaling vector
@@ -91,7 +91,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(affine)
+        ifabsent: TransformationType(affine)
     attributes:
       affine:
         description: The affine matrix
@@ -109,7 +109,7 @@ classes:
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
-        ifabsent: string(sequence)
+        ifabsent: TransformationType(sequence)
     attributes:
       sequence:
         description: The sequence of transformations
