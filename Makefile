@@ -14,6 +14,11 @@ gen-python:
 	@echo "Generating Python code from linkml files"
 	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/gen_models.py
 
+	@echo "Patching generated model file"
+	python model_gen/patch_models.py \
+		src/cets_data_model/models/gen_models.py \
+		src/cets_data_model/models/gen_models.py
+
 .PHONY: compare-models
 compare-models:
 	@echo "Comparing model files"

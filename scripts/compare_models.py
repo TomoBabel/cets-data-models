@@ -12,7 +12,7 @@ def load_module(path):
 
 
 def print_schema_change(name, old_val, new_val, indent=2):
-    """Pretty print schema changes with better formatting for large defs"""
+    """Pretty print schema changes with formatting for large defs"""
     prefix = " " * indent
     
     if isinstance(old_val, dict) and isinstance(new_val, dict):
