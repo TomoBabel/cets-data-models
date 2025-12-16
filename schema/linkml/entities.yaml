@@ -48,7 +48,19 @@ classes:
         multivalued: true
       annotations:
         description: The annotations for this region
-        range: Annotation
+        any_of: 
+          - range: PointVectorSet2D
+          - range: PointVectorSet3D
+          - range: PointMatrixSet2D
+          - range: PointMatrixSet3D
+          - range: PointSet2D
+          - range: PointSet3D
+          - range: SegmentationMask2D
+          - range: SegmentationMask3D
+          - range: ProbabilityMap2D
+          - range: ProbabilityMap3D
+          - range: TriMesh
+          - range: Annotation
         multivalued: true
 
   Average:
