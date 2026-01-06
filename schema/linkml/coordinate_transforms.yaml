@@ -17,6 +17,7 @@ slots:
   transformation_type:
     description: The type of transformation.
     range: TransformationType
+    required: true
 
 classes:
   CoordinateTransformation:
@@ -31,14 +32,12 @@ classes:
       output:
         description: The target coordinate system name
         range: string
-
   Identity:
     description: The identity transformation
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(identity)
-
   AxisNameMapping:
     description: Axis name to Axis name mapping
     attributes:
@@ -48,7 +47,6 @@ classes:
       axis2_name:
         description: The mapping of the axis names
         range: string
-
   MapAxis:
     description: Axis permutation transformation
     is_a: CoordinateTransformation
@@ -61,7 +59,6 @@ classes:
         range: AxisNameMapping
         inlined: true
         multivalued: true
-
   Translation:
     description: A translation transformation
     is_a: CoordinateTransformation
@@ -73,7 +70,6 @@ classes:
         description: The translation vector
         range: float
         multivalued: true
-
   Scale:
     description: A scaling transformation
     is_a: CoordinateTransformation
@@ -85,7 +81,6 @@ classes:
         description: The scaling vector
         range: float
         multivalued: true
-
   Affine:
     description: An affine transformation
     is_a: CoordinateTransformation
@@ -103,7 +98,6 @@ classes:
               exact_cardinality: 3
             - alias: exact_card
               exact_cardinality: 3
-
   Sequence:
     description: A sequence of transformations
     is_a: CoordinateTransformation
@@ -128,6 +122,8 @@ enums:
       scale:
         description: A scaling transformation.
       affine:
-        description: An affine transformation
+        description: An affine transformation.
       sequence:
-        description: A sequence of transformations
+        description: A sequence of transformations.
+      projection_alignment:
+        description: A sequence specific to projection alignments.

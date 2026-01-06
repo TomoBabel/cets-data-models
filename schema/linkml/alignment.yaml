@@ -16,15 +16,12 @@ imports:
 
 classes:
   ProjectionAlignment:
-    is_a: Sequence
+    is_a: CoordinateTransformation
     description: The tomographic alignment for a single projection.
+    slot_usage:
+      transformation_type:
+        ifabsent: TransformationType(projection_alignment)
     attributes:
-      input:
-        description: The source coordinate system name
-        range: string
-      output:
-        description: The target coordinate system name
-        range: string
       sequence:
         description: The sequence of transformations
         range: CoordinateTransformation
