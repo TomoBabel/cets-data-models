@@ -60,7 +60,16 @@ Repository = "https://github.com/TomoBabel/cets-data-models"
 files = ["src"]
 python_version = "3.11"
 warn_unused_configs = true
+explicit_package_bases = true
+mypy_path = ["src"]
 
 [[tool.mypy.overrides]]
-module = ["gemmi", "mrcfile", "tiffile", "networkx", "matplotlib.pyplot"]
+module = [
+    "gemmi", 
+    "mrcfile", 
+    "tiffile", 
+    "networkx", 
+    "matplotlib.pyplot", 
+    "deepdiff",
+]
 ignore_missing_imports = true
