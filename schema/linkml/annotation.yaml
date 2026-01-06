@@ -16,6 +16,10 @@ imports:
 - ./coordinate_transforms
 
 slots:
+  - annotation_type:
+      description: The type of annotation.
+      range: AnnotationType
+      required: true
   - origin2D:
       description: Location on a 2D image (Nx2).
       range: float
@@ -58,7 +62,6 @@ slots:
             exact_cardinality: 2
           - alias: xy
             exact_cardinality: 2
-
   - origin3D:
       description: Location on a 3D image (Nx3).
       range: float
@@ -150,36 +153,44 @@ classes:
   Annotation:
     description: A primitive annotation.
     slots:
+      - annotation_type
       - name
-
   SegmentationMask2D:
     is_a: Annotation
     mixins:
       - Image2D
       - AssociatedFile
     description: An annotation image with categorical labels.
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(segmentation_mask_2D)
   SegmentationMask3D:
     is_a: Annotation
     mixins:
       - Image3D
       - AssociatedFile
     description: An annotation volume with categorical labels.
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(segmentation_mask_3D)
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
       - Image2D
       - AssociatedFile
     description: An annotation image with real-valued labels.
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(probability_map_2D)
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
       - Image3D
       - AssociatedFile
     description: An annotation volume with real-valued labels.
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(probability_map_3D)
   PointSet2D:
     is_a: Annotation
     mixins:
@@ -187,7 +198,9 @@ classes:
     description: A set of 2D point annotations.
     slots:
       - origin2D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_set_2D)
   PointSet3D:
     is_a: Annotation
     mixins:
@@ -195,7 +208,9 @@ classes:
     description: A set of 3D point annotations.
     slots:
       - origin3D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_set_3D)
   PointVectorSet2D:
     is_a: Annotation
     mixins:
@@ -204,7 +219,9 @@ classes:
     slots:
       - origin2D
       - vector2D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_vector_set_2D)
   PointVectorSet3D:
     is_a: Annotation
     mixins:
@@ -213,7 +230,9 @@ classes:
     slots:
       - origin3D
       - vector3D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_vector_set_3D)
   PointMatrixSet2D:
     is_a: Annotation
     mixins:
@@ -222,7 +241,9 @@ classes:
     slots:
       - origin2D
       - matrix2D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_matrix_set_2D)
   PointMatrixSet3D:
     is_a: Annotation
     mixins:
@@ -231,12 +252,17 @@ classes:
     slots:
       - origin3D
       - matrix3D
-
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(point_matrix_set_3D)
   TriMesh:
     is_a: Annotation
     mixins:
       - CoordMetaMixin
     description: A mesh annotation.
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(tri_mesh)
 
   SphereSet:
     is_a: Annotation
@@ -309,3 +335,29 @@ classes:
     description: A density map fit into a volume
     slots:
       - matrix3D
+
+enums:
+  AnnotationType:
+    permissible_values:
+      segmentation_mask_2D:
+        description: An annotation image with categorical labels.
+      segmentation_mask_3D:
+        description: An annotation volume with categorical labels.
+      probability_map_2D:
+        description: An annotation image with real-valued labels.
+      probability_map_3D:
+        description: An annotation volume with real-valued labels.
+      point_set_2D:
+        description: A set of 2D point annotations.
+      point_set_3D:
+        description: A set of 3D point annotations.
+      point_vector_set_2D:
+        description: A set of 2D points with an associated direction vector.
+      point_vector_set_3D:
+        description: A set of 3D points with an associated direction vector.
+      point_matrix_set_2D:
+        description: A set of 2D points with an associated rotation matrix.
+      point_matrix_set_3D: 
+        description: A set of 3D points with an associated rotation matrix.
+      tri_mesh:
+        description: A mesh annotation.
