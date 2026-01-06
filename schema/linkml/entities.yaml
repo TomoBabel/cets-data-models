@@ -31,6 +31,7 @@ classes:
         description: The tilt series
         range: TiltSeries
         multivalued: true
+        inlined_as_list: true
       alignments:
         description: The alignments
         range: Alignment
@@ -39,6 +40,7 @@ classes:
         description: The tomograms
         range: Tomogram
         multivalued: true
+        inlined_as_list: true
       annotations:
         description: The annotations for this region
         range: Annotation
@@ -65,6 +67,7 @@ classes:
         description: The movie stacks in the collection
         range: MovieStackSeries
         multivalued: true
+        inlined_as_list: true
       gain_file:
         description: The gain file for the movie stacks
         range: GainFile
@@ -81,6 +84,7 @@ classes:
         description: The regions in the dataset
         range: Region
         multivalued: true
+        inlined_as_list: true
       averages:
         description: The averages in the dataset
         range: Average
