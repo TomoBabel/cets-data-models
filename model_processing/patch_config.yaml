@@ -1,0 +1,44 @@
+discriminated_fields:
+  - field_name: annotations
+    discriminator: annotation_type
+    union_types:
+      - SegmentationMask2D
+      - SegmentationMask3D
+      - ProbabilityMap2D
+      - ProbabilityMap3D
+      - PointSet2D
+      - PointSet3D
+      - PointVectorSet2D
+      - PointVectorSet3D
+      - PointMatrixSet2D
+      - PointMatrixSet3D
+      - TriMesh
+  - field_name: coordinate_transformations
+    discriminator: transformation_type
+    union_types:
+      - Identity
+      - MapAxis
+      - Translation
+      - Scale
+      - Affine
+      - Sequence
+type_aliases:
+  - name: Vector2D
+    definition: "Annotated[list[float], Field(min_length=2, max_length=2)]"
+    for_field: 
+      - origin2D
+      - vector2D
+  - name: Vector3D
+    definition: "Annotated[list[float], Field(min_length=3, max_length=3)]"
+    for_field: 
+      - origin3D
+      - vector3D
+  - name: Matrix2x2
+    definition: "Annotated[list[Vector2D], Field(min_length=2, max_length=2)]"
+    for_field: 
+      - matrix2D
+  - name: Matrix3x3
+    definition: "Annotated[list[Vector3D], Field(min_length=3, max_length=3)]"
+    for_field: 
+      - matrix3D
+      - affine
