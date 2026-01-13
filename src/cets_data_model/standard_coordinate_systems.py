@@ -36,7 +36,7 @@ def logical_coords(name: Optional[str] = None, dim: int = 2) -> CoordinateSystem
     name = BASE_LOGICAL_COORDS_2D if name is None else name
     axes = [x_axis_logical, y_axis_logical]
     if dim == 3:
-        name = BASE_LOGICAL_COORDS_3D
+        name = BASE_LOGICAL_COORDS_3D if name is None else name
         axes.append(z_axis_logical)
     elif dim not in (2, 3):
         raise ValueError(f"{dim} is not a valid dimension")
