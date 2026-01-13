@@ -237,6 +237,10 @@ enums:
         description: An affine transformation
       sequence:
         description: A sequence of transformations
+      image_pixel_size:
+        description: A scaling transformation that defines physical pixel size
+      image_super_resolution_pixel_size:
+        description: A scaling transformation that defines super resolution physical pixel size
       align_movie_frame:
         description: A sequence of transformations to align a movie frame to a movie
       align_projection_image:

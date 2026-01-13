@@ -59,6 +59,8 @@ class TransformationType(str, Enum):
     scale = "scale"
     affine = "affine"
     sequence = "sequence"
+    image_pixel_size = "image_pixel_size"
+    image_super_resolution_pixel_size = "image_super_resolution_pixel_size"
     align_movie_frame = "align_movie_frame"
     align_projection_image = "align_projection_image"
     align_subtomogram = "align_subtomogram"
@@ -653,3 +655,10 @@ Region.model_rebuild()
 Average.model_rebuild()
 MovieStackCollection.model_rebuild()
 Dataset.model_rebuild()
+ImagePixelSize.model_rebuild()
+ImageSuperResolutionPixelSize.model_rebuild()
+AlignMovieFrame.model_rebuild()
+AlignProjectionImage.model_rebuild()
+AlignSubtomogram.model_rebuild()
+AlignMap.model_rebuild()
+AlignAnnotation.model_rebuild()
