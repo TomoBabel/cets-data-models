@@ -37,9 +37,9 @@ ALIGN_ANNOTATION_XFROM = "align_annotation_to_tomogram"
 ALIGN_ANNOTATION_COORDS = "aligned_annotation"
 
 # set pixel size of image
-IMAGE_PIXEL_SIZE_XFROM = "image_pixel_size"
+IMAGE_PIXEL_SIZE_XFROM = "image_pixel_size_transformation"
 IMAGE_PIXEL_SIZE_COORDS = "image_pixel_size"
 
 # set super res pixel size of image
-IMAGE_SUPER_RES_PIXEL_SIZE_XFROM = "image_super_res_pixel_size"
+IMAGE_SUPER_RES_PIXEL_SIZE_XFROM = "image_super_res_pixel_size_transformation"
 IMAGE_SUPER_RES_PIXEL_SIZE_COORDS = "image_super_res_pixel_size"
