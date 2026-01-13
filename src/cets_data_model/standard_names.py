@@ -10,7 +10,7 @@
 
 # basic logical coords
 BASE_LOGICAL_COORDS_2D = "base_logical_coordinates_2D"
-BASE_LOGICAL_COORDS_3D = "base_logical_coordinates_2D"
+BASE_LOGICAL_COORDS_3D = "base_logical_coordinates_3D"
 
 # Align calibration image to movie frame
 ALIGN_CALIBRATION_IMAGE_XFROM = "align_calibration_image_to_movie_frame"
