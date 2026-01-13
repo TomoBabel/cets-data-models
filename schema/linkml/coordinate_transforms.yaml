@@ -153,6 +153,75 @@ classes:
         range: CoordinateTransformation
         multivalued: true
 
+  AlignMovieFrame:
+    description: A sequence of transformations to align a movie frame to a movie
+    is_a: Sequence
+    slot_usage:
+      type:
+        ifabsent: string(align_movie_frame)
+    attributes:
+      target:
+        description: The target merged movie of the alignment
+        range: string
+
+  ImagePixelSize:
+    description: A scaling transformation that defines physical pixel size
+    is_a: Scale
+    slot_usage:
+      type:
+        if_absent: string(image_pixel_size)
+
+  ImageSuperResolutionPixelSize:
+    description: A scaling transformation that defines physical pixel size
+    is_a: Scale
+    slot_usage:
+      type:
+        if_absent: string(image_super_resolution_pixel_size)
+
+  AlignProjectionImage:
+    description: A sequence of transformations to align a projection image to a tilt series
+    is_a: Sequence
+    slot_usage:
+      type:
+        ifabsent: string(align_projection_image)
+    attributes:
+      target:
+        description: The target tilt series of the alignment
+        range: string
+
+  AlignSubtomogram:
+    description: A sequence of transformations to align a subtomogram to a tomogram
+    is_a: Sequence
+    slot_usage:
+      type:
+        ifabsent: string(align_subtomogram)
+    attributes:
+      target:
+        description: The target tomogram of the alignment
+        range: string
+
+  AlignMap:
+    description: A sequence of transformations to align a map to a tomogram
+    is_a: Sequence
+    slot_usage:
+      type:
+        ifabsent: string(align_map)
+    attributes:
+      target:
+        description: The target tomogram of the alignment
+        range: string
+
+  AlignAnnotation:
+    description: A sequence of transformations to align an annotation to a tomogram or 2D image
+    is_a: Sequence
+    slot_usage:
+      type:
+        ifabsent: string(align_annotation)
+    attributes:
+      target:
+        description: The target of the alignment; tomogram or 2D image
+        range: string
+
 enums:
   TransformationType:
     permissible_values:
@@ -168,3 +237,13 @@ enums:
         description: An affine transformation
       sequence:
         description: A sequence of transformations
+      align_movie_frame:
+        description: A sequence of transformations to align a movie frame to a movie
+      align_projection_image:
+        description: A sequence of transformations to align a projection image to a tilt series
+      align_subtomogram:
+        description: A sequence of transformations to align a subtomogram frame to a tomogram
+      align_map:
+        description: A sequence of transformations to align a map frame to a tomogram
+      align_annotation:
+        description: A sequence of transformations to align an annotation to a tomogram or 2D image

@@ -1,9 +1,5 @@
 from typing import Optional
 from cets_data_model.models.models import Axis, CoordinateSystem
-from cets_data_model.standard_names import (
-    BASE_LOGICAL_COORDS_2D,
-    BASE_LOGICAL_COORDS_3D,
-)
 
 # Axis definitions
 x_axis_logical = Axis(name="logical coordinates x axis", axis_unit="pixel/voxel")
@@ -13,6 +9,10 @@ z_axis_logical = Axis(name="logical coordinates z axis", axis_unit="pixel/voxel"
 x_axis_physical = Axis(name="physical coordinates x axis", axis_unit="Ångstrom")
 y_axis_physical = Axis(name="physical coordinates y axis", axis_unit="Ångstrom")
 z_axis_physical = Axis(name="physical coordinates z axis", axis_unit="Ångstrom")
+
+# basic logical coords
+BASE_LOGICAL_COORDS_2D = "base_logical_coordinates_2D"
+BASE_LOGICAL_COORDS_3D = "base_logical_coordinates_3D"
 
 # helper functions for generating coordinate systems
 

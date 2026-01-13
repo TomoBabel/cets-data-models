@@ -59,6 +59,11 @@ class TransformationType(str, Enum):
     scale = "scale"
     affine = "affine"
     sequence = "sequence"
+    align_movie_frame = "align_movie_frame"
+    align_projection_image = "align_projection_image"
+    align_subtomogram = "align_subtomogram"
+    align_map = "align_map"
+    align_annotation = "align_annotation"
 
 
 # -----------------------------------------------------------------------------
@@ -143,8 +148,69 @@ class Sequence(CoordinateTransformation):
     )
 
 
+class ImagePixelSize(CoordinateTransformation):
+    type: Literal["image_pixel_size"] = Field(
+        "image_pixel_size", description="The type of transformation"
+    )
+
+
+class ImageSuperResolutionPixelSize(CoordinateTransformation):
+    type: Literal["image_super_resolution_pixel_size"] = Field(
+        "image_super_resolution_pixel_size", description="The type of transformation"
+    )
+
+
+class AlignMovieFrame(CoordinateTransformation):
+    type: Literal["align_movie_frame"] = Field(
+        "align_movie_frame", description="The type of transformation"
+    )
+    target: Optional[str] = Field(None, description="The target merged movie")
+
+
+class AlignProjectionImage(CoordinateTransformation):
+    type: Literal["align_projection_image"] = Field(
+        "align_projection_image", description="The type of transformation"
+    )
+    target: Optional[str] = Field(None, description="The target tilt series")
+
+
+class AlignSubtomogram(CoordinateTransformation):
+    type: Literal["align_subtomogram"] = Field(
+        "align_subtomogram", description="The type of transformation"
+    )
+    target: Optional[str] = Field(None, description="The target tomogram")
+
+
+class AlignMap(CoordinateTransformation):
+    type: Literal["align_map"] = Field(
+        "align_map", description="The type of transformation"
+    )
+    target: Optional[str] = Field(None, description="The target tomogram")
+
+
+class AlignAnnotation(CoordinateTransformation):
+    type: Literal["align_annotation"] = Field(
+        "align_annotation", description="The type of transformation"
+    )
+    target: Optional[str] = Field(None, description="The target tomogram or image")
+
+
 Transformation = Annotated[
-    Union[Affine, Identity, MapAxis, Translation, Scale, Sequence],
+    Union[
+        Affine,
+        Identity,
+        MapAxis,
+        Translation,
+        Scale,
+        Sequence,
+        ImagePixelSize,
+        ImageSuperResolutionPixelSize,
+        AlignMovieFrame,
+        AlignProjectionImage,
+        AlignSubtomogram,
+        AlignAnnotation,
+        AlignMap,
+    ],
     Field(discriminator="type"),
 ]
 
