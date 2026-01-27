@@ -373,7 +373,7 @@ class Affine(CoordinateTransformation):
     An affine transformation
     """
 
-    affine: Optional[Annotated[list[Matrix3x3], Field(min_length=1)]] = Field(
+    affine: Optional[Matrix3x3] = Field(
         default=None, description="""The affine matrix"""
     )
     transformation_type: Literal[TransformationType.affine] = Field(
@@ -396,9 +396,14 @@ class Sequence(CoordinateTransformation):
     A sequence of transformations
     """
 
-    sequence: Optional[list[CoordinateTransformation]] = Field(
-        default=[], description="""The sequence of transformations"""
-    )
+    sequence: Optional[
+        list[
+            Annotated[
+                Union[Identity, MapAxis, Translation, Scale, Affine],
+                Field(discriminator="transformation_type"),
+            ]
+        ]
+    ] = Field(default=[], description="""The sequence of transformations""")
     transformation_type: Literal[TransformationType.sequence] = Field(
         TransformationType.sequence, description="""The type of transformation."""
     )
@@ -546,7 +551,7 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
@@ -609,7 +614,7 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
@@ -649,7 +654,7 @@ class ProjectionImage(BaseProjectionImage):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
@@ -692,7 +697,7 @@ class SubProjectionImage(ProjectionImage):
         default=None, description="""Index of a particle inside a tomogram."""
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
@@ -735,7 +740,7 @@ class TiltImage(BaseProjectionImage):
         default=None, description="""The ID of the movie stack for this tilt image."""
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    section: Optional[str] = Field(
+    section: Optional[int] = Field(
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )

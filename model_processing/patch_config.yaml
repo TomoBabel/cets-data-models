@@ -22,23 +22,38 @@ discriminated_fields:
       - Scale
       - Affine
       - Sequence
+  - field_name: sequence
+    for_classes:
+      - Sequence
+    discriminator: transformation_type
+    union_types:
+      - Identity
+      - MapAxis
+      - Translation
+      - Scale
+      - Affine
 type_aliases:
   - name: Vector2D
     definition: "Annotated[list[float], Field(min_length=2, max_length=2)]"
     for_field: 
-      - origin2D
-      - vector2D
+      as_list:
+        - origin2D
+        - vector2D
   - name: Vector3D
     definition: "Annotated[list[float], Field(min_length=3, max_length=3)]"
     for_field: 
-      - origin3D
-      - vector3D
+      as_list:
+        - origin3D
+        - vector3D
   - name: Matrix2x2
     definition: "Annotated[list[Vector2D], Field(min_length=2, max_length=2)]"
     for_field: 
-      - matrix2D
+      as_list:
+        - matrix2D
   - name: Matrix3x3
     definition: "Annotated[list[Vector3D], Field(min_length=3, max_length=3)]"
     for_field: 
-      - matrix3D
-      - affine
+      as_list:
+        - matrix3D
+      as_single:
+        - affine

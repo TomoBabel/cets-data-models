@@ -20,6 +20,7 @@ imports:
 slots:
   section:
     description: 0-based section index to the entity inside a stack.
+    range: integer
   nominal_tilt_angle:
     description: The tilt angle reported by the microscope
     range: float
