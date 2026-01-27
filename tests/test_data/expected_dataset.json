@@ -1,0 +1,577 @@
+{
+  "name": "example_cets_dataset",
+  "regions": [
+    {
+      "id": "region_01",
+      "movie_stack_collection": {
+        "movie_stacks": [
+          {
+            "id": "movie_stack_series_01",
+            "stacks": [
+              {
+                "id": "movie_stack_01",
+                "path": "/data/movies/tilt_00.tif",
+                "images": [
+                  {
+                    "path": "/data/movies/tilt_00.tif",
+                    "section": 0,
+                    "nominal_tilt_angle": -60.0,
+                    "accumulated_dose": 2.5,
+                    "ctf_metadata": {
+                      "defocus_u": 25000.0,
+                      "defocus_v": 24500.0,
+                      "defocus_angle": 45.0,
+                      "defocus_handedness": -1
+                    },
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [
+                      {
+                        "name": "movie_frame_pixels",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          }
+                        ]
+                      }
+                    ],
+                    "coordinate_transformations": []
+                  },
+                  {
+                    "path": "/data/movies/tilt_00.tif",
+                    "section": 1,
+                    "nominal_tilt_angle": -60.0,
+                    "accumulated_dose": 5.0,
+                    "ctf_metadata": {
+                      "defocus_u": 25000.0,
+                      "defocus_v": 24500.0,
+                      "defocus_angle": 45.0,
+                      "defocus_handedness": -1
+                    },
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [],
+                    "coordinate_transformations": []
+                  }
+                ]
+              },
+              {
+                "id": "movie_stack_02",
+                "path": "/data/movies/tilt_01.tif",
+                "images": [
+                  {
+                    "path": "/data/movies/tilt_01.tif",
+                    "section": 0,
+                    "nominal_tilt_angle": -30.0,
+                    "accumulated_dose": 7.5,
+                    "ctf_metadata": {
+                      "defocus_u": 24800.0,
+                      "defocus_v": 24300.0,
+                      "defocus_angle": 46.0,
+                      "defocus_handedness": -1
+                    },
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [],
+                    "coordinate_transformations": []
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "gain_file": {
+          "path": "/data/gain_reference.mrc",
+          "width": 4096,
+          "height": 4096,
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        "defect_file": {
+          "path": "/data/defect_map.mrc",
+          "width": 4096,
+          "height": 4096,
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        }
+      },
+      "tilt_series": [
+        {
+          "id": "tilt_series_01",
+          "path": "/data/tilt_series/ts_01.mrc",
+          "ctf_corrected": false,
+          "even_path": "/data/tilt_series/ts_01_even.mrc",
+          "odd_path": "/data/tilt_series/ts_01_odd.mrc",
+          "movie_stack_series_id": "movie_stack_series_01",
+          "images": [
+            {
+              "movie_stack_id": "movie_stack_01",
+              "path": "/data/tilt_series/ts_01.mrc",
+              "section": 0,
+              "nominal_tilt_angle": -60.0,
+              "accumulated_dose": 5.0,
+              "ctf_metadata": {
+                "defocus_u": 25000.0,
+                "defocus_v": 24500.0,
+                "defocus_angle": 45.0,
+                "defocus_handedness": -1
+              },
+              "width": 3840,
+              "height": 3840,
+              "coordinate_systems": [
+                {
+                  "name": "tilt_image_pixels",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    }
+                  ]
+                },
+                {
+                  "name": "tilt_image_angstroms",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    }
+                  ]
+                }
+              ],
+              "coordinate_transformations": [
+                {
+                  "transformation_type": "scale",
+                  "name": "pixel_to_angstrom",
+                  "input": "tilt_image_pixels",
+                  "output": "tilt_image_angstroms",
+                  "scale": [
+                    1.05,
+                    1.05
+                  ]
+                }
+              ]
+            },
+            {
+              "movie_stack_id": "movie_stack_02",
+              "path": "/data/tilt_series/ts_01.mrc",
+              "section": 1,
+              "nominal_tilt_angle": -30.0,
+              "accumulated_dose": 10.0,
+              "ctf_metadata": {
+                "defocus_u": 24800.0,
+                "defocus_v": 24300.0,
+                "defocus_angle": 46.0,
+                "defocus_handedness": -1
+              },
+              "width": 3840,
+              "height": 3840,
+              "coordinate_systems": [],
+              "coordinate_transformations": []
+            }
+          ]
+        }
+      ],
+      "alignments": [
+        {
+          "projection_alignments": [
+            {
+              "transformation_type": "projection_alignment",
+              "name": "align_tilt_neg60",
+              "input": "tilt_image_angstroms",
+              "output": "tomogram_angstroms",
+              "sequence": [
+                {
+                  "transformation_type": "translation",
+                  "name": "shift_to_origin",
+                  "input": "tilt_image_angstroms",
+                  "output": "tilt_centered",
+                  "translation": [
+                    -1920.0,
+                    -1920.0,
+                    0.0
+                  ]
+                },
+                {
+                  "transformation_type": "affine",
+                  "name": "rotate_and_project",
+                  "input": "tilt_centered",
+                  "output": "tomogram_angstroms",
+                  "affine": [
+                    [
+                      0.866,
+                      -0.5,
+                      0.0
+                    ],
+                    [
+                      0.5,
+                      0.866,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "transformation_type": "projection_alignment",
+              "name": "align_tilt_neg30",
+              "input": "tilt_image_angstroms",
+              "output": "tomogram_angstroms",
+              "sequence": [
+                {
+                  "transformation_type": "translation",
+                  "name": "shift_to_origin",
+                  "input": "tilt_image_angstroms",
+                  "output": "tilt_centered",
+                  "translation": [
+                    -1920.0,
+                    -1920.0,
+                    0.0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tomograms": [
+        {
+          "id": "tomogram_01",
+          "path": "/data/tomograms/tomo_01.mrc",
+          "ctf_corrected": false,
+          "even_path": "/data/tomograms/tomo_01_even.mrc",
+          "odd_path": "/data/tomograms/tomo_01_odd.mrc",
+          "tilt_series_id": "tilt_series_01",
+          "width": 1920,
+          "height": 1920,
+          "depth": 500,
+          "coordinate_systems": [
+            {
+              "name": "tomogram_voxels",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                }
+              ]
+            },
+            {
+              "name": "tomogram_angstroms",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "scale",
+              "name": "voxel_to_angstrom",
+              "input": "tomogram_voxels",
+              "output": "tomogram_angstroms",
+              "scale": [
+                10.5,
+                10.5,
+                10.5
+              ]
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "annotation_type": "point_set_3D",
+          "path": "/data/annotations/particles_01.star",
+          "origin3D": [
+            [
+              100.5,
+              200.3,
+              150.7
+            ],
+            [
+              305.2,
+              420.8,
+              180.1
+            ],
+            [
+              510.9,
+              630.5,
+              220.4
+            ],
+            [
+              715.3,
+              840.2,
+              260.8
+            ]
+          ],
+          "coordinate_systems": [
+            {
+              "name": "particle_coords_voxels",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "identity",
+              "name": "particle_to_tomogram",
+              "input": "particle_coords_voxels",
+              "output": "tomogram_voxels"
+            }
+          ]
+        },
+        {
+          "annotation_type": "point_vector_set_3D",
+          "path": "/data/annotations/orientations_01.star",
+          "origin3D": [
+            [
+              100.5,
+              200.3,
+              150.7
+            ],
+            [
+              305.2,
+              420.8,
+              180.1
+            ]
+          ],
+          "vector3D": [
+            [
+              0.707,
+              0.707,
+              0.0
+            ],
+            [
+              1.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        {
+          "annotation_type": "point_matrix_set_3D",
+          "path": "/data/annotations/rotations_01.star",
+          "origin3D": [
+            [
+              100.5,
+              200.3,
+              150.7
+            ]
+          ],
+          "matrix3D": [
+            [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.866,
+                -0.5
+              ],
+              [
+                0.0,
+                0.5,
+                0.866
+              ]
+            ]
+          ],
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        {
+          "annotation_type": "segmentation_mask_3D",
+          "path": "/data/annotations/membrane_mask.mrc",
+          "width": 1920,
+          "height": 1920,
+          "depth": 500,
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        {
+          "annotation_type": "probability_map_3D",
+          "path": "/data/annotations/probability_map.mrc",
+          "width": 1920,
+          "height": 1920,
+          "depth": 500,
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        {
+          "annotation_type": "point_set_2D",
+          "path": "/data/annotations/fiducials_2D.txt",
+          "origin2D": [
+            [
+              1024.5,
+              2048.3
+            ],
+            [
+              2048.7,
+              1536.9
+            ],
+            [
+              512.1,
+              3072.4
+            ]
+          ],
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        },
+        {
+          "annotation_type": "tri_mesh",
+          "path": "/data/annotations/surface_mesh.obj",
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        }
+      ]
+    }
+  ],
+  "averages": [
+    {
+      "name": "ribosome_average_01",
+      "particle_maps": [
+        {
+          "path": "/data/averages/ribosome_map.mrc",
+          "width": 256,
+          "height": 256,
+          "depth": 256,
+          "coordinate_systems": [
+            {
+              "name": "particle_map_voxels",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                }
+              ]
+            },
+            {
+              "name": "particle_map_angstroms",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "scale",
+              "name": "particle_voxel_to_angstrom",
+              "input": "particle_map_voxels",
+              "output": "particle_map_angstroms",
+              "scale": [
+                1.5,
+                1.5,
+                1.5
+              ]
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "annotation_type": "point_set_3D",
+          "path": "/data/averages/symmetry_points.txt",
+          "origin3D": [
+            [
+              128.0,
+              128.0,
+              128.0
+            ]
+          ],
+          "coordinate_systems": [],
+          "coordinate_transformations": []
+        }
+      ]
+    }
+  ]
+}
