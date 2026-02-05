@@ -1,7 +1,18 @@
+import ast
+import importlib.util
+import logging
 import re
 import sys
 import yaml
 from pathlib import Path
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 
 def load_patch_config_yaml():
@@ -16,7 +27,7 @@ def patch_discriminated_unions(model_def: str, unions: list) -> str:
     if not unions:
         return model_def
 
-    print(f"Patching {len(unions)} discriminated union fields...")
+    logger.info(f"Patching {len(unions)} discriminated union fields...")
 
     for union_config in unions:
         field_name = union_config["field_name"]
@@ -24,12 +35,12 @@ def patch_discriminated_unions(model_def: str, unions: list) -> str:
         for_classes = union_config.get("for_classes", None)
 
         if for_classes:
-            print(
+            logger.info(
                 f"  - Patching field '{field_name}' in classes {for_classes} "
                 f"with discriminator '{discriminator}'"
             )
         else:
-            print(
+            logger.info(
                 f"  - Patching field '{field_name}' (all classes) "
                 f"with discriminator '{discriminator}'"
             )
@@ -66,14 +77,14 @@ def patch_field_with_union(
     """
 
     if for_classes is None:
-        return _patch_field_global(model_def, field_name, discriminator, union_types)
+        return patch_field_global(model_def, field_name, discriminator, union_types)
     else:
-        return _patch_field_in_classes(
+        return patch_field_in_classes(
             model_def, field_name, discriminator, union_types, for_classes
         )
 
 
-def _patch_field_global(
+def patch_field_global(
     model_def: str, field_name: str, discriminator: str, union_types: list[str]
 ) -> str:
     """Patch field globally (all classes) - original behavior"""
@@ -90,7 +101,7 @@ def _patch_field_global(
     return re.sub(pattern, replacement, model_def)
 
 
-def _patch_field_in_classes(
+def patch_field_in_classes(
     model_def: str,
     field_name: str,
     discriminator: str,
@@ -145,12 +156,14 @@ def _patch_field_in_classes(
             rest_of_line = line[match.end() :]
             lines[i] = f"{indent}{field_prefix}{new_type}{field_suffix}{rest_of_line}"
             patched_count += 1
-            print(
+            logger.debug(
                 f"    ✓ Patched '{field_name}' in class '{current_class}' (line {i + 1})"
             )
 
     if patched_count == 0:
-        print(f"    ⚠ Warning: Field '{field_name}' not found in classes {class_names}")
+        logger.warning(
+            f"    ⚠ Warning: Field '{field_name}' not found in classes {class_names}"
+        )
 
     return "\n".join(lines)
 
@@ -169,7 +182,9 @@ def patch_discriminator_fields_to_literal(model_def: str, unions: list) -> str:
 
     discriminators = {field["discriminator"] for field in unions}
 
-    print(f"Converting discriminator fields to Literal: {', '.join(discriminators)}")
+    logger.info(
+        f"Converting discriminator fields to Literal: {', '.join(discriminators)}"
+    )
 
     for discriminator in discriminators:
         lines = model_def.split("\n")
@@ -197,7 +212,7 @@ def patch_discriminator_fields_to_literal(model_def: str, unions: list) -> str:
 
                     if old_pattern in line:
                         lines[i] = line.replace(old_pattern, new_pattern)
-                        print(
+                        logger.debug(
                             f"  - Converted {discriminator} from {enum_type} to Literal on line {i}"
                         )
 
@@ -214,7 +229,7 @@ def add_type_aliases(model_def: str, aliases: list[dict]) -> str:
     if not aliases:
         return model_def
 
-    print(f"Processing {len(aliases)} type aliases...")
+    logger.info(f"Processing {len(aliases)} type aliases...")
 
     alias_lines = ["\n# Type aliases"]
     for alias in aliases:
@@ -275,10 +290,12 @@ def substitute_field_type(
     test_pattern = f"{field_name}: Optional[conlist"
 
     if test_pattern not in model_def:
-        print(f"  x Substring not found for '{field_name}'")
+        logger.debug(f"  ✗ Substring not found for '{field_name}'")
         return model_def
 
-    print(f"  - Found substring '{test_pattern}' for {field_name} (as_list={as_list})")
+    logger.debug(
+        f"  - Found substring '{test_pattern}' for {field_name} (as_list={as_list})"
+    )
 
     lines = model_def.split("\n")
     count = 0
@@ -306,7 +323,9 @@ def substitute_field_type(
                     count += 1
 
     model_def = "\n".join(lines)
-    print(f"  - Replaced {count} occurrence(s) of '{field_name}' (as_list={as_list})")
+    logger.debug(
+        f"  - Replaced {count} occurrence(s) of '{field_name}' (as_list={as_list})"
+    )
 
     return model_def
 
@@ -330,7 +349,7 @@ def ensure_typing_imports(model_def: str) -> str:
     match = re.search(pattern, model_def, re.DOTALL)
 
     if not match:
-        print("Warning: Could not find typing imports")
+        logger.warning("Could not find typing imports")
         return model_def
 
     imports_to_add = []
@@ -358,7 +377,7 @@ def remove_treat_empty_lists_serializer(model_def: str) -> str:
     This is a LinkML-generated method that we don't need.
     """
 
-    print("Removing treat_empty_lists_as_none serializer...")
+    logger.info("Removing treat_empty_lists_as_none serializer...")
 
     lines = model_def.split("\n")
     new_lines = []
@@ -371,7 +390,7 @@ def remove_treat_empty_lists_serializer(model_def: str) -> str:
             and "treat_empty_lists_as_none" in lines[i + 1]
         ):
             skip = True
-            print(f"  - Found serializer at line {i}, removing...")
+            logger.debug(f"  - Found serializer at line {i}, removing...")
             continue
 
         if skip and "return handler(_instance, info)" in line:
@@ -382,6 +401,128 @@ def remove_treat_empty_lists_serializer(model_def: str) -> str:
             new_lines.append(line)
 
     return "\n".join(new_lines)
+
+
+def validate_syntax(output_path: Path) -> bool:
+    """
+    CR: Check Python syntax by attempting to parse as AST
+    """
+    try:
+        ast.parse(output_path.read_text())
+        logger.info("  ✓ Syntax validation passed")
+        return True
+    except SyntaxError as e:
+        logger.error(f"  ✗ Syntax error in patched models: {e}")
+        logger.error(f"    Line {e.lineno}: {e.text}")
+    return False
+
+
+def validate_imports(output_path: Path) -> bool:
+    """
+    CR: Attempt to import the module to catch runtime issues
+    CR: (e.g., undefined names, circular imports, type errors that prevent import)
+    """
+    try:
+        spec = importlib.util.spec_from_file_location("models", output_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        logger.info("  ✓ Import validation passed")
+        return True
+    except Exception as e:
+        logger.error(f"  ✗ Failed to import patched models: {e}")
+    return False
+
+
+def validate_type_aliases(module_content: str) -> bool:
+    """
+    CR: Verify expected type aliases exist in the module
+    """
+    expected_aliases = [
+        "Vector2D",
+        "Vector3D",
+        "Matrix2x2",
+        "Matrix3x3",
+        "Radii",
+        "Dimensions2D",
+        "Dimensions3D",
+    ]
+
+    missing_aliases = []
+    for alias in expected_aliases:
+        if f"{alias}: TypeAlias" not in module_content:
+            missing_aliases.append(alias)
+
+    if missing_aliases:
+        logger.error(f"  ✗ Missing type aliases: {', '.join(missing_aliases)}")
+        return False
+    else:
+        logger.info(f"  ✓ All {len(expected_aliases)} type aliases present")
+        return True
+
+
+def validate_discriminated_unions(module_content: str) -> bool:
+    """
+    CR: Verify discriminated unions were applied
+    CR: Look for Field(discriminator=...) pattern
+    """
+    discriminator_pattern = r'Field\(discriminator="[^"]+"\)'
+
+    discriminator_matches = re.findall(discriminator_pattern, module_content)
+
+    if len(discriminator_matches) == 0:
+        logger.error("  ✗ No discriminated unions found (expected at least one)")
+        return False
+    else:
+        logger.info(
+            f"  ✓ Found {len(discriminator_matches)} discriminated union field(s)"
+        )
+        return True
+
+
+def validate_literal_types_for_discriminators(module_content: str) -> bool:
+    """
+    CR: Verify Literal types for discriminator fields exist
+    """
+    literal_pattern = (
+        r"Literal\[TransformationType\.\w+\]|Literal\[AnnotationType\.\w+\]"
+    )
+    literal_matches = re.findall(literal_pattern, module_content)
+
+    if len(literal_matches) == 0:
+        logger.warning("  ⚠ Warning: No Literal discriminator fields found")
+        return False
+    else:
+        logger.info(f"  ✓ Found {len(literal_matches)} Literal discriminator field(s)")
+        return True
+
+
+def validate_patched_models(output_path: Path) -> bool:
+    """
+    CR: Validate that patched models are syntactically valid and importable.
+    CR: This catches cases where regex patching broke the generated code.
+    CR: Returns True if validation passes, False otherwise.
+    """
+    logger.info("Validating patched models...")
+
+    if not validate_syntax(output_path):
+        return False
+
+    if not validate_imports(output_path):
+        return False
+
+    module_content = output_path.read_text()
+
+    if not validate_type_aliases(module_content):
+        return False
+
+    if not validate_discriminated_unions(module_content):
+        return False
+
+    if not validate_literal_types_for_discriminators(module_content):
+        return False
+
+    logger.info("✅ Patched models validated successfully\n")
+    return True
 
 
 def patch_models(input_path: Path, output_path: Path) -> None:
@@ -404,24 +545,30 @@ def patch_models(input_path: Path, output_path: Path) -> None:
         f["field_name"] for f in patch_config.get("discriminated_fields", [])
     ]
     type_alias_names = [a["name"] for a in patch_config.get("type_aliases", [])]
-    print(f"Patched {input_path} -> {output_path}")
-    print(f"Added type aliases for: {', '.join(type_alias_names)}")
-    print(
+    logger.info(f"Patched {input_path} -> {output_path}")
+    logger.info(
         f"Added discriminated unions for: {', '.join(discriminated_union_field_names)}"
     )
+    logger.info(f"Added type aliases for: {', '.join(type_alias_names)}")
+
+    if not validate_patched_models(output_path):
+        logger.error(
+            "❌ Model validation failed. Patching may have broken the generated code."
+        )
+        sys.exit(1)
 
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: patch_models.py <input_file> <output_file>")
-        print("Example: patch_models.py gen_models.py models.py")
+        logger.error("Usage: patch_models.py <input_file> <output_file>")
+        logger.error("Example: patch_models.py gen_models.py models.py")
         sys.exit(1)
 
     input_file = Path(sys.argv[1])
     output_file = Path(sys.argv[2])
 
     if not input_file.exists():
-        print(f"Error: Input file not found: {input_file}")
+        logger.error(f"Input file not found: {input_file}")
         sys.exit(1)
 
     patch_models(input_file, output_file)

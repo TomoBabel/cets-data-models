@@ -57,3 +57,18 @@ type_aliases:
         - matrix3D
       as_single:
         - affine
+  - name: Radii
+    definition: "Annotated[list[float], Field(min_length=1)]"
+    for_field:
+      as_single:
+        - radii
+  - name: Dimensions2D
+    definition: "Annotated[list[float], Field(min_length=2, max_length=2)]"
+    for_field:
+      as_list: 
+        - dimensions2D
+  - name: Dimensions3D
+    definition: "Annotated[list[float], Field(min_length=3, max_length=3)]"
+    for_field:
+      as_list:
+        - dimensions3D

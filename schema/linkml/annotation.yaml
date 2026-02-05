@@ -108,11 +108,9 @@ slots:
       description: Radii of circles, spheres, or cylinders (N).
       range: float
       array:
-        exact_number_dimensions: 2
+        exact_number_dimensions: 1
         dimensions:
           - alias: N
-            minimum_cardinality: 1
-          - alias: radii
             minimum_cardinality: 1
   - dimensions2D:
       description: Dimensions of 2D objects (x, y).
