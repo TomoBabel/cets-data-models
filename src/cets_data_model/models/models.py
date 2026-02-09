@@ -144,6 +144,38 @@ class AnnotationType(str, Enum):
     """
     A mesh annotation.
     """
+    sphere_set = "sphere_set"
+    """
+    A set of spheres.
+    """
+    circle_set = "circle_set"
+    """
+    A set of circles.
+    """
+    cylinder_set = "cylinder_set"
+    """
+    A set of cylinders.
+    """
+    cuboid_set = "cuboid_set"
+    """
+    A set of oriented 3D boxes.
+    """
+    box_set = "box_set"
+    """
+    A set of 2D boxes.
+    """
+    spline_2D = "spline_2D"
+    """
+    A 2D spline.
+    """
+    spline_3D = "spline_3D"
+    """
+    A 3D spline.
+    """
+    density_map = "density_map"
+    """
+    A density map fit into a volume.
+    """
 
 
 class Image2D(ConfiguredBaseModel):
@@ -1223,7 +1255,7 @@ class TriMesh(Annotation, CoordMetaMixin):
 
 class SphereSet(Annotation, CoordMetaMixin):
     """
-    A set of spheres
+    A set of spheres.
     """
 
     origin3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
@@ -1245,15 +1277,15 @@ class SphereSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.sphere_set] = Field(
+        AnnotationType.sphere_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
 
 class CircleSet(Annotation, CoordMetaMixin):
     """
-    A set of circles
+    A set of circles.
     """
 
     origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
@@ -1275,15 +1307,15 @@ class CircleSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.circle_set] = Field(
+        AnnotationType.circle_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
 
 class CylinderSet(Annotation, CoordMetaMixin):
     """
-    A set of cylinders
+    A set of cylinders,
     """
 
     vector3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
@@ -1306,8 +1338,8 @@ class CylinderSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.cylinder_set] = Field(
+        AnnotationType.cylinder_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
@@ -1340,8 +1372,8 @@ class CuboidSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.cuboid_set] = Field(
+        AnnotationType.cuboid_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
@@ -1374,8 +1406,8 @@ class BoxSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.box_set] = Field(
+        AnnotationType.box_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
@@ -1401,8 +1433,8 @@ class Spline2D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.spline_2D] = Field(
+        AnnotationType.spline_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
@@ -1428,15 +1460,15 @@ class Spline3D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.spline_3D] = Field(
+        AnnotationType.spline_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
 
 class DensityMap(Annotation, AssociatedFile, Image3D):
     """
-    A density map fit into a volume
+    A density map fit into a volume.
     """
 
     matrix3D: Optional[Annotated[list[Matrix3x3], Field(min_length=1)]] = Field(
@@ -1466,8 +1498,8 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
         default=[], description="""Named coordinate transformations for this entity"""
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    annotation_type: AnnotationType = Field(
-        default=..., description="""The type of annotation."""
+    annotation_type: Literal[AnnotationType.density_map] = Field(
+        AnnotationType.density_map, description="""The type of annotation."""
     )
     name: Optional[str] = Field(default=None, description="""Name of the annotation""")
 
@@ -1505,6 +1537,14 @@ class Region(ConfiguredBaseModel):
                     PointMatrixSet2D,
                     PointMatrixSet3D,
                     TriMesh,
+                    SphereSet,
+                    CircleSet,
+                    CylinderSet,
+                    CuboidSet,
+                    BoxSet,
+                    Spline2D,
+                    Spline3D,
+                    DensityMap,
                 ],
                 Field(discriminator="annotation_type"),
             ]
@@ -1536,6 +1576,14 @@ class Average(ConfiguredBaseModel):
                     PointMatrixSet2D,
                     PointMatrixSet3D,
                     TriMesh,
+                    SphereSet,
+                    CircleSet,
+                    CylinderSet,
+                    CuboidSet,
+                    BoxSet,
+                    Spline2D,
+                    Spline3D,
+                    DensityMap,
                 ],
                 Field(discriminator="annotation_type"),
             ]

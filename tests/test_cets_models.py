@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 from pydantic import ValidationError
 
-from cets_data_model.models.patched_models import (
+from cets_data_model.models.models import (
     Dataset,
     Region,
     MovieFrame,
@@ -57,7 +57,7 @@ class TestExpectedDatasetValidation:
         assert len(region.tilt_series) == 1
         assert len(region.alignments) == 1
         assert len(region.tomograms) == 1
-        assert len(region.annotations) == 7  # All annotation types
+        assert len(region.annotations) == 7
 
     def test_expected_dataset_annotations(self, expected_dataset_path):
         """Verify all annotation types are present"""
@@ -69,6 +69,7 @@ class TestExpectedDatasetValidation:
 
         annotation_types = {ann.annotation_type for ann in region.annotations}
 
+        # TODO: add new annotation types
         expected_types = {
             "point_set_3D",
             "point_vector_set_3D",
@@ -142,7 +143,6 @@ class TestRoundTripSerialization:
         """Annotations should survive round-trip with all fields"""
         original = PointSet3D(
             annotation_type="point_set_3D",
-            path="/data/particles.star",
             origin3D=[[100.0, 200.0, 300.0], [150.0, 250.0, 350.0]],
             coordinate_systems=[
                 CoordinateSystem(

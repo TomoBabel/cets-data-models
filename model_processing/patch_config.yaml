@@ -13,6 +13,14 @@ discriminated_fields:
       - PointMatrixSet2D
       - PointMatrixSet3D
       - TriMesh
+      - SphereSet
+      - CircleSet
+      - CylinderSet
+      - CuboidSet
+      - BoxSet
+      - Spline2D
+      - Spline3D
+      - DensityMap
   - field_name: coordinate_transformations
     discriminator: transformation_type
     union_types:

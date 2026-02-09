@@ -266,28 +266,37 @@ classes:
     is_a: Annotation
     mixins:
       - CoordMetaMixin
-    description: A set of spheres
+    description: A set of spheres.
     slots:
       - origin3D
       - radii
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(sphere_set)
 
   CircleSet:
     is_a: Annotation
     mixins:
       - CoordMetaMixin
-    description: A set of circles
+    description: A set of circles.
     slots:
       - origin2D
       - radii
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(circle_set)
 
   CylinderSet:
     is_a: Annotation
     mixins:
       - CoordMetaMixin
-    description: A set of cylinders
+    description: A set of cylinders,
     slots:
       - vector3D
       - radii
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(cylinder_set)
 
   CuboidSet:
     is_a: Annotation
@@ -298,6 +307,9 @@ classes:
       - origin3D
       - matrix3D
       - dimensions3D
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(cuboid_set)
 
   BoxSet:
     is_a: Annotation
@@ -308,6 +320,9 @@ classes:
       - origin2D
       - matrix2D
       - dimensions2D
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(box_set)
 
   Spline2D:
     is_a: Annotation
@@ -316,6 +331,9 @@ classes:
     description: A 2D spline.
     slots:
       - origin2D
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(spline_2D)
 
   Spline3D:
     is_a: Annotation
@@ -324,15 +342,21 @@ classes:
     description: A 3D spline.
     slots:
       - origin3D
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(spline_3D)
 
   DensityMap:
     is_a: Annotation
     mixins:
       - Image3D
       - AssociatedFile
-    description: A density map fit into a volume
+    description: A density map fit into a volume.
     slots:
       - matrix3D
+    slot_usage:
+      annotation_type:
+        ifabsent: AnnotationType(density_map)
 
 enums:
   AnnotationType:
@@ -359,3 +383,19 @@ enums:
         description: A set of 3D points with an associated rotation matrix.
       tri_mesh:
         description: A mesh annotation.
+      sphere_set:
+        description: A set of spheres.
+      circle_set:
+        description: A set of circles.
+      cylinder_set:
+        description: A set of cylinders.
+      cuboid_set:
+        description: A set of oriented 3D boxes.
+      box_set:
+        description: A set of 2D boxes.
+      spline_2D:
+        description: A 2D spline.
+      spline_3D:
+        description: A 3D spline.
+      density_map:
+        description: A density map fit into a volume.

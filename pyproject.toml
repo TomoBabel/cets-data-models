@@ -32,8 +32,7 @@ classifiers = [
 dependencies = [
     "pydantic>=2",
     "mrcfile",
-    "pillow",
-    "linkml-runtime>=1.7.0",
+    "pillow"
 ]
 
 optional-dependencies.dev = [

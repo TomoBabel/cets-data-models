@@ -328,7 +328,7 @@
       "annotations": [
         {
           "annotation_type": "point_set_3D",
-          "path": "/data/annotations/particles_01.star",
+          "name": "ribosome_picks",
           "origin3D": [
             [
               100.5,
@@ -384,7 +384,7 @@
         },
         {
           "annotation_type": "point_vector_set_3D",
-          "path": "/data/annotations/orientations_01.star",
+          "name": "oriented_particles",
           "origin3D": [
             [
               100.5,
@@ -414,7 +414,7 @@
         },
         {
           "annotation_type": "point_matrix_set_3D",
-          "path": "/data/annotations/rotations_01.star",
+          "name": "rotated_particles",
           "origin3D": [
             [
               100.5,
@@ -446,6 +446,7 @@
         },
         {
           "annotation_type": "segmentation_mask_3D",
+          "name": "membrane_segmentation",
           "path": "/data/annotations/membrane_mask.mrc",
           "width": 1920,
           "height": 1920,
@@ -455,6 +456,7 @@
         },
         {
           "annotation_type": "probability_map_3D",
+          "name": "ribosome_probability",
           "path": "/data/annotations/probability_map.mrc",
           "width": 1920,
           "height": 1920,
@@ -464,7 +466,7 @@
         },
         {
           "annotation_type": "point_set_2D",
-          "path": "/data/annotations/fiducials_2D.txt",
+          "name": "fiducial_markers",
           "origin2D": [
             [
               1024.5,
@@ -484,7 +486,7 @@
         },
         {
           "annotation_type": "tri_mesh",
-          "path": "/data/annotations/surface_mesh.obj",
+          "name": "membrane_surface",
           "coordinate_systems": [],
           "coordinate_transformations": []
         }
@@ -560,7 +562,7 @@
       "annotations": [
         {
           "annotation_type": "point_set_3D",
-          "path": "/data/averages/symmetry_points.txt",
+          "name": "symmetry_points",
           "origin3D": [
             [
               128.0,
