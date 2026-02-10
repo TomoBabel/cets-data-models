@@ -262,7 +262,9 @@ class Axis(ConfiguredBaseModel):
     An axis in a coordinate system
     """
 
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     axis_unit: Optional[str] = Field(
         default="angstrom", description="""The unit of the axis"""
     )
@@ -290,7 +292,9 @@ class CoordinateTransformation(ConfiguredBaseModel):
     transformation_type: TransformationType = Field(
         default=..., description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -307,7 +311,9 @@ class Identity(CoordinateTransformation):
     transformation_type: Literal[TransformationType.identity] = Field(
         TransformationType.identity, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -340,7 +346,9 @@ class MapAxis(CoordinateTransformation):
     transformation_type: Literal[TransformationType.map_axis] = Field(
         TransformationType.map_axis, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -360,7 +368,9 @@ class Translation(CoordinateTransformation):
     transformation_type: Literal[TransformationType.translation] = Field(
         TransformationType.translation, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -380,7 +390,9 @@ class Scale(CoordinateTransformation):
     transformation_type: Literal[TransformationType.scale] = Field(
         TransformationType.scale, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -400,7 +412,9 @@ class Affine(CoordinateTransformation):
     transformation_type: Literal[TransformationType.affine] = Field(
         TransformationType.affine, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -425,7 +439,9 @@ class Sequence(CoordinateTransformation):
     transformation_type: Literal[TransformationType.sequence] = Field(
         TransformationType.sequence, description="""The type of transformation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -446,7 +462,9 @@ class ProjectionAlignment(CoordinateTransformation):
         TransformationType.projection_alignment,
         description="""The type of transformation.""",
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     input: Optional[str] = Field(
         default=None, description="""The source coordinate system name"""
     )
@@ -922,7 +940,9 @@ class Annotation(ConfiguredBaseModel):
     annotation_type: AnnotationType = Field(
         default=..., description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
@@ -953,7 +973,9 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     annotation_type: Literal[AnnotationType.segmentation_mask_2D] = Field(
         AnnotationType.segmentation_mask_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
@@ -987,7 +1009,9 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
@@ -1018,7 +1042,9 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
@@ -1052,7 +1078,9 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointSet2D(Annotation, CoordMetaMixin):
@@ -1079,7 +1107,9 @@ class PointSet2D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_set_2D] = Field(
         AnnotationType.point_set_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointSet3D(Annotation, CoordMetaMixin):
@@ -1106,7 +1136,9 @@ class PointSet3D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_set_3D] = Field(
         AnnotationType.point_set_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointVectorSet2D(Annotation, CoordMetaMixin):
@@ -1137,7 +1169,9 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_vector_set_2D] = Field(
         AnnotationType.point_vector_set_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointVectorSet3D(Annotation, CoordMetaMixin):
@@ -1168,7 +1202,9 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_vector_set_3D] = Field(
         AnnotationType.point_vector_set_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointMatrixSet2D(Annotation, CoordMetaMixin):
@@ -1199,7 +1235,9 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_matrix_set_2D] = Field(
         AnnotationType.point_matrix_set_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class PointMatrixSet3D(Annotation, CoordMetaMixin):
@@ -1230,7 +1268,9 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.point_matrix_set_3D] = Field(
         AnnotationType.point_matrix_set_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class TriMesh(Annotation, CoordMetaMixin):
@@ -1254,7 +1294,9 @@ class TriMesh(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.tri_mesh] = Field(
         AnnotationType.tri_mesh, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class SphereSet(Annotation, CoordMetaMixin):
@@ -1284,7 +1326,9 @@ class SphereSet(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.sphere_set] = Field(
         AnnotationType.sphere_set, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class CircleSet(Annotation, CoordMetaMixin):
@@ -1314,7 +1358,9 @@ class CircleSet(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.circle_set] = Field(
         AnnotationType.circle_set, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class CylinderSet(Annotation, CoordMetaMixin):
@@ -1345,7 +1391,9 @@ class CylinderSet(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.cylinder_set] = Field(
         AnnotationType.cylinder_set, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class CuboidSet(Annotation, CoordMetaMixin):
@@ -1379,7 +1427,9 @@ class CuboidSet(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.cuboid_set] = Field(
         AnnotationType.cuboid_set, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class BoxSet(Annotation, CoordMetaMixin):
@@ -1413,7 +1463,9 @@ class BoxSet(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.box_set] = Field(
         AnnotationType.box_set, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class Spline2D(Annotation, CoordMetaMixin):
@@ -1440,7 +1492,9 @@ class Spline2D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.spline_2D] = Field(
         AnnotationType.spline_2D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class Spline3D(Annotation, CoordMetaMixin):
@@ -1467,7 +1521,9 @@ class Spline3D(Annotation, CoordMetaMixin):
     annotation_type: Literal[AnnotationType.spline_3D] = Field(
         AnnotationType.spline_3D, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class DensityMap(Annotation, AssociatedFile, Image3D):
@@ -1505,7 +1561,9 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     annotation_type: Literal[AnnotationType.density_map] = Field(
         AnnotationType.density_map, description="""The type of annotation."""
     )
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
 
 
 class Region(ConfiguredBaseModel):
@@ -1561,7 +1619,9 @@ class Average(ConfiguredBaseModel):
     A particle averaging experiment.
     """
 
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     particle_maps: Optional[list[ParticleMap]] = Field(
         default=[], description="""The particle maps"""
     )
@@ -1616,7 +1676,9 @@ class Dataset(ConfiguredBaseModel):
     A dataset
     """
 
-    name: Optional[str] = Field(default=None, description="""Name of the annotation""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     regions: Optional[list[Region]] = Field(
         default=[], description="""The regions in the dataset"""
     )

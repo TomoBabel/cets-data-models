@@ -11,6 +11,7 @@ default_prefix: annotation
 
 imports:
 - linkml:types
+- ./common
 - ./image
 - ./coordinate_systems
 - ./coordinate_transforms
@@ -132,9 +133,6 @@ slots:
             minimum_cardinality: 1
           - alias: xyz
             minimum_cardinality: 3
-  - name:
-      description: Name of the annotation
-      range: string
 
 classes:
   CoordMetaMixin:

@@ -14,7 +14,7 @@ imports:
 
 slots:
   name:
-    description: A name, or title, human-readable, for this entity
+    description: A human-readable name or title for this entity
     range: string
   id:
     description: Unique identifier for this entity
