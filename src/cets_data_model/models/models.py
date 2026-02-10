@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Literal, Optional, Union, Annotated, TypeAlias
+from typing import Annotated, Any, Literal, Optional, TypeAlias, Union
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel
-
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+)
 
 # Type aliases
 Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]

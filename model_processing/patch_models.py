@@ -2,6 +2,7 @@ import ast
 import importlib.util
 import logging
 import re
+import subprocess
 import sys
 import yaml
 from pathlib import Path
@@ -403,9 +404,43 @@ def remove_treat_empty_lists_serializer(model_def: str) -> str:
     return "\n".join(new_lines)
 
 
+def format_with_ruff(filepath: Path):
+    """
+    Format a Python file in-place using ruff (formatting + import sorting + unused removal).
+
+    Args:
+        filepath: Path to the Python file to format
+    """
+    logger.info("Formatting code with ruff...")
+
+    try:
+        subprocess.run(
+            ["ruff", "check", "--select", "I,F401", "--fix", str(filepath)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        subprocess.run(
+            ["ruff", "format", str(filepath)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        logger.info("  ✓ Code formatted successfully (including imports)")
+
+    except FileNotFoundError:
+        logger.warning("  ⚠ Ruff not found in PATH - skipping formatting")
+        logger.warning("    Install ruff with: pip install ruff")
+
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"  ⚠ Ruff formatting failed (non-zero exit): {e.stderr}")
+        logger.warning("    Continuing with unformatted code")
+
+
 def validate_syntax(output_path: Path) -> bool:
     """
-    CR: Check Python syntax by attempting to parse as AST
+    Check Python syntax by attempting to parse as AST.
     """
     try:
         ast.parse(output_path.read_text())
@@ -419,8 +454,8 @@ def validate_syntax(output_path: Path) -> bool:
 
 def validate_imports(output_path: Path) -> bool:
     """
-    CR: Attempt to import the module to catch runtime issues
-    CR: (e.g., undefined names, circular imports, type errors that prevent import)
+    Attempt to import the module to catch runtime issues -
+    (e.g., undefined names, circular imports, type errors that prevent import).
     """
     try:
         spec = importlib.util.spec_from_file_location("models", output_path)
@@ -435,7 +470,7 @@ def validate_imports(output_path: Path) -> bool:
 
 def validate_type_aliases(module_content: str) -> bool:
     """
-    CR: Verify expected type aliases exist in the module
+    Verify expected type aliases exist in the module.
     """
     expected_aliases = [
         "Vector2D",
@@ -462,8 +497,7 @@ def validate_type_aliases(module_content: str) -> bool:
 
 def validate_discriminated_unions(module_content: str) -> bool:
     """
-    CR: Verify discriminated unions were applied
-    CR: Look for Field(discriminator=...) pattern
+    Verify discriminated unions were applied.
     """
     discriminator_pattern = r'Field\(discriminator="[^"]+"\)'
 
@@ -481,7 +515,7 @@ def validate_discriminated_unions(module_content: str) -> bool:
 
 def validate_literal_types_for_discriminators(module_content: str) -> bool:
     """
-    CR: Verify Literal types for discriminator fields exist
+    Verify Literal types for discriminator fields exist.
     """
     literal_pattern = (
         r"Literal\[TransformationType\.\w+\]|Literal\[AnnotationType\.\w+\]"
@@ -498,9 +532,9 @@ def validate_literal_types_for_discriminators(module_content: str) -> bool:
 
 def validate_patched_models(output_path: Path) -> bool:
     """
-    CR: Validate that patched models are syntactically valid and importable.
-    CR: This catches cases where regex patching broke the generated code.
-    CR: Returns True if validation passes, False otherwise.
+    Validate that patched models are syntactically valid and importable.
+    This catches cases where regex patching broke the generated code.
+    Returns True if validation passes, False otherwise.
     """
     logger.info("Validating patched models...")
 
@@ -540,6 +574,8 @@ def patch_models(input_path: Path, output_path: Path) -> None:
             model_def = patch_discriminator_fields_to_literal(model_def, config)
 
     output_path.write_text(model_def)
+
+    format_with_ruff(output_path)
 
     discriminated_union_field_names = [
         f["field_name"] for f in patch_config.get("discriminated_fields", [])

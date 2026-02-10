@@ -15,7 +15,7 @@ are required for model generation:
 ### Post-generation script
 With just the LinkML, we cannot currently specify everything we'd like in the pydantic models. Thus, some post-generation augmentation and refinement is required. For this purpose, the script `patch_models.py` in `model_processing` adds type aliases and discriminated unions to the models. The file `patch_config.yaml` specifies where these modifications should happen, listing, for discriminated unions, the classes that should be in the union, and the fields and (optionally) classes to which they apply, and for type aliases, the name of it, its definition, and fields for which it should be used. Thus with the configuration in the yaml file, model patching can be extended, if need be. 
 
-**NOTE:**This project pins `linkml==1.9.6` because the post-generation patching script depends on specific output format from LinkML's Pydantic generator. 
+**NOTE:** This project pins `linkml==1.9.6` because the post-generation patching script depends on specific output format from LinkML's Pydantic generator. 
 
 If upgrading LinkML:
 1. Check changes to PydanticGenerator in LinkML release notes.
