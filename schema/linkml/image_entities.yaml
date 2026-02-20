@@ -15,13 +15,12 @@ imports:
 - ./coordinate_systems
 - ./coordinate_transforms
 - ./alignment
+- ./common
 
 slots:
-  path:
-    description: Path to a file.
-    range: string
   section:
     description: 0-based section index to the entity inside a stack.
+    range: integer
   nominal_tilt_angle:
     description: The tilt angle reported by the microscope
     range: float
@@ -43,9 +42,19 @@ slots:
   ctf_metadata:
     description: A set of CTF patameters for an image.
     range: CTFMetadata
+  ctf_corrected: 
+    description: Flag to indicate if this was reconstructed from a tilt-series with the ctf corrected.
+    range: boolean
   defocus_handedness:
     description: The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.
     range: integer
+  even_path:
+    description: Path of the even file.
+    range: string
+  odd_path:
+    description: Path of the odd file.
+    range: string
+
 
 classes:
   CTFMetadata:
@@ -58,26 +67,22 @@ classes:
     slot_usage:
       defocus_handedness:
         ifabsent: -1
-
   AcquisitionMetadataMixin:
     description: Metadata concerning the acquisition process.
     slots:
       - nominal_tilt_angle
       - accumulated_dose
       - ctf_metadata
-
   GainFile:
     is_a: Image2D
     description: A gain reference file.
     slots:
       - path
-
   DefectFile:
     is_a: Image2D
     description: A detector defect file.
     slots:
       - path
-
   MovieFrame:
     is_a: Image2D
     mixins:
@@ -86,56 +91,80 @@ classes:
     slots:
       - path
       - section
-
   MovieStack:
     description: A stack of movie frames.
+    slots:
+      - id
+      - path
     attributes:
       images:
         description: The movie frames in the stack
         range: MovieFrame
         multivalued: true
-      path:
-        range: string
-
-  ProjectionImage:
-    is_a: Image2D
-    mixins:
-      - AcquisitionMetadataMixin
-    description: A projection image.
-    slots:
-      - path
-      - section
-
   MovieStackSeries:
     description: A group of movie stacks that belong to a single tilt series.
+    slots:
+      - id
     attributes:
       stacks:
         description: The movie stacks.
         range: MovieStack
         multivalued: true
-
-  TiltSeries:
-    description: A stack of projection images.
-    attributes:
-      images:
-        description: The projections in the stack
-        range: ProjectionImage
-        multivalued: true
-      path:
-        range: string
-
+        inlined_as_list: true
+  BaseProjectionImage:
+    is_a: Image2D
+    mixins:
+      - AcquisitionMetadataMixin
+    description: Base class for different projection image types, not for direct use.
+    abstract: true 
+    slots:
+      - path
+      - section
+  ProjectionImage:
+    is_a: BaseProjectionImage
+    description: A projection image.
   SubProjectionImage:
     is_a: ProjectionImage
     description: A croppecd projection image.
     slots:
       - particle_index
-
+  TiltImage:
+    is_a: BaseProjectionImage
+    description: A projection image that belongs to a tilt series.
+    attributes:
+      movie_stack_id:
+        description: The ID of the movie stack for this tilt image.
+        range: string
+  TiltSeries:
+    description: A stack of projection images.
+    slots:
+      - id
+      - path
+      - ctf_corrected
+      - even_path
+      - odd_path
+    attributes:
+      images:
+        description: The projections in the stack.
+        range: TiltImage
+        multivalued: true
+        inlined_as_list: true
+      movie_stack_series_id: 
+        description: The ID of the movie stack series for this tilt series.
+        range: string
   Tomogram:
     is_a: Image3D
     description: A 3D tomogram.
     slots:
+      - id
       - path
-
+      - ctf_corrected
+      - even_path
+      - odd_path
+    attributes:
+      tilt_series_id:
+        description: The ID of the tilt series for this tomogram.
+        range: string
   ParticleMap:
     is_a: Image3D
     description: A 3D particle density map.

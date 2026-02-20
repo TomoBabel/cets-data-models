@@ -12,7 +12,22 @@ install-dev:
 .PHONY: gen-python
 gen-python:
 	@echo "Generating Python code from linkml files"
-	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/gen_models.py
+	gen-pydantic --meta None schema/linkml/entities.yaml > src/cets_data_model/models/generated_models.py
+
+	@echo "Patching generated model file"
+	python model_processing/patch_models.py \
+		src/cets_data_model/models/generated_models.py \
+		src/cets_data_model/models/patched_models.py
+
+.PHONY: compare-models
+compare-models:
+	@echo "Comparing model files"
+	python scripts/compare_models.py src/cets_data_model/models/models.py src/cets_data_model/models/patched_models.py
+
+.PHONY: compare-models-verbose
+compare-models-verbose:
+	@echo "Comparing model files (verbose)"
+	python scripts/compare_models.py src/cets_data_model/models/models.py src/cets_data_model/models/patched_models.py --verbose
 
 .PHONY: linkml-docs
 linkml-docs:

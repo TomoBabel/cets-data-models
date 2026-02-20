@@ -1,0 +1,25 @@
+name: CETMDCommon
+id: https://w3id.org/cetmd/common
+version: 0.0.1
+description: Common slots and classes used across CETS data models
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  common: https://w3id.org/cetmd/common/
+
+default_prefix: common
+
+imports:
+- linkml:types
+
+slots:
+  name:
+    description: A human-readable name or title for this entity
+    range: string
+  id:
+    description: Unique identifier for this entity
+    range: string
+    identifier: true
+  path:
+    description: Path to a file.
+    range: string

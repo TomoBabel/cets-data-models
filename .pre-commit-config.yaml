@@ -12,4 +12,8 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        additional_dependencies: [types-setuptools]
+        pass_filenames: false
+        additional_dependencies: 
+          - types-setuptools
+          - pydantic>=2
+          - types-Pillow
