@@ -6,6 +6,17 @@ from src.cets_data_model.utils.image_utils import (
     check_file_is_tif,
     get_image_info,
 )
+from src.cets_data_model.utils.coordinate_systems import (
+    logical_coords,
+    physical_coords,
+    X_AXIS_PHYSICAL,
+    Y_AXIS_PHYSICAL,
+    Z_AXIS_PHYSICAL,
+    X_AXIS_LOGICAL,
+    Y_AXIS_LOGICAL,
+    Z_AXIS_LOGICAL,
+)
+from cets_data_model.models.models import CoordinateSystem
 from tests.testing_tools import CetsDataModelTest
 
 
@@ -88,3 +99,42 @@ class UtilsTests(CetsDataModelTest):
             "apix_y": None,
             "apix_z": None,
         }
+
+    def test_make_coordinate_system_bad_dims_logical(self):
+        with self.assertRaises(ValueError):
+            logical_coords(dim=1)
+
+    def test_make_coordinate_system_bad_dims_physical(self):
+        with self.assertRaises(ValueError):
+            physical_coords(dim=1, name="bad")
+
+
+def test_make_coordinate_system_2d_logical():
+    assert logical_coords(dim=2) == CoordinateSystem(
+        name="logical coordinates 2d", axes=[X_AXIS_LOGICAL, Y_AXIS_LOGICAL]
+    )
+
+
+def test_make_coordinate_system_2d_logical_with_name():
+    assert logical_coords(dim=2, name="coords") == CoordinateSystem(
+        name="coords", axes=[X_AXIS_LOGICAL, Y_AXIS_LOGICAL]
+    )
+
+
+def test_make_coordinate_system_3d_logical():
+    assert logical_coords(dim=3) == CoordinateSystem(
+        name="logical coordinates 3d",
+        axes=[X_AXIS_LOGICAL, Y_AXIS_LOGICAL, Z_AXIS_LOGICAL],
+    )
+
+
+def test_make_coordinate_system_2d_physical():
+    assert physical_coords(dim=2, name="coords") == CoordinateSystem(
+        name="coords", axes=[X_AXIS_PHYSICAL, Y_AXIS_PHYSICAL]
+    )
+
+
+def test_make_coordinate_system_3d_phyical():
+    assert physical_coords(name="coords", dim=3) == CoordinateSystem(
+        name="coords", axes=[X_AXIS_PHYSICAL, Y_AXIS_PHYSICAL, Z_AXIS_PHYSICAL]
+    )
