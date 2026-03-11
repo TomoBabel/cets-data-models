@@ -448,6 +448,10 @@ class Sequence(CoordinateTransformation):
     output: Optional[str] = Field(
         default=None, description="""The target coordinate system name"""
     )
+    target_file: Optional[str] = Field(
+        default=None,
+        description="""The file created when the sequence is applied, EG tomogram""",
+    )
 
 
 class ProjectionAlignment(CoordinateTransformation):
