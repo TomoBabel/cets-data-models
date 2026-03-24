@@ -15,13 +15,13 @@ Z_AXIS_LOGICAL = Axis(
 )
 
 X_AXIS_PHYSICAL = Axis(
-    name="physical coordinates x axis", axis_unit="Ångstrom", axis_type=AxisType.array
+    name="physical coordinates x axis", axis_unit="Ångstrom", axis_type=AxisType.space
 )
 Y_AXIS_PHYSICAL = Axis(
-    name="physical coordinates y axis", axis_unit="Ångstrom", axis_type=AxisType.array
+    name="physical coordinates y axis", axis_unit="Ångstrom", axis_type=AxisType.space
 )
 Z_AXIS_PHYSICAL = Axis(
-    name="physical coordinates z axis", axis_unit="Ångstrom", axis_type=AxisType.array
+    name="physical coordinates z axis", axis_unit="Ångstrom", axis_type=AxisType.space
 )
 
 
