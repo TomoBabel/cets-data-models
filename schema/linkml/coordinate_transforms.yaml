@@ -109,6 +109,10 @@ classes:
         description: The sequence of transformations
         range: CoordinateTransformation
         multivalued: true
+      target_file:
+        description: The file created when the sequence is applied, EG tomogram
+        range: string
+        multivalued: false
 
 enums:
   TransformationType:
