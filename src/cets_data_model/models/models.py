@@ -499,6 +499,10 @@ class CTFMetadata(ConfiguredBaseModel):
     defocus_angle: Optional[float] = Field(
         default=None, description="""Estimated angle of astigmatism."""
     )
+    phase_shift: Optional[float] = Field(
+        default=None,
+        description="""Phase shift value produced by the usage of a phase plate.""",
+    )
     defocus_handedness: Optional[int] = Field(
         default=-1,
         description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
