@@ -36,6 +36,10 @@ slots:
   defocus_angle:
     description: Estimated angle of astigmatism.
     range: float
+  phase_shift:
+    description: Phase shift value produced by the usage of a phase plate.
+    range: float
+
   particle_index:
     description: Index of a particle inside a tomogram.
     range: integer
@@ -63,6 +67,7 @@ classes:
       - defocus_u
       - defocus_v
       - defocus_angle
+      - phase_shift
       - defocus_handedness
     slot_usage:
       defocus_handedness:
