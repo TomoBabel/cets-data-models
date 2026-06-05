@@ -21,6 +21,12 @@ slots:
       description: The type of annotation.
       range: AnnotationType
       required: true
+  - source_tomogram_id:
+      description: ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.
+      range: string
+  - source_region_id:
+      description: ID of the region containing the source entity, when known.
+      range: string
   - origin2D:
       description: Location on a 2D image (Nx2).
       range: float
@@ -149,8 +155,11 @@ classes:
   Annotation:
     description: A primitive annotation.
     slots:
+      - id
       - annotation_type
       - name
+      - source_tomogram_id
+      - source_region_id
   SegmentationMask2D:
     is_a: Annotation
     mixins:
