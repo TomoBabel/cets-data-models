@@ -133,7 +133,9 @@ slots:
             minimum_cardinality: 1
           - alias: xyz
             minimum_cardinality: 3
-
+  - target_id:
+      description: The entity the annotation applies to
+      range: string
 classes:
   CoordMetaMixin:
     description: Coordinate system mixins for annotations.
@@ -151,6 +153,8 @@ classes:
     slots:
       - annotation_type
       - name
+      - target_id
+      - id
   SegmentationMask2D:
     is_a: Annotation
     mixins:

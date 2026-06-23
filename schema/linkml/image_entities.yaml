@@ -39,7 +39,6 @@ slots:
   phase_shift:
     description: Phase shift value produced by the usage of a phase plate.
     range: float
-
   particle_index:
     description: Index of a particle inside a tomogram.
     range: integer
@@ -106,10 +105,12 @@ classes:
         description: The movie frames in the stack
         range: MovieFrame
         multivalued: true
+        inlined_as_list: true
   MovieStackSeries:
     description: A group of movie stacks that belong to a single tilt series.
     slots:
       - id
+      - name
     attributes:
       stacks:
         description: The movie stacks.
@@ -175,6 +176,10 @@ classes:
     description: A 3D particle density map.
     slots:
       - path
+    slot_usage:
+      id:
+        required: false
+        ifabsent: string()
 
 
 

@@ -1,5 +1,6 @@
 {
   "name": "example_cets_dataset",
+  "id": "999",
   "regions": [
     {
       "id": "region_01",
@@ -14,6 +15,7 @@
                 "images": [
                   {
                     "path": "/data/movies/tilt_00.tif",
+                    "id": "1",
                     "section": 0,
                     "nominal_tilt_angle": -60.0,
                     "accumulated_dose": 2.5,
@@ -45,6 +47,7 @@
                     "coordinate_transformations": []
                   },
                   {
+                    "id": "2",
                     "path": "/data/movies/tilt_00.tif",
                     "section": 1,
                     "nominal_tilt_angle": -60.0,
@@ -67,6 +70,7 @@
                 "path": "/data/movies/tilt_01.tif",
                 "images": [
                   {
+                    "id": "4",
                     "path": "/data/movies/tilt_01.tif",
                     "section": 0,
                     "nominal_tilt_angle": -30.0,
@@ -88,6 +92,7 @@
           }
         ],
         "gain_file": {
+          "id": "5",
           "path": "/data/gain_reference.mrc",
           "width": 4096,
           "height": 4096,
@@ -95,6 +100,7 @@
           "coordinate_transformations": []
         },
         "defect_file": {
+          "id": "6",
           "path": "/data/defect_map.mrc",
           "width": 4096,
           "height": 4096,
@@ -112,6 +118,7 @@
           "movie_stack_series_id": "movie_stack_series_01",
           "images": [
             {
+              "id": "7",
               "movie_stack_id": "movie_stack_01",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 0,
@@ -171,6 +178,7 @@
               ]
             },
             {
+              "id": "9",
               "movie_stack_id": "movie_stack_02",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 1,
@@ -198,6 +206,7 @@
               "name": "align_tilt_neg60",
               "input": "tilt_image_angstroms",
               "output": "tomogram_angstroms",
+              "target_id": "tomogram_01",
               "sequence": [
                 {
                   "transformation_type": "translation",
@@ -237,6 +246,7 @@
             },
             {
               "transformation_type": "projection_alignment",
+              "target_id": "tomogram_01",
               "name": "align_tilt_neg30",
               "input": "tilt_image_angstroms",
               "output": "tomogram_angstroms",
@@ -327,6 +337,7 @@
       ],
       "annotations": [
         {
+          "id": "9",
           "annotation_type": "point_set_3D",
           "name": "ribosome_picks",
           "origin3D": [
@@ -383,6 +394,7 @@
           ]
         },
         {
+          "id": "10",
           "annotation_type": "point_vector_set_3D",
           "name": "oriented_particles",
           "origin3D": [
@@ -413,6 +425,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "11",
           "annotation_type": "point_matrix_set_3D",
           "name": "rotated_particles",
           "origin3D": [
@@ -445,6 +458,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "12",
           "annotation_type": "segmentation_mask_3D",
           "name": "membrane_segmentation",
           "path": "/data/annotations/membrane_mask.mrc",
@@ -455,6 +469,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "13",
           "annotation_type": "probability_map_3D",
           "name": "ribosome_probability",
           "path": "/data/annotations/probability_map.mrc",
@@ -465,6 +480,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "14",
           "annotation_type": "point_set_2D",
           "name": "fiducial_markers",
           "origin2D": [
@@ -485,6 +501,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "15",
           "annotation_type": "tri_mesh",
           "name": "membrane_surface",
           "coordinate_systems": [],
@@ -495,6 +512,7 @@
   ],
   "averages": [
     {
+      "id": "16",
       "name": "ribosome_average_01",
       "particle_maps": [
         {
@@ -561,6 +579,7 @@
       ],
       "annotations": [
         {
+          "id": "17",
           "annotation_type": "point_set_3D",
           "name": "symmetry_points",
           "origin3D": [

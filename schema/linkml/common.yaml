@@ -16,6 +16,7 @@ slots:
   name:
     description: A human-readable name or title for this entity
     range: string
+    ifabsent: ""
   id:
     description: Unique identifier for this entity
     range: string
@@ -23,3 +24,5 @@ slots:
   path:
     description: Path to a file.
     range: string
+    ifabsent: ""
+

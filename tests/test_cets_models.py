@@ -116,6 +116,7 @@ class TestRoundTripSerialization:
         """Dataset should survive JSON round-trip unchanged"""
         original = Dataset(
             name="test_dataset",
+            id="001",
             regions=[
                 Region(
                     id="region_test",
@@ -226,6 +227,7 @@ class TestConstraintValidation:
             section=0,  # Integer
             width=4096,
             height=4096,
+            id="1",
         )
         assert frame.section == 0
         assert isinstance(frame.section, int)
