@@ -974,10 +974,6 @@ class Annotation(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
@@ -1012,9 +1008,6 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
 
 
 class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
@@ -1044,16 +1037,13 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    id: str = Field(default="", description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
-    )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
     )
 
 
@@ -1081,16 +1071,13 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    id: str = Field(default="", description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
-    )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
     )
 
 
@@ -1121,16 +1108,13 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    id: str = Field(default="", description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
-    )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
     )
 
 
@@ -1161,10 +1145,6 @@ class PointSet2D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class PointSet3D(Annotation, CoordMetaMixin):
@@ -1194,10 +1174,6 @@ class PointSet3D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class PointVectorSet2D(Annotation, CoordMetaMixin):
@@ -1231,10 +1207,6 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class PointVectorSet3D(Annotation, CoordMetaMixin):
@@ -1268,10 +1240,6 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class PointMatrixSet2D(Annotation, CoordMetaMixin):
@@ -1305,10 +1273,6 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class PointMatrixSet3D(Annotation, CoordMetaMixin):
@@ -1342,10 +1306,6 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class TriMesh(Annotation, CoordMetaMixin):
@@ -1372,10 +1332,6 @@ class TriMesh(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class SphereSet(Annotation, CoordMetaMixin):
@@ -1408,10 +1364,6 @@ class SphereSet(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class CircleSet(Annotation, CoordMetaMixin):
@@ -1444,10 +1396,6 @@ class CircleSet(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class CylinderSet(Annotation, CoordMetaMixin):
@@ -1481,10 +1429,6 @@ class CylinderSet(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class CuboidSet(Annotation, CoordMetaMixin):
@@ -1521,10 +1465,6 @@ class CuboidSet(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class BoxSet(Annotation, CoordMetaMixin):
@@ -1561,10 +1501,6 @@ class BoxSet(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class Spline2D(Annotation, CoordMetaMixin):
@@ -1594,10 +1530,6 @@ class Spline2D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class Spline3D(Annotation, CoordMetaMixin):
@@ -1627,10 +1559,6 @@ class Spline3D(Annotation, CoordMetaMixin):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
-    )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class DensityMap(Annotation, AssociatedFile, Image3D):
@@ -1671,9 +1599,6 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
-    )
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
     )
 
 

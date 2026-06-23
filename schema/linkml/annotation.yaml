@@ -153,8 +153,6 @@ classes:
     slots:
       - annotation_type
       - name
-      - target_id
-      - id
   SegmentationMask2D:
     is_a: Annotation
     mixins:
@@ -173,6 +171,9 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(segmentation_mask_3D)
+      id:
+        required: false
+        ifabsent: string()
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
@@ -182,6 +183,9 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(probability_map_2D)
+      id:
+        required: false
+        ifabsent: string()
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
@@ -191,6 +195,9 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(probability_map_3D)
+      id:
+        required: false
+        ifabsent: string()
   PointSet2D:
     is_a: Annotation
     mixins:

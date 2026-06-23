@@ -337,7 +337,6 @@
       ],
       "annotations": [
         {
-          "id": "9",
           "annotation_type": "point_set_3D",
           "name": "ribosome_picks",
           "origin3D": [
@@ -394,7 +393,6 @@
           ]
         },
         {
-          "id": "10",
           "annotation_type": "point_vector_set_3D",
           "name": "oriented_particles",
           "origin3D": [
@@ -425,7 +423,6 @@
           "coordinate_transformations": []
         },
         {
-          "id": "11",
           "annotation_type": "point_matrix_set_3D",
           "name": "rotated_particles",
           "origin3D": [
@@ -458,7 +455,6 @@
           "coordinate_transformations": []
         },
         {
-          "id": "12",
           "annotation_type": "segmentation_mask_3D",
           "name": "membrane_segmentation",
           "path": "/data/annotations/membrane_mask.mrc",
@@ -469,7 +465,6 @@
           "coordinate_transformations": []
         },
         {
-          "id": "13",
           "annotation_type": "probability_map_3D",
           "name": "ribosome_probability",
           "path": "/data/annotations/probability_map.mrc",
@@ -480,7 +475,6 @@
           "coordinate_transformations": []
         },
         {
-          "id": "14",
           "annotation_type": "point_set_2D",
           "name": "fiducial_markers",
           "origin2D": [
@@ -501,7 +495,6 @@
           "coordinate_transformations": []
         },
         {
-          "id": "15",
           "annotation_type": "tri_mesh",
           "name": "membrane_surface",
           "coordinate_systems": [],
@@ -579,7 +572,6 @@
       ],
       "annotations": [
         {
-          "id": "17",
           "annotation_type": "point_set_3D",
           "name": "symmetry_points",
           "origin3D": [
