@@ -958,7 +958,7 @@ class Annotation(ConfiguredBaseModel):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -996,7 +996,7 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1037,7 +1037,7 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1075,7 +1075,7 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1116,7 +1116,7 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1150,7 +1150,7 @@ class PointSet2D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1184,7 +1184,7 @@ class PointSet3D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1222,7 +1222,7 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1260,7 +1260,7 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1298,7 +1298,7 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1336,7 +1336,7 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1367,7 +1367,7 @@ class TriMesh(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1404,7 +1404,7 @@ class SphereSet(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1441,7 +1441,7 @@ class CircleSet(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1479,7 +1479,7 @@ class CylinderSet(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1520,7 +1520,7 @@ class CuboidSet(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1561,7 +1561,7 @@ class BoxSet(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1595,7 +1595,7 @@ class Spline2D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1629,7 +1629,7 @@ class Spline3D(Annotation, CoordMetaMixin):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1674,7 +1674,7 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     )
     source_tomogram_id: Optional[str] = Field(
         default=None,
-        description="""ID of the tomogram this annotation was derived from, such as the tomogram containing picked coordinates.""",
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 

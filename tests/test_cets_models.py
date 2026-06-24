@@ -16,6 +16,7 @@ from cets_data_model.models.models import (
     Sequence,
     PointSet3D,
     ParticleMap,
+    Average,
     AnnotationReference,
 )
 
@@ -211,6 +212,28 @@ class TestRoundTripSerialization:
 
         assert reconstructed.source_annotation_reference_id == "average_ribosome_picks"
         assert reconstructed.coord_index == 3
+
+    def test_average_without_annotation_references_roundtrip(self):
+        """Averages may contain particle maps without source annotation references"""
+        original = Average(
+            name="subtomograms_only",
+            particle_maps=[
+                ParticleMap(
+                    path="/data/subtomograms/particle_001.mrc",
+                    width=64,
+                    height=64,
+                    depth=64,
+                )
+            ],
+        )
+
+        json_str = original.model_dump_json()
+        reconstructed = Average.model_validate_json(json_str)
+
+        assert len(reconstructed.particle_maps) == 1
+        assert reconstructed.annotations == []
+        assert reconstructed.particle_maps[0].source_annotation_reference_id is None
+        assert reconstructed.particle_maps[0].coord_index is None
 
     def test_transformation_sequence_roundtrip(self):
         """Complex transformation sequences should survive round-trip"""
