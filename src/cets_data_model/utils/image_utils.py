@@ -56,7 +56,7 @@ def check_file_is_em(file: Union[str, os.PathLike]) -> bool:
         file (Union[str, os.PathLike]): The path for the file to check, relative to the project directory
 
     Returns:
-        bool: The file is a valid mrc
+        bool: The file is a valid .em
     """
     file = str(file)
     return True if file.endswith(".em") else False
