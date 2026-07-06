@@ -172,8 +172,7 @@ classes:
       annotation_type:
         ifabsent: AnnotationType(segmentation_mask_3D)
       id:
-        required: false
-        ifabsent: string()
+        required: true
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
@@ -184,8 +183,7 @@ classes:
       annotation_type:
         ifabsent: AnnotationType(probability_map_2D)
       id:
-        required: false
-        ifabsent: string()
+        required: true
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
@@ -196,8 +194,7 @@ classes:
       annotation_type:
         ifabsent: AnnotationType(probability_map_3D)
       id:
-        required: false
-        ifabsent: string()
+        required: true
   PointSet2D:
     is_a: Annotation
     mixins:

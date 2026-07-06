@@ -61,6 +61,7 @@ classes:
         description: The images in the stack
         range: Image2D
         multivalued: true
+        inlined_as_list: true
       id:
         description: The id of the stack
         range: string
@@ -78,6 +79,7 @@ classes:
         description: The images in the stack
         range: Image3D
         multivalued: true
+        inlined_as_list: true
       id:
         description: The id of the stack
         range: string

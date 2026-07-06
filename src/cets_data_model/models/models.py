@@ -246,7 +246,7 @@ class ImageStack2D(ConfiguredBaseModel):
     A stack of 2D images.
     """
 
-    images: Optional[list[str]] = Field(
+    images: Optional[list[Image2D]] = Field(
         default=[], description="""The images in the stack"""
     )
     id: Optional[str] = Field(default=None, description="""The id of the stack""")
@@ -259,7 +259,7 @@ class ImageStack3D(ConfiguredBaseModel):
     A stack of 3D images.
     """
 
-    images: Optional[list[str]] = Field(
+    images: Optional[list[Image3D]] = Field(
         default=[], description="""The images in the stack"""
     )
     id: Optional[str] = Field(default=None, description="""The id of the stack""")
@@ -438,8 +438,8 @@ class Sequence(CoordinateTransformation):
     A sequence of transformations
     """
 
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
+    transformation_type: Literal[TransformationType.sequence] = Field(
+        TransformationType.sequence, description="""The type of transformation."""
     )
     sequence: Optional[
         list[
@@ -449,8 +449,8 @@ class Sequence(CoordinateTransformation):
             ]
         ]
     ] = Field(default=[], description="""The sequence of transformations""")
-    transformation_type: Literal[TransformationType.sequence] = Field(
-        TransformationType.sequence, description="""The type of transformation."""
+    target_id: Optional[str] = Field(
+        default=None, description="""The entity this transformation creates"""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -932,7 +932,7 @@ class ParticleMap(Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default="", description="""Unique identifier for this entity""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class CoordMetaMixin(ConfiguredBaseModel):
@@ -1037,7 +1037,7 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default="", description="""Unique identifier for this entity""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
@@ -1071,7 +1071,7 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default="", description="""Unique identifier for this entity""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
@@ -1108,7 +1108,7 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default="", description="""Unique identifier for this entity""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""

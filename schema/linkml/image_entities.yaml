@@ -178,8 +178,7 @@ classes:
       - path
     slot_usage:
       id:
-        required: false
-        ifabsent: string()
+        required: true
 
 
 
