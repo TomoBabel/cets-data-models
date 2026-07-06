@@ -18,6 +18,7 @@ from src.cets_data_model.utils.coordinate_systems import (
 )
 from cets_data_model.models.models import CoordinateSystem
 from tests.testing_tools import CetsDataModelTest
+from src.cets_data_model.utils.validator import validate
 
 
 class UtilsTests(CetsDataModelTest):
@@ -107,6 +108,44 @@ class UtilsTests(CetsDataModelTest):
     def test_make_coordinate_system_bad_dims_physical(self):
         with self.assertRaises(ValueError):
             physical_coords(dim=1, name="bad")
+
+
+class ValidatorTests(CetsDataModelTest):
+    def test_validate_file_no_errors(self):
+        file = self.test_data / "expected_dataset.json"
+        assert validate(file) == {}
+
+    def test_validate_file_with_errors(self):
+        file = self.test_data / "expected_dataset_with_errors.json"
+        assert validate(file) == {
+            "Unresolved movie_stack_series_id": [
+                ("movie_stack_series_01", ".regions[0].tilt_series[0]")
+            ],
+            "Unresolved target_id": [
+                (
+                    "non-existent target",
+                    ".regions[0].alignments[0].projection_alignments[1]",
+                )
+            ],
+            "Wrong type": [
+                (
+                    "movie_stack_id: 'tomogram_01'",
+                    ".regions[0].tilt_series[0].images[0]",
+                )
+            ],
+            "duplicate_id": [
+                (
+                    "999",
+                    "<root>, "
+                    ".regions[0].movie_stack_collection.movie_stacks[0].stacks[0].images[1]",
+                ),
+                (
+                    "tomogram_01",
+                    ".regions[0].movie_stack_collection.movie_stacks[0], "
+                    ".regions[0].tomograms[0]",
+                ),
+            ],
+        }
 
 
 def test_make_coordinate_system_2d_logical():

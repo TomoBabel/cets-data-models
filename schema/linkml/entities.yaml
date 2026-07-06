@@ -23,10 +23,12 @@ classes:
       a specimen.
     slots:
       - id
+      - name
     attributes:
       movie_stack_collection:
         description: The movie stack
         range: MovieStackCollection
+        inlined: true
       tilt_series:
         description: The tilt series
         range: TiltSeries
@@ -36,6 +38,7 @@ classes:
         description: The alignments
         range: Alignment
         multivalued: true
+        inlined_as_list: true
       tomograms:
         description: The tomograms
         range: Tomogram
@@ -45,23 +48,29 @@ classes:
         description: The annotations for this region
         range: Annotation
         multivalued: true
+        inlined_as_list: true
 
   Average:
     description: A particle averaging experiment.
     slots:
+      - id
       - name
     attributes:
       particle_maps:
         description: The particle maps
         range: ParticleMap
         multivalued: true
+        inlined_as_list: true
       annotations:
         description: The annotations
         range: Annotation
         multivalued: true
+        inlined_as_list: true
 
   MovieStackCollection:
     description: A collection of movie stacks using the same gain and defect files.
+    slots:
+      - name
     attributes:
       movie_stacks:
         description: The movie stacks in the collection
@@ -71,14 +80,17 @@ classes:
       gain_file:
         description: The gain file for the movie stacks
         range: GainFile
+        inlined: true
       defect_file:
         description: The defect file for the movie stacks
         range: DefectFile
+        inlined: true
 
   Dataset:
     description: A dataset
     slots:
       - name
+      - id
     attributes:
       regions:
         description: The regions in the dataset
@@ -89,3 +101,4 @@ classes:
         description: The averages in the dataset
         range: Average
         multivalued: true
+        inlined_as_list: true

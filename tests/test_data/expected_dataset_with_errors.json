@@ -7,10 +7,10 @@
       "movie_stack_collection": {
         "movie_stacks": [
           {
-            "id": "movie_stack_series_01",
+            "id": "tomogram_01",
             "stacks": [
               {
-                "id": "movie_stack_01",
+                "id": "no stack",
                 "path": "/data/movies/tilt_00.tif",
                 "images": [
                   {
@@ -47,7 +47,7 @@
                     "coordinate_transformations": []
                   },
                   {
-                    "id": "2",
+                    "id": "999",
                     "path": "/data/movies/tilt_00.tif",
                     "section": 1,
                     "nominal_tilt_angle": -60.0,
@@ -119,7 +119,7 @@
           "images": [
             {
               "id": "7",
-              "movie_stack_id": "movie_stack_01",
+              "movie_stack_id": "tomogram_01",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 0,
               "nominal_tilt_angle": -60.0,
@@ -246,7 +246,7 @@
             },
             {
               "transformation_type": "projection_alignment",
-              "target_id": "tomogram_01",
+              "target_id": "non-existent target",
               "name": "align_tilt_neg30",
               "input": "tilt_image_angstroms",
               "output": "tomogram_angstroms",

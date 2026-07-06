@@ -18,6 +18,8 @@ classes:
   ProjectionAlignment:
     is_a: CoordinateTransformation
     description: The tomographic alignment for a single projection.
+    slots:
+      - target_id
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(projection_alignment)
