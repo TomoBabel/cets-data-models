@@ -142,6 +142,8 @@ classes:
   TiltImage:
     is_a: BaseProjectionImage
     description: A projection image that belongs to a tilt series.
+    slots:
+      - id
     attributes:
       movie_stack_id:
         description: The ID of the movie stack for this tilt image.
