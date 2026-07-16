@@ -3,14 +3,14 @@
   "plugins": [
     {
       "type": "linked-versions",
-      "groupName": "cets-standard",
-      "components": ["schema", "models"]
+      "groupName": "schema",
+      "components": ["schema-linkml", "schema-models"]
     }
   ],
   "packages": {
     "schema": {
       "release-type": "simple",
-      "component": "schema",
+      "component": "schema-linkml",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
@@ -33,14 +33,14 @@
     },
     "src/cets_data_model/models": {
       "release-type": "simple",
-      "component": "models",
+      "component": "schema-models",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true
     },
     ".": {
       "release-type": "python",
-      "component": "cets-data-model",
+      "component": "library",
       "package-name": "cets_data_model",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
