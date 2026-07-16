@@ -44,12 +44,5 @@ jobs:
           # release line; the rest feed the cets-data-model package line.
           scopes: |
             schema
-            models
-            codegen
-            utils
-            docs
-            deps
-            ci
-            tests
-            build
+            library
           requireScope: false
