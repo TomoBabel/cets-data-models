@@ -40,6 +40,7 @@ discriminated_fields:
       - Translation
       - Scale
       - Affine
+
 type_aliases:
   - name: Vector2D
     definition: "Annotated[list[float], Field(min_length=2, max_length=2)]"
@@ -80,3 +81,16 @@ type_aliases:
     for_field:
       as_list:
         - dimensions3D
+
+# Hand-written mixin base classes injected into generated classes at generation
+# time (see model_processing/generate_models.py). Each `mixin` is prepended to
+# the bases of every class in `into`, and imported from `import_from`.
+injected_base_classes:
+  - mixin: PixelSizeMixin
+    import_from: cets_data_model.models.mixins
+    into:
+      - Image2D
+  - mixin: VoxelSizeMixin
+    import_from: cets_data_model.models.mixins
+    into:
+      - Image3D

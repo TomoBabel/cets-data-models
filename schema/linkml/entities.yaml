@@ -1,6 +1,6 @@
 name: CETMDEntities
 id: https://w3id.org/cetmd/entities
-version: 0.0.1
+version: 0.0.1 # x-release-please-version
 description: Schema for cryoET geometry
 
 prefixes:

@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Transient model-generation artifact (produced by `make gen-python`; the
+# committed model is src/cets_data_model/models/models.py, synced from this).
+src/cets_data_model/models/generated_models.py
+
 # Distribution / packaging
 .Python
 build/
