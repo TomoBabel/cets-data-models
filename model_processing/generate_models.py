@@ -33,13 +33,15 @@ HERE = Path(__file__).parent
 CONFIG_PATH = HERE / "patch_config.yaml"
 SCHEMA_PATH = HERE.parent / "schema" / "linkml" / "entities.yaml"
 TEMPLATE_DIR = HERE / "templates"
-DEFAULT_OUTPUT = HERE.parent / "src" / "cets_data_model" / "models" / "generated_models.py"
+DEFAULT_OUTPUT = (
+    HERE.parent / "src" / "cets_data_model" / "models" / "generated_models.py"
+)
 
 CONFIG = yaml.safe_load(CONFIG_PATH.read_text()) or {}
 
 # --- base-class (mixin) injection registry ---------------------------------
-INJECT_MAP: dict[str, list[str]] = {}       # class name -> [mixin names]
-MIXIN_IMPORTS: dict[str, list[str]] = {}    # module -> [mixin names]
+INJECT_MAP: dict[str, list[str]] = {}  # class name -> [mixin names]
+MIXIN_IMPORTS: dict[str, list[str]] = {}  # module -> [mixin names]
 for _entry in CONFIG.get("injected_base_classes", []) or []:
     MIXIN_IMPORTS.setdefault(_entry["import_from"], []).append(_entry["mixin"])
     for _cname in _entry["into"]:
@@ -56,15 +58,17 @@ def _discriminated_range(discriminator: str, union_types: list[str]) -> str:
 
 
 # --- type aliases ----------------------------------------------------------
-ALIAS_DEFS: list[str] = []          # module-level "Name: TypeAlias = ..." lines
-ALIAS_SUB: dict[str, str] = {}      # field name -> replacement range string
+ALIAS_DEFS: list[str] = []  # module-level "Name: TypeAlias = ..." lines
+ALIAS_SUB: dict[str, str] = {}  # field name -> replacement range string
 for _alias in CONFIG.get("type_aliases", []) or []:
     ALIAS_DEFS.append(f"{_alias['name']}: TypeAlias = {_alias['definition']}")
     _ff = _alias.get("for_field") or {}
     _as_list = _ff.get("as_list", []) if isinstance(_ff, dict) else list(_ff)
     _as_single = _ff.get("as_single", []) if isinstance(_ff, dict) else []
     for _f in _as_list or []:
-        ALIAS_SUB[_f] = f"Optional[Annotated[list[{_alias['name']}], Field(min_length=1)]]"
+        ALIAS_SUB[_f] = (
+            f"Optional[Annotated[list[{_alias['name']}], Field(min_length=1)]]"
+        )
     for _f in _as_single or []:
         ALIAS_SUB[_f] = f"Optional[{_alias['name']}]"
 
@@ -91,12 +95,18 @@ class CETSPydanticGenerator(PydanticGenerator):
                 if d["field_name"] == name:
                     for_classes = d.get("for_classes")
                     if for_classes is None or c.name in for_classes:
-                        attr.range = _discriminated_range(d["discriminator"], d["union_types"])
+                        attr.range = _discriminated_range(
+                            d["discriminator"], d["union_types"]
+                        )
 
             # 4) discriminator field in a *subclass* -> Literal[...]
             #    subclasses carry a concrete enum default via `predefined`; the
             #    abstract base has `default=...` (required) -> `predefined` unset -> skip.
-            if name in DISCRIMINATORS and attr.predefined and attr.predefined not in ("...", "[]", "None"):
+            if (
+                name in DISCRIMINATORS
+                and attr.predefined
+                and attr.predefined not in ("...", "[]", "None")
+            ):
                 attr.range = f"Literal[{attr.predefined}]"
 
         return cls
@@ -110,7 +120,9 @@ def _build_imports() -> Imports:
         objects=[ObjectImport(name="Annotated"), ObjectImport(name="TypeAlias")],
     )
     for module, names in MIXIN_IMPORTS.items():
-        imports = imports + Import(module=module, objects=[ObjectImport(name=n) for n in names])
+        imports = imports + Import(
+            module=module, objects=[ObjectImport(name=n) for n in names]
+        )
     return imports
 
 
@@ -142,9 +154,13 @@ def _format_with_ruff(path: Path) -> None:
     try:
         subprocess.run(
             ["ruff", "check", "--select", "I,F401", "--fix", str(path)],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
-        subprocess.run(["ruff", "format", str(path)], capture_output=True, text=True, check=True)
+        subprocess.run(
+            ["ruff", "format", str(path)], capture_output=True, text=True, check=True
+        )
     except FileNotFoundError:
         print("WARNING: ruff not found; output left unformatted", file=sys.stderr)
     except subprocess.CalledProcessError as e:
