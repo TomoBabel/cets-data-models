@@ -45,6 +45,7 @@ classes:
         description: The annotations for this region
         range: Annotation
         multivalued: true
+        inlined_as_list: true
 
   Average:
     description: A particle averaging experiment.
@@ -54,10 +55,6 @@ classes:
       particle_maps:
         description: The particle maps
         range: ParticleMap
-        multivalued: true
-      annotations:
-        description: The annotations
-        range: Annotation
         multivalued: true
 
   MovieStackCollection:
