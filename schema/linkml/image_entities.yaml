@@ -43,8 +43,11 @@ slots:
   particle_index:
     description: Index of a particle inside a tomogram.
     range: integer
-  source_annotation_reference_id:
-    description: ID of the average-local annotation reference containing the coordinate used to extract this particle map.
+  source_region_id:
+    description: ID of the region containing the source annotation used to extract this particle map.
+    range: string
+  source_annotation_id:
+    description: ID of the source annotation used to extract this particle map.
     range: string
   coord_index:
     description: 0-based index of the coordinate inside the resolved source annotation.
@@ -181,7 +184,8 @@ classes:
     description: A 3D particle density map.
     slots:
       - path
-      - source_annotation_reference_id
+      - source_region_id
+      - source_annotation_id
       - coord_index
 
 

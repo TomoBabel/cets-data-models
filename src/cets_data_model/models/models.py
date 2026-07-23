@@ -884,9 +884,13 @@ class ParticleMap(Image3D):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    source_annotation_reference_id: Optional[str] = Field(
+    source_region_id: Optional[str] = Field(
         default=None,
-        description="""ID of the average-local annotation reference containing the coordinate used to extract this particle map.""",
+        description="""ID of the region containing the source annotation used to extract this particle map.""",
+    )
+    source_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the source annotation used to extract this particle map.""",
     )
     coord_index: Optional[int] = Field(
         default=None,
@@ -1726,22 +1730,6 @@ class Region(ConfiguredBaseModel):
     ] = Field(default=[], description="""The annotations for this region""")
 
 
-class AnnotationReference(ConfiguredBaseModel):
-    """
-    A reference from an average to an annotation stored in a region.
-    """
-
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
-    source_region_id: Optional[str] = Field(
-        default=None,
-        description="""ID of the region containing the source annotation.""",
-    )
-    source_annotation_id: Optional[str] = Field(
-        default=None,
-        description="""ID of the source annotation inside the referenced region.""",
-    )
-
-
 class Average(ConfiguredBaseModel):
     """
     A particle averaging experiment.
@@ -1752,9 +1740,6 @@ class Average(ConfiguredBaseModel):
     )
     particle_maps: Optional[list[ParticleMap]] = Field(
         default=[], description="""The particle maps"""
-    )
-    annotations: Optional[list[AnnotationReference]] = Field(
-        default=[], description="""The source annotations used by this average."""
     )
 
 
@@ -1845,7 +1830,6 @@ Spline2D.model_rebuild()
 Spline3D.model_rebuild()
 DensityMap.model_rebuild()
 Region.model_rebuild()
-AnnotationReference.model_rebuild()
 Average.model_rebuild()
 MovieStackCollection.model_rebuild()
 Dataset.model_rebuild()

@@ -507,7 +507,8 @@
       "particle_maps": [
         {
           "path": "/data/averages/ribosome_map.mrc",
-          "source_annotation_reference_id": "average_ribosome_picks",
+          "source_region_id": "region_01",
+          "source_annotation_id": "ribosome_picks",
           "coord_index": 0,
           "width": 256,
           "height": 256,
@@ -567,13 +568,6 @@
               ]
             }
           ]
-        }
-      ],
-      "annotations": [
-        {
-          "id": "average_ribosome_picks",
-          "source_region_id": "region_01",
-          "source_annotation_id": "ribosome_picks"
         }
       ]
     }

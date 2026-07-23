@@ -17,14 +17,6 @@ imports:
 - ./annotation
 - ./common
 
-slots:
-  source_region_id:
-    description: ID of the region containing the source annotation.
-    range: string
-  source_annotation_id:
-    description: ID of the source annotation inside the referenced region.
-    range: string
-
 classes:
   Region:
     description: Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of
@@ -53,13 +45,7 @@ classes:
         description: The annotations for this region
         range: Annotation
         multivalued: true
-
-  AnnotationReference:
-    description: A reference from an average to an annotation stored in a region.
-    slots:
-      - id
-      - source_region_id
-      - source_annotation_id
+        inlined_as_list: true
 
   Average:
     description: A particle averaging experiment.
@@ -70,11 +56,6 @@ classes:
         description: The particle maps
         range: ParticleMap
         multivalued: true
-      annotations:
-        description: The source annotations used by this average.
-        range: AnnotationReference
-        multivalued: true
-        inlined_as_list: true
 
   MovieStackCollection:
     description: A collection of movie stacks using the same gain and defect files.
