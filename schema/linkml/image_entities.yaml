@@ -43,6 +43,12 @@ slots:
   particle_index:
     description: Index of a particle inside a tomogram.
     range: integer
+  source_annotation_reference_id:
+    description: ID of the average-local annotation reference containing the coordinate used to extract this particle map.
+    range: string
+  coord_index:
+    description: 0-based index of the coordinate inside the resolved source annotation.
+    range: integer
   ctf_metadata:
     description: A set of CTF patameters for an image.
     range: CTFMetadata
@@ -136,6 +142,8 @@ classes:
   TiltImage:
     is_a: BaseProjectionImage
     description: A projection image that belongs to a tilt series.
+    slots:
+      - id
     attributes:
       movie_stack_id:
         description: The ID of the movie stack for this tilt image.
@@ -175,7 +183,8 @@ classes:
     description: A 3D particle density map.
     slots:
       - path
-
+      - source_annotation_reference_id
+      - coord_index
 
 
 

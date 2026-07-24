@@ -1,5 +1,7 @@
 discriminated_fields:
   - field_name: annotations
+    for_classes:
+      - Region
     discriminator: annotation_type
     union_types:
       - SegmentationMask2D

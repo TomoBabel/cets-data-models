@@ -15,6 +15,9 @@ from cets_data_model.models.models import (
     Affine,
     Sequence,
     PointSet3D,
+    ParticleMap,
+    Average,
+    AnnotationReference,
 )
 
 
@@ -68,6 +71,7 @@ class TestExpectedDatasetValidation:
         region = dataset.regions[0]
 
         annotation_types = {ann.annotation_type for ann in region.annotations}
+        annotation_ids = {ann.id for ann in region.annotations}
 
         # TODO: add new annotation types
         expected_types = {
@@ -81,6 +85,17 @@ class TestExpectedDatasetValidation:
         }
 
         assert annotation_types == expected_types
+        assert "ribosome_picks" in annotation_ids
+        assert region.annotations[0].source_tomogram_id == "tomogram_01"
+
+        average = dataset.averages[0]
+        assert average.annotations[0].id == "average_ribosome_picks"
+        assert average.annotations[0].source_region_id == "region_01"
+        assert average.annotations[0].source_annotation_id == "ribosome_picks"
+        assert (
+            average.particle_maps[0].source_annotation_reference_id
+            == "average_ribosome_picks"
+        )
 
     def test_expected_dataset_transformations(self, expected_dataset_path):
         """Verify transformation types are present"""
@@ -142,7 +157,9 @@ class TestRoundTripSerialization:
     def test_annotation_roundtrip(self):
         """Annotations should survive round-trip with all fields"""
         original = PointSet3D(
+            id="particle_coords_annotation",
             annotation_type="point_set_3D",
+            source_tomogram_id="tomogram_01",
             origin3D=[[100.0, 200.0, 300.0], [150.0, 250.0, 350.0]],
             coordinate_systems=[
                 CoordinateSystem(
@@ -162,6 +179,61 @@ class TestRoundTripSerialization:
         assert original.model_dump() == reconstructed.model_dump()
         assert len(reconstructed.origin3D) == 2
         assert reconstructed.coordinate_systems[0].name == "particle_coords"
+        assert reconstructed.source_tomogram_id == "tomogram_01"
+
+    def test_annotation_reference_roundtrip(self):
+        """Annotation references should preserve region and annotation IDs"""
+        original = AnnotationReference(
+            id="average_ribosome_picks",
+            source_region_id="region_01",
+            source_annotation_id="ribosome_picks",
+        )
+
+        json_str = original.model_dump_json()
+        reconstructed = AnnotationReference.model_validate_json(json_str)
+
+        assert reconstructed.id == "average_ribosome_picks"
+        assert reconstructed.source_region_id == "region_01"
+        assert reconstructed.source_annotation_id == "ribosome_picks"
+
+    def test_particle_map_coordinate_reference_roundtrip(self):
+        """Particle maps should preserve links to source annotation references"""
+        original = ParticleMap(
+            path="/data/subtomograms/particle_001.mrc",
+            source_annotation_reference_id="average_ribosome_picks",
+            coord_index=3,
+            width=64,
+            height=64,
+            depth=64,
+        )
+
+        json_str = original.model_dump_json()
+        reconstructed = ParticleMap.model_validate_json(json_str)
+
+        assert reconstructed.source_annotation_reference_id == "average_ribosome_picks"
+        assert reconstructed.coord_index == 3
+
+    def test_average_without_annotation_references_roundtrip(self):
+        """Averages may contain particle maps without source annotation references"""
+        original = Average(
+            name="subtomograms_only",
+            particle_maps=[
+                ParticleMap(
+                    path="/data/subtomograms/particle_001.mrc",
+                    width=64,
+                    height=64,
+                    depth=64,
+                )
+            ],
+        )
+
+        json_str = original.model_dump_json()
+        reconstructed = Average.model_validate_json(json_str)
+
+        assert len(reconstructed.particle_maps) == 1
+        assert reconstructed.annotations == []
+        assert reconstructed.particle_maps[0].source_annotation_reference_id is None
+        assert reconstructed.particle_maps[0].coord_index is None
 
     def test_transformation_sequence_roundtrip(self):
         """Complex transformation sequences should survive round-trip"""
@@ -203,6 +275,7 @@ class TestConstraintValidation:
         """3D vectors must have exactly 3 elements"""
         with pytest.raises(ValidationError):
             PointSet3D(
+                id="bad_point_set",
                 annotation_type="point_set_3d",
                 origin3D=[[1.0, 2.0]],  # Missing z coordinate
             )
@@ -260,10 +333,15 @@ class TestConstraintValidation:
         """Point sets must have at least one point"""
         with pytest.raises(ValidationError):
             PointSet3D(
+                id="empty_point_set",
                 annotation_type="point_set_3D",
                 origin3D=[],  # Empty list not allowed
             )
 
         # Should work with one point
-        ps = PointSet3D(annotation_type="point_set_3D", origin3D=[[1.0, 2.0, 3.0]])
+        ps = PointSet3D(
+            id="single_point_set",
+            annotation_type="point_set_3D",
+            origin3D=[[1.0, 2.0, 3.0]],
+        )
         assert len(ps.origin3D) == 1

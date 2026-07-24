@@ -13,15 +13,23 @@ default_prefix: alignment
 imports:
 - linkml:types
 - ./coordinate_transforms
+- ./common
 
 classes:
   ProjectionAlignment:
     is_a: CoordinateTransformation
     description: The tomographic alignment for a single projection.
+    slots:
+      - id
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(projection_alignment)
     attributes:
+      tilt_image_id:
+        description: >-
+          ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced 
+          by different algorithms) may reference the same tilt-image.
+        range: string
       sequence:
         description: The sequence of transformations
         range: CoordinateTransformation
@@ -34,10 +42,16 @@ classes:
   Alignment:
     description: The tomographic alignment for a tilt series.
     attributes:
+        tilt_series_id:
+          description: >-
+            ID of the tilt-series this alignment set applies to. Multiple Alignments (e.g. 
+            from different algorithms) may reference the same tilt-series.
+          range: string
         projection_alignments:
           description: alignment for a specific projection
           range: ProjectionAlignment
           multivalued: true
+          inlined_as_list: true
 
 
 
