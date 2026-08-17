@@ -327,8 +327,10 @@
       ],
       "annotations": [
         {
+          "id": "ribosome_picks",
           "annotation_type": "point_set_3D",
           "name": "ribosome_picks",
+          "source_tomogram_id": "tomogram_01",
           "origin3D": [
             [
               100.5,
@@ -383,6 +385,7 @@
           ]
         },
         {
+          "id": "oriented_particles",
           "annotation_type": "point_vector_set_3D",
           "name": "oriented_particles",
           "origin3D": [
@@ -413,6 +416,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "rotated_particles",
           "annotation_type": "point_matrix_set_3D",
           "name": "rotated_particles",
           "origin3D": [
@@ -445,6 +449,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "membrane_segmentation",
           "annotation_type": "segmentation_mask_3D",
           "name": "membrane_segmentation",
           "path": "/data/annotations/membrane_mask.mrc",
@@ -455,6 +460,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "ribosome_probability",
           "annotation_type": "probability_map_3D",
           "name": "ribosome_probability",
           "path": "/data/annotations/probability_map.mrc",
@@ -465,6 +471,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "fiducial_markers",
           "annotation_type": "point_set_2D",
           "name": "fiducial_markers",
           "origin2D": [
@@ -485,6 +492,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "membrane_surface",
           "annotation_type": "tri_mesh",
           "name": "membrane_surface",
           "coordinate_systems": [],
@@ -499,6 +507,8 @@
       "particle_maps": [
         {
           "path": "/data/averages/ribosome_map.mrc",
+          "source_annotation_reference_id": "average_ribosome_picks",
+          "coord_index": 0,
           "width": 256,
           "height": 256,
           "depth": 256,
@@ -561,17 +571,9 @@
       ],
       "annotations": [
         {
-          "annotation_type": "point_set_3D",
-          "name": "symmetry_points",
-          "origin3D": [
-            [
-              128.0,
-              128.0,
-              128.0
-            ]
-          ],
-          "coordinate_systems": [],
-          "coordinate_transformations": []
+          "id": "average_ribosome_picks",
+          "source_region_id": "region_01",
+          "source_annotation_id": "ribosome_picks"
         }
       ]
     }
