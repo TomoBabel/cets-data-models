@@ -455,6 +455,11 @@ class ProjectionAlignment(CoordinateTransformation):
     The tomographic alignment for a single projection.
     """
 
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    tilt_image_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
+    )
     sequence: Optional[list[Union[Affine, Translation]]] = Field(
         default=[], description="""The sequence of transformations""", max_length=2
     )
@@ -478,6 +483,10 @@ class Alignment(ConfiguredBaseModel):
     The tomographic alignment for a tilt series.
     """
 
+    tilt_series_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tilt-series this alignment set applies to. Multiple Alignments (e.g.  from different algorithms) may reference the same tilt-series.""",
+    )
     projection_alignments: Optional[list[ProjectionAlignment]] = Field(
         default=[], description="""alignment for a specific projection"""
     )
@@ -770,6 +779,7 @@ class TiltImage(BaseProjectionImage):
     A projection image that belongs to a tilt series.
     """
 
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     movie_stack_id: Optional[str] = Field(
         default=None, description="""The ID of the movie stack for this tilt image."""
     )
