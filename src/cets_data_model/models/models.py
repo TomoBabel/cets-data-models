@@ -532,6 +532,20 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
+    )
 
 
 class GainFile(Image2D):
@@ -607,6 +621,20 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -670,6 +698,20 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -709,6 +751,20 @@ class ProjectionImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -753,6 +809,20 @@ class SubProjectionImage(ProjectionImage):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -796,6 +866,20 @@ class TiltImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1).""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None, description="""Dose rate during acquisition in e-/A^2/s."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
