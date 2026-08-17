@@ -17,7 +17,6 @@ from cets_data_model.models.models import (
     PointSet3D,
     ParticleMap,
     Average,
-    AnnotationReference,
 )
 
 
@@ -89,13 +88,8 @@ class TestExpectedDatasetValidation:
         assert region.annotations[0].source_tomogram_id == "tomogram_01"
 
         average = dataset.averages[0]
-        assert average.annotations[0].id == "average_ribosome_picks"
-        assert average.annotations[0].source_region_id == "region_01"
-        assert average.annotations[0].source_annotation_id == "ribosome_picks"
-        assert (
-            average.particle_maps[0].source_annotation_reference_id
-            == "average_ribosome_picks"
-        )
+        assert average.particle_maps[0].source_region_id == "region_01"
+        assert average.particle_maps[0].source_annotation_id == "ribosome_picks"
 
     def test_expected_dataset_transformations(self, expected_dataset_path):
         """Verify transformation types are present"""
@@ -181,26 +175,12 @@ class TestRoundTripSerialization:
         assert reconstructed.coordinate_systems[0].name == "particle_coords"
         assert reconstructed.source_tomogram_id == "tomogram_01"
 
-    def test_annotation_reference_roundtrip(self):
-        """Annotation references should preserve region and annotation IDs"""
-        original = AnnotationReference(
-            id="average_ribosome_picks",
-            source_region_id="region_01",
-            source_annotation_id="ribosome_picks",
-        )
-
-        json_str = original.model_dump_json()
-        reconstructed = AnnotationReference.model_validate_json(json_str)
-
-        assert reconstructed.id == "average_ribosome_picks"
-        assert reconstructed.source_region_id == "region_01"
-        assert reconstructed.source_annotation_id == "ribosome_picks"
-
     def test_particle_map_coordinate_reference_roundtrip(self):
-        """Particle maps should preserve links to source annotation references"""
+        """Particle maps should preserve links to source annotations"""
         original = ParticleMap(
             path="/data/subtomograms/particle_001.mrc",
-            source_annotation_reference_id="average_ribosome_picks",
+            source_region_id="region_01",
+            source_annotation_id="ribosome_picks",
             coord_index=3,
             width=64,
             height=64,
@@ -210,11 +190,12 @@ class TestRoundTripSerialization:
         json_str = original.model_dump_json()
         reconstructed = ParticleMap.model_validate_json(json_str)
 
-        assert reconstructed.source_annotation_reference_id == "average_ribosome_picks"
+        assert reconstructed.source_region_id == "region_01"
+        assert reconstructed.source_annotation_id == "ribosome_picks"
         assert reconstructed.coord_index == 3
 
-    def test_average_without_annotation_references_roundtrip(self):
-        """Averages may contain particle maps without source annotation references"""
+    def test_average_without_source_annotations_roundtrip(self):
+        """Averages may contain particle maps without source annotation links"""
         original = Average(
             name="subtomograms_only",
             particle_maps=[
@@ -231,8 +212,8 @@ class TestRoundTripSerialization:
         reconstructed = Average.model_validate_json(json_str)
 
         assert len(reconstructed.particle_maps) == 1
-        assert reconstructed.annotations == []
-        assert reconstructed.particle_maps[0].source_annotation_reference_id is None
+        assert reconstructed.particle_maps[0].source_region_id is None
+        assert reconstructed.particle_maps[0].source_annotation_id is None
         assert reconstructed.particle_maps[0].coord_index is None
 
     def test_transformation_sequence_roundtrip(self):
