@@ -1,0 +1,47 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: ruff + mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      # Installs the ruff / mypy versions pinned in pyproject.toml [dev]
+      # (ruff==0.11.12, mypy==1.8.0 -- kept in sync with .pre-commit-config.yaml).
+      - name: Install dev dependencies
+        run: pip install -e .[dev]
+
+      - name: Ruff (lint)
+        run: ruff check .
+
+      - name: Ruff (format)
+        run: ruff format --check .
+
+      # Typing is gated on the generated data models only. The utils package
+      # (image IO / numpy) has pre-existing type issues tracked separately.
+      - name: Mypy (models)
+        run: mypy src/cets_data_model/models

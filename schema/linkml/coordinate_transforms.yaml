@@ -25,6 +25,9 @@ classes:
     slots:
       - transformation_type
       - name
+    # `name` is left free-form (the shared `name` slot): transforms include per-instance
+    # (per-tilt) and intermediate sub-transformations that fall outside the canonical set.
+    # The canonical transformation names are enumerated by TransformationName for reference/use.
     attributes:
       input:
         description: The source coordinate system name
@@ -127,3 +130,24 @@ enums:
         description: A sequence of transformations.
       projection_alignment:
         description: A sequence specific to projection alignments.
+  TransformationName:
+    description: Canonical controlled-vocabulary names for the standard transformations (Direction B).
+    permissible_values:
+      array_to_physical:
+        description: Sampling — an entity's array (pixel/voxel) space to its physical space.
+      calibration_to_movie_frame:
+        description: Calibration image to movie frame.
+      movie_frame_to_projection:
+        description: Movie frame to projection.
+      sub_projection_to_projection:
+        description: Sub-projection to projection.
+      annotation_to_tomogram:
+        description: Annotation to tomogram.
+      subtomogram_to_tomogram:
+        description: Subtomogram to tomogram.
+      particle_map_to_subtomogram:
+        description: Particle map to subtomogram.
+      particle_map_to_tomogram:
+        description: Particle map to tomogram (derived composition).
+      tomogram_to_projection:
+        description: Tomogram to projection (the tomographic projection, per tilt).
