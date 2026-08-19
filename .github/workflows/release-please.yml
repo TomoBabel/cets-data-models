@@ -1,0 +1,32 @@
+name: release-please
+
+# Maintains a running "release PR" that bumps the version (pyproject.toml) and
+# updates CHANGELOG.md from Conventional Commit messages on main. Merging that
+# PR tags the release and creates the GitHub Release.
+#
+# Note: no PyPI publish step is wired up here -- add one under a `needs:
+# release-please` job (with trusted publishing) if/when the package is released
+# to PyPI.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

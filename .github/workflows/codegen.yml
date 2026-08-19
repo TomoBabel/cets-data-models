@@ -1,0 +1,50 @@
+name: codegen
+
+# Fails the build if the models generated from the LinkML schema no longer
+# match the committed src/cets_data_model/models/models.py -- i.e. someone
+# changed the schema or the generation config without regenerating models.py.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  models-up-to-date:
+    name: generated models match models.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dev dependencies
+        run: pip install -e .[dev]
+
+      - name: Regenerate models from the LinkML schema
+        run: make gen-python
+
+      - name: Fail if generated models differ from committed models.py
+        run: |
+          output=$(make compare-models)
+          echo "$output"
+          if echo "$output" | grep -Eq 'Classes (added|removed|changed): [1-9]'; then
+            echo "::error::Regenerated models differ from committed src/cets_data_model/models/models.py. Run 'make gen-python' and sync models.py."
+            exit 1
+          fi
