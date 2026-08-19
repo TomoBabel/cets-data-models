@@ -31,9 +31,9 @@ classes:
           by different algorithms) may reference the same tilt-image.
         range: string
       sequence:
-        description: The sequence of transformations
+        description: The ordered tilt, in-plane rotation, and shift transformations.
         range: CoordinateTransformation
-        maximum_cardinality: 2
+        maximum_cardinality: 3
         any_of:
           - range: Affine
           - range: Translation
@@ -52,6 +52,5 @@ classes:
           range: ProjectionAlignment
           multivalued: true
           inlined_as_list: true
-
 
 
