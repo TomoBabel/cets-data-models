@@ -39,18 +39,6 @@ slots:
   phase_shift:
     description: Phase shift value produced by the usage of a phase plate.
     range: float
-  voltage:
-    description: Acceleration voltage of the microscope in kV.
-    range: float
-  spherical_aberration:
-    description: Spherical aberration (Cs) of the objective lens in mm.
-    range: float
-  amplitude_contrast:
-    description: Amplitude contrast fraction (dimensionless, typically 0.07-0.1).
-    range: float
-  dose_rate:
-    description: Dose rate during acquisition in e-/A^2/s.
-    range: float
 
   particle_index:
     description: Index of a particle inside a tomogram.
@@ -94,15 +82,11 @@ classes:
       defocus_handedness:
         ifabsent: -1
   AcquisitionMetadataMixin:
-    description: Metadata concerning the acquisition process.
+    description: Per-exposure acquisition metadata (varies from image to image).
     slots:
       - nominal_tilt_angle
       - accumulated_dose
       - ctf_metadata
-      - voltage
-      - spherical_aberration
-      - amplitude_contrast
-      - dose_rate
   GainFile:
     is_a: Image2D
     description: A gain reference file.
@@ -141,6 +125,9 @@ classes:
         range: MovieStack
         multivalued: true
         inlined_as_list: true
+      acquisition_session_id:
+        description: The ID of the acquisition session this movie stack series was collected in.
+        range: string
   BaseProjectionImage:
     is_a: Image2D
     mixins:
@@ -181,8 +168,11 @@ classes:
         range: TiltImage
         multivalued: true
         inlined_as_list: true
-      movie_stack_series_id: 
+      movie_stack_series_id:
         description: The ID of the movie stack series for this tilt series.
+        range: string
+      acquisition_session_id:
+        description: The ID of the acquisition session this tilt series was collected in.
         range: string
   Tomogram:
     is_a: Image3D
