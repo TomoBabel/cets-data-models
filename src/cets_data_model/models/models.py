@@ -532,6 +532,9 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
+    )
 
 
 class GainFile(Image2D):
@@ -607,6 +610,9 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -670,6 +676,9 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -709,6 +718,9 @@ class ProjectionImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -753,6 +765,9 @@ class SubProjectionImage(ProjectionImage):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -796,6 +811,9 @@ class TiltImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
