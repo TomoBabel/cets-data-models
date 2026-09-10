@@ -71,6 +71,44 @@ class AxisType(str, Enum):
     """
 
 
+class CoordinateSpaceName(str, Enum):
+    """
+    Canonical names for an entity's standard coordinate systems.
+    """
+
+    array = "array"
+    """
+    Discrete index space (integer pixel/voxel coordinates).
+    """
+    physical = "physical"
+    """
+    Continuous physical space in Ångström.
+    """
+
+
+class AxisUnit(str, Enum):
+    """
+    Allowable axis units.
+    """
+
+    pixel = "pixel"
+    """
+    2D array index unit.
+    """
+    voxel = "voxel"
+    """
+    3D array index unit.
+    """
+    angstrom = "angstrom"
+    """
+    Physical length in Ångström (the default).
+    """
+    nanometer = "nanometer"
+    """
+    Physical length in nanometers.
+    """
+
+
 class TransformationType(str, Enum):
     identity = "identity"
     """
@@ -99,6 +137,49 @@ class TransformationType(str, Enum):
     projection_alignment = "projection_alignment"
     """
     A sequence specific to projection alignments.
+    """
+
+
+class TransformationName(str, Enum):
+    """
+    Canonical controlled-vocabulary names for the standard transformations (Direction B).
+    """
+
+    array_to_physical = "array_to_physical"
+    """
+    Sampling — an entity's array (pixel/voxel) space to its physical space.
+    """
+    calibration_to_movie_frame = "calibration_to_movie_frame"
+    """
+    Calibration image to movie frame.
+    """
+    movie_frame_to_projection = "movie_frame_to_projection"
+    """
+    Movie frame to projection.
+    """
+    sub_projection_to_projection = "sub_projection_to_projection"
+    """
+    Sub-projection to projection.
+    """
+    annotation_to_tomogram = "annotation_to_tomogram"
+    """
+    Annotation to tomogram.
+    """
+    subtomogram_to_tomogram = "subtomogram_to_tomogram"
+    """
+    Subtomogram to tomogram.
+    """
+    particle_map_to_subtomogram = "particle_map_to_subtomogram"
+    """
+    Particle map to subtomogram.
+    """
+    particle_map_to_tomogram = "particle_map_to_tomogram"
+    """
+    Particle map to tomogram (derived composition).
+    """
+    tomogram_to_projection = "tomogram_to_projection"
+    """
+    Tomogram to projection (the tomographic projection, per tilt).
     """
 
 
@@ -264,8 +345,8 @@ class Axis(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    axis_unit: Optional[str] = Field(
-        default="angstrom", description="""The unit of the axis"""
+    axis_unit: Optional[AxisUnit] = Field(
+        default=AxisUnit.angstrom, description="""The unit of the axis"""
     )
     axis_type: Optional[AxisType] = Field(
         default=None, description="""The type of axis"""
@@ -277,7 +358,10 @@ class CoordinateSystem(ConfiguredBaseModel):
     A coordinate system
     """
 
-    name: str = Field(default=..., description="""The name of the coordinate system""")
+    name: str = Field(
+        default=...,
+        description="""The name of the coordinate system. Free-form to allow per-entity / intermediate systems; the canonical values are enumerated by CoordinateSpaceName.""",
+    )
     axes: list[Axis] = Field(
         default=..., description="""The axes of the coordinate system"""
     )
@@ -464,7 +548,9 @@ class ProjectionAlignment(CoordinateTransformation):
         description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
     )
     sequence: Optional[list[Union[Affine, Translation]]] = Field(
-        default=[], description="""The sequence of transformations""", max_length=2
+        default=[],
+        description="""The ordered tilt, in-plane rotation, and shift transformations.""",
+        max_length=3,
     )
     transformation_type: Literal[TransformationType.projection_alignment] = Field(
         default=TransformationType.projection_alignment,

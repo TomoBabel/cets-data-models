@@ -1,0 +1,1030 @@
+{
+  "name": "mock_named_transform_dataset",
+  "regions": [
+    {
+      "id": "region-001",
+      "movie_stack_collection": {
+        "movie_stacks": [
+          {
+            "id": "movie-stack-series-001",
+            "stacks": [
+              {
+                "id": "movie-stack-001",
+                "path": "mock-data/raw/tilt-minus-30.eer",
+                "images": [
+                  {
+                    "path": "mock-data/raw/tilt-minus-30.eer",
+                    "section": 0,
+                    "nominal_tilt_angle": -30.0,
+                    "accumulated_dose": 2.5,
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [
+                      {
+                        "name": "array",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "physical",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          }
+                        ]
+                      }
+                    ],
+                    "coordinate_transformations": [
+                      {
+                        "transformation_type": "sequence",
+                        "name": "array_to_physical",
+                        "input": "array",
+                        "output": "physical",
+                        "sequence": [
+                          {
+                            "transformation_type": "translation",
+                            "name": "center_array_origin",
+                            "translation": [
+                              -2048.0,
+                              -2048.0
+                            ]
+                          },
+                          {
+                            "transformation_type": "scale",
+                            "name": "scale_to_physical",
+                            "scale": [
+                              1.35,
+                              1.35
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "transformation_type": "translation",
+                        "name": "movie_frame_to_projection",
+                        "input": "physical",
+                        "output": "physical",
+                        "translation": [
+                          0.25,
+                          -0.5
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "movie-stack-002",
+                "path": "mock-data/raw/tilt-zero.eer",
+                "images": [
+                  {
+                    "path": "mock-data/raw/tilt-zero.eer",
+                    "section": 0,
+                    "nominal_tilt_angle": 0.0,
+                    "accumulated_dose": 5.0,
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [
+                      {
+                        "name": "array",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "physical",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          }
+                        ]
+                      }
+                    ],
+                    "coordinate_transformations": [
+                      {
+                        "transformation_type": "sequence",
+                        "name": "array_to_physical",
+                        "input": "array",
+                        "output": "physical",
+                        "sequence": [
+                          {
+                            "transformation_type": "translation",
+                            "name": "center_array_origin",
+                            "translation": [
+                              -2048.0,
+                              -2048.0
+                            ]
+                          },
+                          {
+                            "transformation_type": "scale",
+                            "name": "scale_to_physical",
+                            "scale": [
+                              1.35,
+                              1.35
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "transformation_type": "translation",
+                        "name": "movie_frame_to_projection",
+                        "input": "physical",
+                        "output": "physical",
+                        "translation": [
+                          0.0,
+                          0.0
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "movie-stack-003",
+                "path": "mock-data/raw/tilt-plus-30.eer",
+                "images": [
+                  {
+                    "path": "mock-data/raw/tilt-plus-30.eer",
+                    "section": 0,
+                    "nominal_tilt_angle": 30.0,
+                    "accumulated_dose": 7.5,
+                    "width": 4096,
+                    "height": 4096,
+                    "coordinate_systems": [
+                      {
+                        "name": "array",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "pixel",
+                            "axis_type": "array"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "physical",
+                        "axes": [
+                          {
+                            "name": "x",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          },
+                          {
+                            "name": "y",
+                            "axis_unit": "angstrom",
+                            "axis_type": "space"
+                          }
+                        ]
+                      }
+                    ],
+                    "coordinate_transformations": [
+                      {
+                        "transformation_type": "sequence",
+                        "name": "array_to_physical",
+                        "input": "array",
+                        "output": "physical",
+                        "sequence": [
+                          {
+                            "transformation_type": "translation",
+                            "name": "center_array_origin",
+                            "translation": [
+                              -2048.0,
+                              -2048.0
+                            ]
+                          },
+                          {
+                            "transformation_type": "scale",
+                            "name": "scale_to_physical",
+                            "scale": [
+                              1.35,
+                              1.35
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "transformation_type": "translation",
+                        "name": "movie_frame_to_projection",
+                        "input": "physical",
+                        "output": "physical",
+                        "translation": [
+                          -0.2,
+                          0.4
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "gain_file": {
+          "path": "mock-data/calibration/gain-reference.mrc",
+          "width": 4096,
+          "height": 4096,
+          "coordinate_systems": [
+            {
+              "name": "array",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "pixel",
+                  "axis_type": "array"
+                }
+              ]
+            },
+            {
+              "name": "physical",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "sequence",
+              "name": "array_to_physical",
+              "input": "array",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "translation",
+                  "name": "center_array_origin",
+                  "translation": [
+                    -2048.0,
+                    -2048.0
+                  ]
+                },
+                {
+                  "transformation_type": "scale",
+                  "name": "scale_to_physical",
+                  "scale": [
+                    1.35,
+                    1.35
+                  ]
+                }
+              ]
+            },
+            {
+              "transformation_type": "affine",
+              "name": "calibration_to_movie_frame",
+              "input": "physical",
+              "output": "physical",
+              "affine": [
+                [
+                  0.0,
+                  -1.0,
+                  0.0
+                ],
+                [
+                  -1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            }
+          ]
+        }
+      },
+      "tilt_series": [
+        {
+          "id": "tilt-series-001",
+          "path": "mock-data/processed/tilt-series.mrc",
+          "ctf_corrected": false,
+          "movie_stack_series_id": "movie-stack-series-001",
+          "images": [
+            {
+              "id": "tilt-series-001_0",
+              "movie_stack_id": "movie-stack-001",
+              "path": "mock-data/processed/tilt-series.mrc",
+              "section": 0,
+              "nominal_tilt_angle": -30.0,
+              "accumulated_dose": 2.5,
+              "width": 3840,
+              "height": 3840,
+              "coordinate_systems": [
+                {
+                  "name": "array",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    }
+                  ]
+                },
+                {
+                  "name": "physical",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    }
+                  ]
+                }
+              ],
+              "coordinate_transformations": [
+                {
+                  "transformation_type": "sequence",
+                  "name": "array_to_physical",
+                  "input": "array",
+                  "output": "physical",
+                  "sequence": [
+                    {
+                      "transformation_type": "translation",
+                      "name": "center_array_origin",
+                      "translation": [
+                        -1920.0,
+                        -1920.0
+                      ]
+                    },
+                    {
+                      "transformation_type": "scale",
+                      "name": "scale_to_physical",
+                      "scale": [
+                        1.44,
+                        1.44
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tilt-series-001_1",
+              "movie_stack_id": "movie-stack-002",
+              "path": "mock-data/processed/tilt-series.mrc",
+              "section": 1,
+              "nominal_tilt_angle": 0.0,
+              "accumulated_dose": 5.0,
+              "width": 3840,
+              "height": 3840,
+              "coordinate_systems": [
+                {
+                  "name": "array",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    }
+                  ]
+                },
+                {
+                  "name": "physical",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    }
+                  ]
+                }
+              ],
+              "coordinate_transformations": [
+                {
+                  "transformation_type": "sequence",
+                  "name": "array_to_physical",
+                  "input": "array",
+                  "output": "physical",
+                  "sequence": [
+                    {
+                      "transformation_type": "translation",
+                      "name": "center_array_origin",
+                      "translation": [
+                        -1920.0,
+                        -1920.0
+                      ]
+                    },
+                    {
+                      "transformation_type": "scale",
+                      "name": "scale_to_physical",
+                      "scale": [
+                        1.44,
+                        1.44
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tilt-series-001_2",
+              "movie_stack_id": "movie-stack-003",
+              "path": "mock-data/processed/tilt-series.mrc",
+              "section": 2,
+              "nominal_tilt_angle": 30.0,
+              "accumulated_dose": 7.5,
+              "width": 3840,
+              "height": 3840,
+              "coordinate_systems": [
+                {
+                  "name": "array",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "pixel",
+                      "axis_type": "array"
+                    }
+                  ]
+                },
+                {
+                  "name": "physical",
+                  "axes": [
+                    {
+                      "name": "x",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    },
+                    {
+                      "name": "y",
+                      "axis_unit": "angstrom",
+                      "axis_type": "space"
+                    }
+                  ]
+                }
+              ],
+              "coordinate_transformations": [
+                {
+                  "transformation_type": "sequence",
+                  "name": "array_to_physical",
+                  "input": "array",
+                  "output": "physical",
+                  "sequence": [
+                    {
+                      "transformation_type": "translation",
+                      "name": "center_array_origin",
+                      "translation": [
+                        -1920.0,
+                        -1920.0
+                      ]
+                    },
+                    {
+                      "transformation_type": "scale",
+                      "name": "scale_to_physical",
+                      "scale": [
+                        1.44,
+                        1.44
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "alignments": [
+        {
+          "tilt_series_id": "tilt-series-001",
+          "projection_alignments": [
+            {
+              "id": "tilt-series-001_align_0",
+              "tilt_image_id": "tilt-series-001_0",
+              "transformation_type": "projection_alignment",
+              "name": "tomogram_to_projection",
+              "input": "physical",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "affine",
+                  "name": "tilt",
+                  "input": "physical",
+                  "output": "tilted_physical",
+                  "affine": [
+                    [
+                      0.8660254,
+                      0.0,
+                      -0.5,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      1.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.5,
+                      0.0,
+                      0.8660254,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "affine",
+                  "name": "in_plane_rotation",
+                  "input": "tilted_physical",
+                  "output": "rotated_physical",
+                  "affine": [
+                    [
+                      0.9993908,
+                      -0.0348995,
+                      0.0
+                    ],
+                    [
+                      0.0348995,
+                      0.9993908,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "translation",
+                  "name": "shift",
+                  "input": "rotated_physical",
+                  "output": "physical",
+                  "translation": [
+                    12.0,
+                    -8.0
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tilt-series-001_align_1",
+              "tilt_image_id": "tilt-series-001_1",
+              "transformation_type": "projection_alignment",
+              "name": "tomogram_to_projection",
+              "input": "physical",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "affine",
+                  "name": "tilt",
+                  "input": "physical",
+                  "output": "tilted_physical",
+                  "affine": [
+                    [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      1.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "affine",
+                  "name": "in_plane_rotation",
+                  "input": "tilted_physical",
+                  "output": "rotated_physical",
+                  "affine": [
+                    [
+                      0.9998477,
+                      0.0174524,
+                      0.0
+                    ],
+                    [
+                      -0.0174524,
+                      0.9998477,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "translation",
+                  "name": "shift",
+                  "input": "rotated_physical",
+                  "output": "physical",
+                  "translation": [
+                    -2.0,
+                    4.0
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "tilt-series-001_align_2",
+              "tilt_image_id": "tilt-series-001_2",
+              "transformation_type": "projection_alignment",
+              "name": "tomogram_to_projection",
+              "input": "physical",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "affine",
+                  "name": "tilt",
+                  "input": "physical",
+                  "output": "tilted_physical",
+                  "affine": [
+                    [
+                      0.8660254,
+                      0.0,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      1.0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      -0.5,
+                      0.0,
+                      0.8660254,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "affine",
+                  "name": "in_plane_rotation",
+                  "input": "tilted_physical",
+                  "output": "rotated_physical",
+                  "affine": [
+                    [
+                      0.9996573,
+                      -0.0261769,
+                      0.0
+                    ],
+                    [
+                      0.0261769,
+                      0.9996573,
+                      0.0
+                    ],
+                    [
+                      0.0,
+                      0.0,
+                      1.0
+                    ]
+                  ]
+                },
+                {
+                  "transformation_type": "translation",
+                  "name": "shift",
+                  "input": "rotated_physical",
+                  "output": "physical",
+                  "translation": [
+                    -10.0,
+                    6.0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tomograms": [
+        {
+          "id": "tomogram-001",
+          "path": "mock-data/reconstructions/tomogram.mrc",
+          "ctf_corrected": false,
+          "tilt_series_id": "tilt-series-001",
+          "width": 1024,
+          "height": 1024,
+          "depth": 512,
+          "coordinate_systems": [
+            {
+              "name": "array",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                }
+              ]
+            },
+            {
+              "name": "physical",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "sequence",
+              "name": "array_to_physical",
+              "input": "array",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "translation",
+                  "name": "center_array_origin",
+                  "translation": [
+                    -512.0,
+                    -512.0,
+                    -256.0
+                  ]
+                },
+                {
+                  "transformation_type": "scale",
+                  "name": "scale_to_physical",
+                  "scale": [
+                    10.8,
+                    10.8,
+                    10.8
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "id": "ribosome-picks-001",
+          "annotation_type": "point_set_3D",
+          "name": "mock ribosome picks",
+          "source_tomogram_id": "tomogram-001",
+          "origin3D": [
+            [
+              1080.0,
+              2160.0,
+              3240.0
+            ]
+          ],
+          "coordinate_systems": [
+            {
+              "name": "physical",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "identity",
+              "name": "annotation_to_tomogram",
+              "input": "physical",
+              "output": "physical"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "averages": [
+    {
+      "name": "mock ribosome average",
+      "particle_maps": [
+        {
+          "path": "mock-data/averages/ribosome-map.mrc",
+          "source_region_id": "region-001",
+          "source_annotation_id": "ribosome-picks-001",
+          "coord_index": 0,
+          "width": 128,
+          "height": 128,
+          "depth": 128,
+          "coordinate_systems": [
+            {
+              "name": "array",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "voxel",
+                  "axis_type": "array"
+                }
+              ]
+            },
+            {
+              "name": "physical",
+              "axes": [
+                {
+                  "name": "x",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "y",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                },
+                {
+                  "name": "z",
+                  "axis_unit": "angstrom",
+                  "axis_type": "space"
+                }
+              ]
+            }
+          ],
+          "coordinate_transformations": [
+            {
+              "transformation_type": "sequence",
+              "name": "array_to_physical",
+              "input": "array",
+              "output": "physical",
+              "sequence": [
+                {
+                  "transformation_type": "translation",
+                  "name": "center_array_origin",
+                  "translation": [
+                    -64.0,
+                    -64.0,
+                    -64.0
+                  ]
+                },
+                {
+                  "transformation_type": "scale",
+                  "name": "scale_to_physical",
+                  "scale": [
+                    10.8,
+                    10.8,
+                    10.8
+                  ]
+                }
+              ]
+            },
+            {
+              "transformation_type": "affine",
+              "name": "particle_map_to_tomogram",
+              "input": "physical",
+              "output": "physical",
+              "affine": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

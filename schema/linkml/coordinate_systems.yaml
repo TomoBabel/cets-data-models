@@ -21,17 +21,18 @@ classes:
     attributes:
       axis_unit:
         description: The unit of the axis
-        range: string
-        ifabsent: angstrom
+        range: AxisUnit
+        ifabsent: AxisUnit(angstrom)
       axis_type:
         description: The type of axis
         range: AxisType
-        
+
   CoordinateSystem:
     description: A coordinate system
     attributes:
       name:
-        description: The name of the coordinate system
+        description: The name of the coordinate system. Free-form to allow per-entity /
+          intermediate systems; the canonical values are enumerated by CoordinateSpaceName.
         range: string
         required: true
       axes:
@@ -48,3 +49,21 @@ enums:
         description: A spatial axis
       array:
         description: An array axis
+  CoordinateSpaceName:
+    description: Canonical names for an entity's standard coordinate systems.
+    permissible_values:
+      array:
+        description: Discrete index space (integer pixel/voxel coordinates).
+      physical:
+        description: Continuous physical space in Ångström.
+  AxisUnit:
+    description: Allowable axis units.
+    permissible_values:
+      pixel:
+        description: 2D array index unit.
+      voxel:
+        description: 3D array index unit.
+      angstrom:
+        description: Physical length in Ångström (the default).
+      nanometer:
+        description: Physical length in nanometers.
