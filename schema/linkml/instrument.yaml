@@ -58,13 +58,6 @@ slots:
   detector_dose_rate:
     description: Dose rate at the detector in e-/pixel/s (post-specimen; counting-mode calibration).
     range: float
-  exposure_time:
-    description: Total exposure time per movie/record in seconds.
-    range: float
-    aliases:
-      - Exposure_Time
-    exact_mappings:
-      - oscem:Exposure_Time
   amplitude_contrast:
     description: Amplitude contrast fraction (dimensionless, typically 0.07-0.1). CTF-model parameter.
     range: float
@@ -77,7 +70,6 @@ classes:
       - name
       - microscope_model
       - voltage
-      - spherical_aberration
       - electron_source
       - detector_model
   AcquisitionSession:
@@ -88,8 +80,8 @@ classes:
       - instrument_id
       - dose_rate
       - detector_dose_rate
-      - exposure_time
       - amplitude_contrast
+      - spherical_aberration
 
 enums:
   ElectronSource:

@@ -6,6 +6,7 @@ description: Schema for cryoET alignments
 prefixes:
   linkml: https://w3id.org/linkml/
   image_entities: https://w3id.org/cetmd/imageentities/
+  oscem: https://w3id.org/osc-em/
 
 default_prefix: image_entities
 
@@ -39,6 +40,13 @@ slots:
   phase_shift:
     description: Phase shift value produced by the usage of a phase plate.
     range: float
+  exposure_time:
+    description: Total exposure time per movie/record in seconds.
+    range: float
+    aliases:
+      - Exposure_Time
+    exact_mappings:
+      - oscem:Exposure_Time
 
   particle_index:
     description: Index of a particle inside a tomogram.
@@ -87,6 +95,7 @@ classes:
       - nominal_tilt_angle
       - accumulated_dose
       - ctf_metadata
+      - exposure_time
   GainFile:
     is_a: Image2D
     description: A gain reference file.

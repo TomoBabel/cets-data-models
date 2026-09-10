@@ -555,6 +555,9 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
 
 
 class GainFile(Image2D):
@@ -630,6 +633,9 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -697,6 +703,9 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -736,6 +745,9 @@ class ProjectionImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -780,6 +792,9 @@ class SubProjectionImage(ProjectionImage):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -823,6 +838,9 @@ class TiltImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -1739,10 +1757,6 @@ class Instrument(ConfiguredBaseModel):
     voltage: Optional[float] = Field(
         default=None, description="""Acceleration voltage of the microscope in kV."""
     )
-    spherical_aberration: Optional[float] = Field(
-        default=None,
-        description="""Spherical aberration (Cs) of the objective lens in mm.""",
-    )
     electron_source: Optional[ElectronSource] = Field(
         default=None, description="""Type of electron source."""
     )
@@ -1772,12 +1786,13 @@ class AcquisitionSession(ConfiguredBaseModel):
         default=None,
         description="""Dose rate at the detector in e-/pixel/s (post-specimen; counting-mode calibration).""",
     )
-    exposure_time: Optional[float] = Field(
-        default=None, description="""Total exposure time per movie/record in seconds."""
-    )
     amplitude_contrast: Optional[float] = Field(
         default=None,
         description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1). CTF-model parameter.""",
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
     )
 
 
