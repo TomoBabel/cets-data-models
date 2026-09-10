@@ -1,0 +1,97 @@
+name: CETMDInstrument
+id: https://w3id.org/cetmd/instrument
+version: 0.0.1
+description: Instrument- and session-level acquisition metadata for cryoET.
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  instrument: https://w3id.org/cetmd/instrument/
+  oscem: https://w3id.org/osc-em/
+
+default_prefix: instrument
+
+imports:
+- linkml:types
+- ./common
+
+slots:
+  # --- instrument-level (physical hardware) ---
+  voltage:
+    description: Acceleration voltage of the microscope in kV.
+    range: float
+    aliases:
+      - Acceleration_Voltage
+    exact_mappings:
+      - oscem:Acceleration_Voltage
+  spherical_aberration:
+    description: Spherical aberration (Cs) of the objective lens in mm.
+    range: float
+    aliases:
+      - Cs
+    exact_mappings:
+      - oscem:Cs
+  microscope_model:
+    description: Manufacturer/model of the microscope, e.g. "Titan Krios G4".
+    range: string
+    exact_mappings:
+      - oscem:Microscope
+  electron_source:
+    description: Type of electron source.
+    range: ElectronSource
+    exact_mappings:
+      - oscem:Electron_Source
+  detector_model:
+    description: Manufacturer/model of the detector/camera.
+    range: string
+    exact_mappings:
+      - oscem:Detector
+
+  # --- session-level ---
+  instrument_id:
+    description: ID of the Instrument used for this acquisition session.
+    range: string
+  dose_rate:
+    description: Dose rate on the specimen during acquisition in e-/A^2/s (pre-specimen fluence).
+    range: float
+    aliases:
+      - Dose_Rate
+  detector_dose_rate:
+    description: Dose rate at the detector in e-/pixel/s (post-specimen; counting-mode calibration).
+    range: float
+  amplitude_contrast:
+    description: Amplitude contrast fraction (dimensionless, typically 0.07-0.1). CTF-model parameter.
+    range: float
+
+classes:
+  Instrument:
+    description: A microscope/instrument used to acquire data. Physical, rarely-changing hardware.
+    slots:
+      - id
+      - name
+      - microscope_model
+      - voltage
+      - electron_source
+      - detector_model
+  AcquisitionSession:
+    description: Parameters constant within one data-collection session; links to the Instrument used.
+    slots:
+      - id
+      - name
+      - instrument_id
+      - dose_rate
+      - detector_dose_rate
+      - amplitude_contrast
+      - spherical_aberration
+
+enums:
+  ElectronSource:
+    description: Type of electron source (mirrors OSC-EM permissible values).
+    permissible_values:
+      FEG:
+        description: Field emission gun
+      cold_FEG:
+        description: Cold field emission gun
+      LaB6:
+        description: Lanthanum hexaboride
+      tungsten:
+        description: Tungsten filament
