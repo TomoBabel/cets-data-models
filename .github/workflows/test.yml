@@ -35,12 +35,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dev dependencies
-        run: |
-          pip install -e .[dev]
-          # linkml==1.9.6 leaves linkml-runtime unpinned; >=1.10 dropped
-          # Format.JSON and breaks gen-pydantic (exercised by the model-gen
-          # test). Keep the runtime on the compatible 1.9.x line.
-          pip install 'linkml-runtime<1.10'
+        run: pip install -e .[dev]
 
       # test_utils.py is a pre-existing broken module (imports a symbol that
       # does not exist via a stale `src.`-prefixed path); tracked separately.

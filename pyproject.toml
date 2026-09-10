@@ -42,7 +42,8 @@ optional-dependencies.dev = [
     "pytest",
     "types-setuptools",
     "ruff==0.11.12", # this version should match the one in .pre-commit-config.yaml
-    "linkml==1.9.6", 
+    "linkml==1.11.1",
+    "linkml-runtime==1.11.1",  # pin both; linkml leaves its runtime dep unpinned
 ]
 
 optional-dependencies.docs = [

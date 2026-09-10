@@ -10,23 +10,17 @@ are required for model generation:
 
     make gen-python
 
-**NOTE:** currently the generated and patched (see *Post-generation script*, below) models are created at `src/cets_data_model/models/generated_models.py` and `src/cets_data_model/models/patched_models.py`, respectively, leaving *models.py* (i.e. at `src/cets_data_model/models/models.py`) untouched. This will be replaced in future iterations once tests are in place for validation of generated models. 
+**NOTE:** `make gen-python` writes the generated module to `src/cets_data_model/models/generated_models.py` (a git-ignored build artifact). The committed, imported model is `src/cets_data_model/models/models.py`; sync it from the generated file (e.g. `cp generated_models.py models.py`) once `make compare-models` confirms they agree.
 
-### Post-generation script
-With just the LinkML, we cannot currently specify everything we'd like in the pydantic models. Thus, some post-generation augmentation and refinement is required. For this purpose, the script `patch_models.py` in `model_processing` adds type aliases and discriminated unions to the models. The file `patch_config.yaml` specifies where these modifications should happen, listing, for discriminated unions, the classes that should be in the union, and the fields and (optionally) classes to which they apply, and for type aliases, the name of it, its definition, and fields for which it should be used. Thus with the configuration in the yaml file, model patching can be extended, if need be. 
+### Generation-time transforms
+LinkML's Pydantic generator cannot, on its own, express everything the model needs: discriminated unions, reusable constrained type aliases, injected mixin base classes, and dropping LinkML's `treat_empty_lists_as_none` serializer. Rather than post-processing the generated *text*, `model_processing/generate_models.py` subclasses LinkML's `PydanticGenerator` and applies these transforms **at generation time**, on the generator's object model via the documented `after_generate_class` lifecycle hook (plus its `injected_classes` / `imports` params and a serializer-free `base_model.py.jinja` template override). It also keeps `[]` (not `None`) defaults for optional multivalued slots via `empty_list_for_multivalued_slots=True`, which downstream consumers rely on.
 
-**NOTE:** This project pins `linkml==1.9.6` because the post-generation patching script depends on specific output format from LinkML's Pydantic generator. 
+Everything is driven declaratively by `model_processing/patch_config.yaml`:
+- `injected_base_classes` — hand-written mixins (`src/cets_data_model/models/mixins.py`) to add as base classes of specific generated classes;
+- `discriminated_fields` — fields to wrap in `Annotated[Union[...], Field(discriminator=...)]` (their discriminator fields become `Literal[...]` in subclasses);
+- `type_aliases` — reusable constrained type aliases and the fields to substitute them into.
 
-If upgrading LinkML:
-1. Check changes to PydanticGenerator in LinkML release notes.
-2. Update regex patterns in `model_processing/patch_models.py` if needed.
-3. Run `make gen-python` and `make compare-models-verbose` to verify.
-
-When the Makefile command described above, 
-
-    make gen-python
-
-is exceuted, the post-generation script, with its configuration, is also called. A summary of modifications is given as a printed output. 
+Because the transforms operate on LinkML's object model rather than regex over generated text, the project is **not** tied to a specific LinkML output format. If upgrading LinkML, run `make gen-python` (it fails loudly on any incompatible hook/object-model change) and `make compare-models-verbose` to confirm the output is unchanged.
 
 ### Comparing generations of models
 When changes are made to either LinkML or the post-generation configuration and new models generated, the differences between new and old can be ascertained with the script `compare_models.py`. The script can be run with the Makefile commands:
