@@ -22,7 +22,7 @@ This independent clone anticipates upstream changes; no upstream publication is 
 
 Integration and feature validation results are recorded as they are run. Pending checks are not passes.
 
-- LinkML 1.9.6 requires a compatible runtime: pin linkml-runtime 1.9.5 (1.10 removes Format.JSON). Its generator lacks the newer empty_list_for_multivalued_slots option; the generation hook supplies existing optional-list defaults instead.
+- Final generator dependencies follow reviewed PR #32: LinkML 1.11.1 and linkml-runtime 1.11.1. An initial trial using main's older 1.9.6 toolchain was superseded before schema development; retain PR #32's supported optional-list setting.
 - Restore get_image_info as a compatibility wrapper around the existing get_em_info dispatcher; the upstream suite still imports the former name.
 
 ## Integration validation (2026-09-10)

@@ -86,9 +86,6 @@ class CETSPydanticGenerator(PydanticGenerator):
             c.bases = list(mixins) + [b for b in bases if b not in mixins]
 
         for name, attr in (c.attributes or {}).items():
-            slot = sv.induced_slot(name, c.name)
-            if slot.multivalued and not slot.required and not attr.predefined:
-                attr.predefined = "[]"
             # 2) constrained-array field -> reusable type alias
             if name in ALIAS_SUB:
                 attr.range = ALIAS_SUB[name]
@@ -142,6 +139,7 @@ def build_generator() -> CETSPydanticGenerator:
         black=False,
         metadata_mode="None",
         # keep `[]` defaults for optional multivalued slots (downstream relies on it)
+        empty_list_for_multivalued_slots=True,
         # serializer-free base model (drops treat_empty_lists_as_none)
         template_dir=str(TEMPLATE_DIR),
         # module-level type-alias definitions + the imports they/the unions need

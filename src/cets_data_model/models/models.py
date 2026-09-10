@@ -12,7 +12,7 @@ from pydantic import (
 
 from cets_data_model.models.mixins import PixelSizeMixin, VoxelSizeMixin
 
-metamodel_version = "None"
+metamodel_version = "1.11.0"
 version = "0.0.1"
 
 
