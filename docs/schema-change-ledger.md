@@ -31,3 +31,26 @@ Integration and feature validation results are recorded as they are run. Pending
 - Unmodified cets-aretomo3 suite: 8 passed.
 - Unmodified cets-warpm suite (frozen arewarpion oracle supplied explicitly): 13 passed.
 - Shared io/cets suites: 39 passed, 2 failures in constant-grid goldens. Those fixtures synthesize equal-dose Warp XML and fail in arewarpion's strict native loader before CETS evaluation; retain the tests unchanged and record the preserved-environment comparison.
+
+## First-class non-rigid feature (2026-09-10)
+
+The feature branch adds Alignment.non_rigid_alignment and a derived, nonserialized
+has_non_rigid_alignment property, shared reference-volume binding to Tomogram,
+MovieAlignment/FrameAlignment, discriminated grid/particle sampling, explicit
+held-out and channel descriptors, acquisition order/dose, alignment-scoped
+exclusions and angle observations, point identities/attributes, and scientific
+provenance. Existing Alignment fields remain optional.
+
+The ordinary core package also provides document_to_dict and
+validate_document_references. The serializer preserves unknown legacy CTF
+handedness without turning the old default into an explicit observation.
+Reference validation is separate from ordinary permissive entity construction.
+
+Generator hooks support scalar discriminated unions, JSON-Schema-visible scalar
+patterns, item-level numeric constraints on lists, and enum values containing
+hyphens. All changes originate in LinkML or generator configuration; no separate
+numerical-package schema or runtime patching is used.
+
+Validation: 68 core tests passed; public-model regeneration is byte-identical.
+The numerical package additionally checks the canonical floor(N/2) frame,
+proper rotations, complete row identities, and context-bound payloads.

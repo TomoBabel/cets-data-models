@@ -52,9 +52,10 @@ DISC_FIELDS = CONFIG.get("discriminated_fields", []) or []
 DISCRIMINATORS = {d["discriminator"] for d in DISC_FIELDS}
 
 
-def _discriminated_range(discriminator: str, union_types: list[str]) -> str:
+def _discriminated_range(discriminator: str, union_types: list[str], multivalued: bool = True) -> str:
     union = "Union[" + ", ".join(union_types) + "]"
-    return f'Optional[list[Annotated[{union}, Field(discriminator="{discriminator}")]]]'
+    inner = f'Annotated[{union}, Field(discriminator="{discriminator}")]'
+    return f"Optional[list[{inner}]]" if multivalued else inner
 
 
 # --- type aliases ----------------------------------------------------------
@@ -86,6 +87,29 @@ class CETSPydanticGenerator(PydanticGenerator):
             c.bases = list(mixins) + [b for b in bases if b not in mixins]
 
         for name, attr in (c.attributes or {}).items():
+            slot = sv.induced_slot(name, c.name)
+            # LinkML emits invalid attribute expressions for hyphenated enum defaults.
+            # A literal value is validated against the enum by validate_default=True.
+            if slot.range in sv.all_enums() and attr.predefined and "." in attr.predefined:
+                enum_prefix, enum_value = attr.predefined.split(".", 1)
+                if enum_prefix == slot.range and not enum_value.isidentifier():
+                    attr.predefined = repr(enum_value)
+            # Express scalar regex constraints in Field as well as the wire schema.
+            if slot.pattern and not slot.multivalued:
+                attr.range = f"Annotated[{attr.range}, Field(pattern={slot.pattern!r})]"
+                attr.pattern = None
+            # Numeric constraints on a multivalued slot constrain its items.
+            if slot.multivalued and slot.range in {"integer", "float", "double"}:
+                limits = []
+                if attr.minimum_value is not None:
+                    limits.append(f"ge={attr.minimum_value!r}")
+                if attr.maximum_value is not None:
+                    limits.append(f"le={attr.maximum_value!r}")
+                if limits:
+                    scalar = "int" if slot.range == "integer" else "float"
+                    bounded = f"Annotated[{scalar}, Field({', '.join(limits)})]"
+                    attr.range = attr.range.replace(f"list[{scalar}]", f"list[{bounded}]")
+                    attr.minimum_value = attr.maximum_value = None
             # 2) constrained-array field -> reusable type alias
             if name in ALIAS_SUB:
                 attr.range = ALIAS_SUB[name]
@@ -96,7 +120,7 @@ class CETSPydanticGenerator(PydanticGenerator):
                     for_classes = d.get("for_classes")
                     if for_classes is None or c.name in for_classes:
                         attr.range = _discriminated_range(
-                            d["discriminator"], d["union_types"]
+                            d["discriminator"], d["union_types"], d.get("multivalued", True)
                         )
 
             # 4) discriminator field in a *subclass* -> Literal[...]

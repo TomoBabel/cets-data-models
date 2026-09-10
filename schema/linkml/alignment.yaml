@@ -2,55 +2,373 @@ name: CETMDAlignment
 id: https://w3id.org/cetmd/alignment
 version: 0.0.1
 description: Schema for cryoET alignments
-
 prefixes:
   linkml: https://w3id.org/linkml/
   alignment: https://w3id.org/cetmd/alignment/
   coord_transforms: https://w3id.org/cetmd/coord_transforms/
-
 default_prefix: alignment
-
 imports:
 - linkml:types
 - ./coordinate_transforms
 - ./common
-
 classes:
   ProjectionAlignment:
     is_a: CoordinateTransformation
     description: The tomographic alignment for a single projection.
     slots:
-      - id
+    - id
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(projection_alignment)
     attributes:
       tilt_image_id:
-        description: >-
-          ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced 
-          by different algorithms) may reference the same tilt-image.
+        description: ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by
+          different algorithms) may reference the same tilt-image.
         range: string
       sequence:
         description: The ordered tilt, in-plane rotation, and shift transformations.
         range: CoordinateTransformation
         maximum_cardinality: 3
         any_of:
-          - range: Affine
-          - range: Translation
+        - range: Affine
+        - range: Translation
         multivalued: true
-
   Alignment:
     description: The tomographic alignment for a tilt series.
     attributes:
-        tilt_series_id:
-          description: >-
-            ID of the tilt-series this alignment set applies to. Multiple Alignments (e.g. 
-            from different algorithms) may reference the same tilt-series.
-          range: string
-        projection_alignments:
-          description: alignment for a specific projection
-          range: ProjectionAlignment
-          multivalued: true
-          inlined_as_list: true
-
-
+      tilt_series_id:
+        description: ID of the tilt-series this alignment set applies to. Multiple Alignments (e.g.  from different
+          algorithms) may reference the same tilt-series.
+        range: string
+      projection_alignments:
+        description: alignment for a specific projection
+        range: ProjectionAlignment
+        multivalued: true
+        inlined_as_list: true
+      id:
+        description: Optional alignment identity; required by the non-rigid processing profile.
+        range: string
+      name:
+        description: ''
+        range: string
+      reference_volume_id:
+        description: ID of the Tomogram defining the shared reference physical frame; its path may be null.
+        range: string
+      non_rigid_alignment:
+        description: ''
+        range: NonRigidAlignment
+      tilt_angle_observations:
+        description: ''
+        range: TiltAngleObservation
+        multivalued: true
+        inlined_as_list: true
+      exclusions:
+        description: ''
+        range: ProjectionExclusion
+        multivalued: true
+        inlined_as_list: true
+      provenance:
+        description: ''
+        range: ProcessingProvenance
+  SamplingDescriptor:
+    description: Sampling identities; coordinates are stored in the payload.
+    abstract: true
+    attributes:
+      kind:
+        description: ''
+        range: SamplingKind
+        required: true
+  GridSampling:
+    description: Regular inclusive grid in the reference physical frame.
+    is_a: SamplingDescriptor
+    slot_usage:
+      kind:
+        ifabsent: SamplingKind(grid)
+    attributes:
+      grid_shape:
+        description: Grid counts in x,y[,z] order.
+        range: integer
+        required: true
+        multivalued: true
+        minimum_value: 1
+        minimum_cardinality: 2
+        maximum_cardinality: 3
+  ParticleSampling:
+    description: Samples bound to stable point identities in a CETS point set.
+    is_a: SamplingDescriptor
+    slot_usage:
+      kind:
+        ifabsent: SamplingKind(particles)
+    attributes:
+      annotation_id:
+        description: ID of the PointSet3D defining effective static particle coordinates.
+        range: string
+        required: true
+  HeldoutSampling:
+    description: How held-out samples were selected; zero count is not evaluated.
+    attributes:
+      method:
+        description: ''
+        range: HeldoutMethod
+        required: true
+      seed:
+        description: ''
+        range: integer
+        minimum_value: 0
+      count:
+        description: ''
+        range: integer
+        required: true
+        minimum_value: 0
+      fraction:
+        description: Requested particle held-out fraction.
+        range: float
+        minimum_value: 0
+        maximum_value: 1
+      min_count:
+        description: Particle split minimum; too-small inputs have no held-out set.
+        range: integer
+        minimum_value: 0
+  NonRigidChannels:
+    description: Independent availability of scientific channels.
+    attributes:
+      displacement_3d:
+        description: ''
+        range: DisplacementAvailability
+        ifabsent: DisplacementAvailability(none)
+      ctf_depth:
+        description: ''
+        range: DepthAvailability
+        ifabsent: DepthAvailability(none)
+  NonRigidAlignment:
+    description: A lossy point-sampled non-rigid component owned by its alignment.
+    attributes:
+      profile_version:
+        description: ''
+        range: string
+        required: true
+        pattern: ^cets-nonrigid/0\.1$
+      kind:
+        description: ''
+        range: NonRigidKind
+        required: true
+      tilt_image_ids:
+        description: All tilt-image IDs in payload row order; movies use MovieAlignment.frame_ids.
+        range: string
+        multivalued: true
+      payload_uri:
+        description: Local Zarr path, relative to the document directory or absolute.
+        range: string
+        required: true
+      payload_group:
+        description: Relative group key within the payload store.
+        range: string
+        required: true
+      sampling:
+        description: ''
+        range: SamplingDescriptor
+        required: true
+        any_of:
+        - range: GridSampling
+        - range: ParticleSampling
+      heldout:
+        description: ''
+        range: HeldoutSampling
+        required: true
+      channels:
+        description: ''
+        range: NonRigidChannels
+        required: true
+      context_digest:
+        description: ''
+        range: string
+        required: true
+        pattern: ^[0-9a-f]{64}$
+      digest_version:
+        description: ''
+        range: integer
+        required: true
+        minimum_value: 1
+        maximum_value: 1
+  NativeParameter:
+    description: Tool-specific parameter or provenance; never duplicate core geometry.
+    attributes:
+      name:
+        description: ''
+        range: string
+        required: true
+      value_json:
+        description: JSON encoding of the parameter value.
+        range: string
+        required: true
+  NativeArtifact:
+    description: Optional source artifact; processing never reopens it implicitly.
+    attributes:
+      role:
+        description: ''
+        range: string
+        required: true
+      uri:
+        description: ''
+        range: string
+        required: true
+      sha256:
+        description: ''
+        range: string
+        pattern: ^[0-9a-f]{64}$
+  ProcessingProvenance:
+    description: Software and structured import/export provenance.
+    attributes:
+      software_name:
+        description: ''
+        range: string
+      software_version:
+        description: ''
+        range: string
+      parameters:
+        description: ''
+        range: NativeParameter
+        multivalued: true
+        inlined_as_list: true
+      artifacts:
+        description: ''
+        range: NativeArtifact
+        multivalued: true
+        inlined_as_list: true
+      warnings:
+        description: ''
+        range: string
+        multivalued: true
+      dropped_information:
+        description: ''
+        range: string
+        multivalued: true
+  TiltAngleObservation:
+    description: A source angle attached to an alignment, including excluded images.
+    attributes:
+      tilt_image_id:
+        description: ''
+        range: string
+        required: true
+      value_degrees:
+        description: ''
+        range: float
+        required: true
+      angle_kind:
+        description: ''
+        range: SourceAngleKind
+        ifabsent: SourceAngleKind(unknown)
+      source:
+        description: ''
+        range: string
+  ProjectionExclusion:
+    description: Why an image has no projection alignment in this alignment instance.
+    attributes:
+      tilt_image_id:
+        description: ''
+        range: string
+        required: true
+      reason:
+        description: ''
+        range: string
+        required: true
+  FrameAlignment:
+    description: Global map from corrected physical image coordinates to raw-frame coordinates in Angstrom.
+    attributes:
+      frame_id:
+        description: ''
+        range: string
+        required: true
+      transform:
+        description: ''
+        range: Translation
+        required: true
+  MovieAlignment:
+    description: Frame-series alignment with a first-class optional non-rigid component.
+    attributes:
+      id:
+        description: ''
+        range: string
+      name:
+        description: ''
+        range: string
+      profile_version:
+        description: ''
+        range: string
+        pattern: ^cets-nonrigid/0\.1$
+      movie_stack_id:
+        description: ''
+        range: string
+      frame_ids:
+        description: All enumerated movie-frame IDs in payload row order.
+        range: string
+        multivalued: true
+      gauge:
+        description: ''
+        range: MovieGauge
+        ifabsent: string(native-origin)
+      reference_frame_id:
+        description: Frame whose global drift defines the reference-frame gauge; local motion need not vanish.
+        range: string
+      frame_alignments:
+        description: ''
+        range: FrameAlignment
+        multivalued: true
+        inlined_as_list: true
+      non_rigid_alignment:
+        description: ''
+        range: NonRigidAlignment
+      provenance:
+        description: ''
+        range: ProcessingProvenance
+  PointAttribute:
+    description: Named per-point column; values follow the point-set identity order.
+    attributes:
+      name:
+        description: ''
+        range: string
+        required: true
+      numeric_values:
+        description: ''
+        range: float
+        multivalued: true
+      string_values:
+        description: ''
+        range: string
+        multivalued: true
+      boolean_values:
+        description: ''
+        range: boolean
+        multivalued: true
+enums:
+  NonRigidKind:
+    permissible_values:
+      tilt-series-projection-residual: {}
+      movie-frame-residual: {}
+  SamplingKind:
+    permissible_values:
+      grid: {}
+      particles: {}
+  HeldoutMethod:
+    permissible_values:
+      scrambled-sobol: {}
+      particle-subset: {}
+      none: {}
+  DisplacementAvailability:
+    permissible_values:
+      present: {}
+      zero_at_samples: {}
+      none: {}
+  DepthAvailability:
+    permissible_values:
+      present: {}
+      none: {}
+  SourceAngleKind:
+    permissible_values:
+      nominal: {}
+      effective: {}
+      unknown: {}
+  MovieGauge:
+    permissible_values:
+      native-origin: {}
+      reference-frame: {}

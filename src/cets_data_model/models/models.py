@@ -10,7 +10,11 @@ from pydantic import (
     RootModel,
 )
 
-from cets_data_model.models.mixins import PixelSizeMixin, VoxelSizeMixin
+from cets_data_model.models.mixins import (
+    NonRigidPresenceMixin,
+    PixelSizeMixin,
+    VoxelSizeMixin,
+)
 
 metamodel_version = "1.11.0"
 version = "0.0.1"
@@ -181,6 +185,44 @@ class TransformationName(str, Enum):
     """
     Tomogram to projection (the tomographic projection, per tilt).
     """
+
+
+class NonRigidKind(str, Enum):
+    tilt_series_projection_residual = "tilt-series-projection-residual"
+    movie_frame_residual = "movie-frame-residual"
+
+
+class SamplingKind(str, Enum):
+    grid = "grid"
+    particles = "particles"
+
+
+class HeldoutMethod(str, Enum):
+    scrambled_sobol = "scrambled-sobol"
+    particle_subset = "particle-subset"
+    none = "none"
+
+
+class DisplacementAvailability(str, Enum):
+    present = "present"
+    zero_at_samples = "zero_at_samples"
+    none = "none"
+
+
+class DepthAvailability(str, Enum):
+    present = "present"
+    none = "none"
+
+
+class SourceAngleKind(str, Enum):
+    nominal = "nominal"
+    effective = "effective"
+    unknown = "unknown"
+
+
+class MovieGauge(str, Enum):
+    native_origin = "native-origin"
+    reference_frame = "reference-frame"
 
 
 class AnnotationType(str, Enum):
@@ -590,7 +632,7 @@ class ProjectionAlignment(CoordinateTransformation):
     )
 
 
-class Alignment(ConfiguredBaseModel):
+class Alignment(NonRigidPresenceMixin, ConfiguredBaseModel):
     """
     The tomographic alignment for a tilt series.
     """
@@ -602,6 +644,215 @@ class Alignment(ConfiguredBaseModel):
     projection_alignments: Optional[list[ProjectionAlignment]] = Field(
         default=[], description="""alignment for a specific projection"""
     )
+    id: Optional[str] = Field(
+        default=None,
+        description="""Optional alignment identity; required by the non-rigid processing profile.""",
+    )
+    name: Optional[str] = Field(default=None)
+    reference_volume_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the Tomogram defining the shared reference physical frame; its path may be null.""",
+    )
+    non_rigid_alignment: Optional[NonRigidAlignment] = Field(default=None)
+    tilt_angle_observations: Optional[list[TiltAngleObservation]] = Field(default=[])
+    exclusions: Optional[list[ProjectionExclusion]] = Field(default=[])
+    provenance: Optional[ProcessingProvenance] = Field(default=None)
+
+
+class SamplingDescriptor(ConfiguredBaseModel):
+    """
+    Sampling identities; coordinates are stored in the payload.
+    """
+
+    kind: SamplingKind = Field(default=...)
+
+
+class GridSampling(SamplingDescriptor):
+    """
+    Regular inclusive grid in the reference physical frame.
+    """
+
+    grid_shape: list[Annotated[int, Field(ge=1)]] = Field(
+        default=...,
+        description="""Grid counts in x,y[,z] order.""",
+        min_length=2,
+        max_length=3,
+    )
+    kind: Literal[SamplingKind.grid] = Field(default=SamplingKind.grid)
+
+
+class ParticleSampling(SamplingDescriptor):
+    """
+    Samples bound to stable point identities in a CETS point set.
+    """
+
+    annotation_id: str = Field(
+        default=...,
+        description="""ID of the PointSet3D defining effective static particle coordinates.""",
+    )
+    kind: Literal[SamplingKind.particles] = Field(default=SamplingKind.particles)
+
+
+class HeldoutSampling(ConfiguredBaseModel):
+    """
+    How held-out samples were selected; zero count is not evaluated.
+    """
+
+    method: HeldoutMethod = Field(default=...)
+    seed: Optional[int] = Field(default=None, ge=0)
+    count: int = Field(default=..., ge=0)
+    fraction: Optional[float] = Field(
+        default=None,
+        description="""Requested particle held-out fraction.""",
+        ge=0,
+        le=1,
+    )
+    min_count: Optional[int] = Field(
+        default=None,
+        description="""Particle split minimum; too-small inputs have no held-out set.""",
+        ge=0,
+    )
+
+
+class NonRigidChannels(ConfiguredBaseModel):
+    """
+    Independent availability of scientific channels.
+    """
+
+    displacement_3d: Optional[DisplacementAvailability] = Field(
+        default=DisplacementAvailability.none
+    )
+    ctf_depth: Optional[DepthAvailability] = Field(default=DepthAvailability.none)
+
+
+class NonRigidAlignment(ConfiguredBaseModel):
+    """
+    A lossy point-sampled non-rigid component owned by its alignment.
+    """
+
+    profile_version: Annotated[str, Field(pattern="^cets-nonrigid/0\\.1$")] = Field(
+        default=...
+    )
+    kind: NonRigidKind = Field(default=...)
+    tilt_image_ids: Optional[list[str]] = Field(
+        default=[],
+        description="""All tilt-image IDs in payload row order; movies use MovieAlignment.frame_ids.""",
+    )
+    payload_uri: str = Field(
+        default=...,
+        description="""Local Zarr path, relative to the document directory or absolute.""",
+    )
+    payload_group: str = Field(
+        default=..., description="""Relative group key within the payload store."""
+    )
+    sampling: Annotated[
+        Union[GridSampling, ParticleSampling], Field(discriminator="kind")
+    ] = Field(default=...)
+    heldout: HeldoutSampling = Field(default=...)
+    channels: NonRigidChannels = Field(default=...)
+    context_digest: Annotated[str, Field(pattern="^[0-9a-f]{64}$")] = Field(default=...)
+    digest_version: int = Field(default=..., ge=1, le=1)
+
+
+class NativeParameter(ConfiguredBaseModel):
+    """
+    Tool-specific parameter or provenance; never duplicate core geometry.
+    """
+
+    name: str = Field(default=...)
+    value_json: str = Field(
+        default=..., description="""JSON encoding of the parameter value."""
+    )
+
+
+class NativeArtifact(ConfiguredBaseModel):
+    """
+    Optional source artifact; processing never reopens it implicitly.
+    """
+
+    role: str = Field(default=...)
+    uri: str = Field(default=...)
+    sha256: Annotated[Optional[str], Field(pattern="^[0-9a-f]{64}$")] = Field(
+        default=None
+    )
+
+
+class ProcessingProvenance(ConfiguredBaseModel):
+    """
+    Software and structured import/export provenance.
+    """
+
+    software_name: Optional[str] = Field(default=None)
+    software_version: Optional[str] = Field(default=None)
+    parameters: Optional[list[NativeParameter]] = Field(default=[])
+    artifacts: Optional[list[NativeArtifact]] = Field(default=[])
+    warnings: Optional[list[str]] = Field(default=[])
+    dropped_information: Optional[list[str]] = Field(default=[])
+
+
+class TiltAngleObservation(ConfiguredBaseModel):
+    """
+    A source angle attached to an alignment, including excluded images.
+    """
+
+    tilt_image_id: str = Field(default=...)
+    value_degrees: float = Field(default=...)
+    angle_kind: Optional[SourceAngleKind] = Field(default=SourceAngleKind.unknown)
+    source: Optional[str] = Field(default=None)
+
+
+class ProjectionExclusion(ConfiguredBaseModel):
+    """
+    Why an image has no projection alignment in this alignment instance.
+    """
+
+    tilt_image_id: str = Field(default=...)
+    reason: str = Field(default=...)
+
+
+class FrameAlignment(ConfiguredBaseModel):
+    """
+    Global map from corrected physical image coordinates to raw-frame coordinates in Angstrom.
+    """
+
+    frame_id: str = Field(default=...)
+    transform: Translation = Field(default=...)
+
+
+class MovieAlignment(NonRigidPresenceMixin, ConfiguredBaseModel):
+    """
+    Frame-series alignment with a first-class optional non-rigid component.
+    """
+
+    id: Optional[str] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    profile_version: Annotated[
+        Optional[str], Field(pattern="^cets-nonrigid/0\\.1$")
+    ] = Field(default=None)
+    movie_stack_id: Optional[str] = Field(default=None)
+    frame_ids: Optional[list[str]] = Field(
+        default=[],
+        description="""All enumerated movie-frame IDs in payload row order.""",
+    )
+    gauge: Optional[MovieGauge] = Field(default="native-origin")
+    reference_frame_id: Optional[str] = Field(
+        default=None,
+        description="""Frame whose global drift defines the reference-frame gauge; local motion need not vanish.""",
+    )
+    frame_alignments: Optional[list[FrameAlignment]] = Field(default=[])
+    non_rigid_alignment: Optional[NonRigidAlignment] = Field(default=None)
+    provenance: Optional[ProcessingProvenance] = Field(default=None)
+
+
+class PointAttribute(ConfiguredBaseModel):
+    """
+    Named per-point column; values follow the point-set identity order.
+    """
+
+    name: str = Field(default=...)
+    numeric_values: Optional[list[float]] = Field(default=[])
+    string_values: Optional[list[str]] = Field(default=[])
+    boolean_values: Optional[list[bool]] = Field(default=[])
 
 
 class CTFMetadata(ConfiguredBaseModel):
@@ -618,11 +869,11 @@ class CTFMetadata(ConfiguredBaseModel):
         description="""Estimated defocus V for this image in Angstrom, underfocus positive.""",
     )
     defocus_angle: Optional[float] = Field(
-        default=None, description="""Estimated angle of astigmatism."""
+        default=None, description="""Estimated angle of astigmatism. Unit: degrees."""
     )
     phase_shift: Optional[float] = Field(
         default=None,
-        description="""Phase shift value produced by the usage of a phase plate.""",
+        description="""Phase shift value produced by the usage of a phase plate. Unit: degrees.""",
     )
     defocus_handedness: Optional[int] = Field(
         default=-1,
@@ -646,6 +897,16 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     )
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
+    )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
     )
 
 
@@ -713,6 +974,20 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
         default=None,
         description="""0-based section index to the entity inside a stack.""",
     )
+    id: Optional[str] = Field(
+        default=None,
+        description="""Optional stable identity; required when referenced by a movie alignment.""",
+    )
+    source_start_index: Optional[int] = Field(
+        default=None,
+        description="""Zero-based first raw input frame integrated into this image.""",
+        ge=0,
+    )
+    source_frame_count: Optional[int] = Field(
+        default=None,
+        description="""Number of contiguous raw input frames integrated into this image.""",
+        ge=1,
+    )
     nominal_tilt_angle: Optional[float] = Field(
         default=None, description="""The tilt angle reported by the microscope"""
     )
@@ -724,6 +999,16 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     )
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
+    )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -746,7 +1031,7 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     )
 
 
-class MovieStack(ConfiguredBaseModel):
+class MovieStack(Image2D):
     """
     A stack of movie frames.
     """
@@ -755,6 +1040,31 @@ class MovieStack(ConfiguredBaseModel):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     images: Optional[list[MovieFrame]] = Field(
         default=[], description="""The movie frames in the stack"""
+    )
+    alignments: Optional[list[MovieAlignment]] = Field(default=[])
+    raw_frame_count: Optional[int] = Field(
+        default=None,
+        description="""Total raw input frames, including excluded frames.""",
+        ge=1,
+    )
+    width: Optional[int] = Field(
+        default=None, description="""The width of the image (x-axis) in pixels"""
+    )
+    height: Optional[int] = Field(
+        default=None, description="""The height of the image (y-axis) in pixels"""
+    )
+    coordinate_systems: Optional[list[CoordinateSystem]] = Field(
+        default=[], description="""Named coordinate systems for this entity"""
+    )
+    coordinate_transformations: Optional[
+        list[
+            Annotated[
+                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Field(discriminator="transformation_type"),
+            ]
+        ]
+    ] = Field(
+        default=[], description="""Named coordinate transformations for this entity"""
     )
 
 
@@ -794,6 +1104,16 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     )
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
+    )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -837,6 +1157,16 @@ class ProjectionImage(BaseProjectionImage):
     )
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
+    )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -884,6 +1214,16 @@ class SubProjectionImage(ProjectionImage):
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
     )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -930,6 +1270,16 @@ class TiltImage(BaseProjectionImage):
     )
     exposure_time: Optional[float] = Field(
         default=None, description="""Total exposure time per movie/record in seconds."""
+    )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Zero-based acquisition order, independent of storage order.""",
+        ge=0,
+    )
+    exposure_dose: Optional[float] = Field(
+        default=None,
+        description="""Exposure during this image in electrons per square Angstrom.""",
+        ge=0,
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -980,6 +1330,24 @@ class TiltSeries(ConfiguredBaseModel):
         default=None,
         description="""The ID of the acquisition session this tilt series was collected in.""",
     )
+    defocus_handedness: Optional[int] = Field(
+        default=None,
+        description="""Sign of the defocus contribution of positive beam-depth displacement; unknown is null.""",
+        ge=-1,
+        le=1,
+    )
+    defocus_slope: Optional[float] = Field(
+        default=None,
+        description="""Dimensionless multiplier of the signed geometric depth contribution.""",
+    )
+    nominal_tilt_axis_angle: Optional[float] = Field(
+        default=None,
+        description="""Acquisition-stage tilt-axis angle in degrees, not a refined rotation.""",
+    )
+    collection_metadata_path: Optional[str] = Field(
+        default=None,
+        description="""Optional acquisition metadata artifact path or URI.""",
+    )
 
 
 class Tomogram(Image3D):
@@ -1002,6 +1370,11 @@ class Tomogram(Image3D):
     tilt_series_id: Optional[str] = Field(
         default=None, description="""The ID of the tilt series for this tomogram."""
     )
+    alignment_id: Optional[str] = Field(
+        default=None,
+        description="""Alignment that produced this reconstructed tomogram.""",
+    )
+    provenance: Optional[ProcessingProvenance] = Field(default=None)
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -1284,6 +1657,10 @@ class PointSet2D(Annotation, CoordMetaMixin):
     origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 2D image (Nx2)."""
     )
+    point_ids: Optional[list[str]] = Field(
+        default=[], description="""Stable IDs in coordinate order."""
+    )
+    point_attributes: Optional[list[PointAttribute]] = Field(default=[])
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
     )
@@ -1318,6 +1695,10 @@ class PointSet3D(Annotation, CoordMetaMixin):
     origin3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 3D image (Nx3)."""
     )
+    point_ids: Optional[list[str]] = Field(
+        default=[], description="""Stable IDs in coordinate order."""
+    )
+    point_attributes: Optional[list[PointAttribute]] = Field(default=[])
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
     )
@@ -2010,6 +2391,20 @@ Affine.model_rebuild()
 Sequence.model_rebuild()
 ProjectionAlignment.model_rebuild()
 Alignment.model_rebuild()
+SamplingDescriptor.model_rebuild()
+GridSampling.model_rebuild()
+ParticleSampling.model_rebuild()
+HeldoutSampling.model_rebuild()
+NonRigidChannels.model_rebuild()
+NonRigidAlignment.model_rebuild()
+NativeParameter.model_rebuild()
+NativeArtifact.model_rebuild()
+ProcessingProvenance.model_rebuild()
+TiltAngleObservation.model_rebuild()
+ProjectionExclusion.model_rebuild()
+FrameAlignment.model_rebuild()
+MovieAlignment.model_rebuild()
+PointAttribute.model_rebuild()
 CTFMetadata.model_rebuild()
 AcquisitionMetadataMixin.model_rebuild()
 GainFile.model_rebuild()

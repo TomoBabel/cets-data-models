@@ -68,3 +68,11 @@ class VoxelSizeMixin:
         )
 
         set_voxel_size(self, value)
+
+
+class NonRigidPresenceMixin:
+    """Derived component presence; never a serialized field."""
+
+    @property
+    def has_non_rigid_alignment(self) -> bool:
+        return self.non_rigid_alignment is not None
