@@ -879,6 +879,15 @@ class CTFMetadata(ConfiguredBaseModel):
         default=-1,
         description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
     )
+    fit_score: Optional[float] = Field(
+        default=None,
+        description="""Optional native CTF-fit quality score; interpretation is software-specific.""",
+    )
+    fit_resolution: Optional[float] = Field(
+        default=None,
+        description="""Optional native CTF-fit resolution limit in Angstrom.""",
+        ge=0,
+    )
 
 
 class AcquisitionMetadataMixin(ConfiguredBaseModel):

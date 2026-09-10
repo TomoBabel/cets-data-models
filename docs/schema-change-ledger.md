@@ -54,3 +54,8 @@ numerical-package schema or runtime patching is used.
 Validation: 68 core tests passed; public-model regeneration is byte-identical.
 The numerical package additionally checks the canonical floor(N/2) frame,
 proper rotations, complete row identities, and context-bound payloads.
+
+CTFMetadata.fit_score and fit_resolution preserve the optional diagnostics already
+carried by the validated native CTF readers. fit_resolution uses Angstrom. These
+are optional core fields; they avoid silently replacing known native diagnostics
+with writer placeholders during bundle-only conversion.

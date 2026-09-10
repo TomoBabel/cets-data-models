@@ -83,6 +83,14 @@ classes:
     slot_usage:
       defocus_handedness:
         ifabsent: -1
+    attributes:
+      fit_score:
+        description: Optional native CTF-fit quality score; interpretation is software-specific.
+        range: float
+      fit_resolution:
+        description: Optional native CTF-fit resolution limit in Angstrom.
+        range: float
+        minimum_value: 0
   AcquisitionMetadataMixin:
     description: Per-exposure acquisition metadata (varies from image to image).
     slots:
