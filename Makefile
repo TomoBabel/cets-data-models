@@ -12,7 +12,8 @@ install-dev:
 .PHONY: gen-python
 gen-python:
 	@echo "Generating Python model code from LinkML schema."
-	python model_processing/generate_models.py src/cets_data_model/models/generated_models.py
+	python model_processing/generate_models.py src/cets_data_model/models/models.py
+	cp src/cets_data_model/models/models.py src/cets_data_model/models/generated_models.py
 
 .PHONY: compare-models
 compare-models:
@@ -28,3 +29,7 @@ compare-models-verbose:
 linkml-docs:
 	@echo "Generating documentation from linkml files"
 	gen-markdown -d docs/linkml schema/linkml/entities.yaml
+
+.PHONY: check-generated
+check-generated:
+	python model_processing/check_generated.py

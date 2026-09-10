@@ -304,3 +304,8 @@ def get_em_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
         return get_em_file_info(img_name)
     else:
         raise ValueError(f"{img_name} is not a valid mrc, tif or em file.")
+
+
+def get_image_info(img_name: Union[str, os.PathLike]) -> ImageInfo:
+    """Backward-compatible image-information entry point for MRC, TIFF, and EM."""
+    return get_em_info(img_name)

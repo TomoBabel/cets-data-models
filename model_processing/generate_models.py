@@ -34,7 +34,7 @@ CONFIG_PATH = HERE / "patch_config.yaml"
 SCHEMA_PATH = HERE.parent / "schema" / "linkml" / "entities.yaml"
 TEMPLATE_DIR = HERE / "templates"
 DEFAULT_OUTPUT = (
-    HERE.parent / "src" / "cets_data_model" / "models" / "generated_models.py"
+    HERE.parent / "src" / "cets_data_model" / "models" / "models.py"
 )
 
 CONFIG = yaml.safe_load(CONFIG_PATH.read_text()) or {}
@@ -86,6 +86,9 @@ class CETSPydanticGenerator(PydanticGenerator):
             c.bases = list(mixins) + [b for b in bases if b not in mixins]
 
         for name, attr in (c.attributes or {}).items():
+            slot = sv.induced_slot(name, c.name)
+            if slot.multivalued and not slot.required and not attr.predefined:
+                attr.predefined = "[]"
             # 2) constrained-array field -> reusable type alias
             if name in ALIAS_SUB:
                 attr.range = ALIAS_SUB[name]
@@ -139,7 +142,6 @@ def build_generator() -> CETSPydanticGenerator:
         black=False,
         metadata_mode="None",
         # keep `[]` defaults for optional multivalued slots (downstream relies on it)
-        empty_list_for_multivalued_slots=True,
         # serializer-free base model (drops treat_empty_lists_as_none)
         template_dir=str(TEMPLATE_DIR),
         # module-level type-alias definitions + the imports they/the unions need
@@ -153,18 +155,18 @@ def _format_with_ruff(path: Path) -> None:
     """Sort/prune imports and format (replaces the former patch step's ruff pass)."""
     try:
         subprocess.run(
-            ["ruff", "check", "--select", "I,F401", "--fix", str(path)],
+            [sys.executable, "-m", "ruff", "check", "--select", "I,F401", "--fix", str(path)],
             capture_output=True,
             text=True,
             check=True,
         )
         subprocess.run(
-            ["ruff", "format", str(path)], capture_output=True, text=True, check=True
+            [sys.executable, "-m", "ruff", "format", str(path)], capture_output=True, text=True, check=True
         )
     except FileNotFoundError:
-        print("WARNING: ruff not found; output left unformatted", file=sys.stderr)
+        raise RuntimeError("Pinned ruff is required for reproducible generation")
     except subprocess.CalledProcessError as e:
-        print(f"WARNING: ruff failed: {e.stderr}", file=sys.stderr)
+        raise RuntimeError(f"Formatting generated models failed: {e.stderr}") from e
 
 
 def _validate(path: Path) -> None:
