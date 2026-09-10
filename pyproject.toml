@@ -12,7 +12,7 @@ namespaces = false
 
 [project]
 name = "cets_data_model"
-version = "0.1"
+version = "0.1.0"
 description = "Universal data standard for cryoET"
 license = {file = "LICENSE"}
 readme = "README.md"

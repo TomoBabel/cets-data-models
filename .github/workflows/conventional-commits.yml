@@ -1,0 +1,48 @@
+name: conventional-commits
+
+# Validates that the PR title is a Conventional Commit. On squash-merge the PR
+# title becomes the commit on main, which is what release-please parses to
+# decide the next version and changelog entry.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-title:
+    name: validate PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Allowed commit types (prefixes) -- kept in sync with the
+          # changelog-sections in release-please-config.json.
+          types: |
+            feat
+            fix
+            perf
+            docs
+            refactor
+            revert
+            build
+            ci
+            test
+            chore
+            style
+          # Allowed scopes (components) -- project areas. Scope is optional, but
+          # when present must be one of these. schema/models feed the standard
+          # release line; the rest feed the cets-data-model package line.
+          scopes: |
+            schema
+            library
+          requireScope: false
