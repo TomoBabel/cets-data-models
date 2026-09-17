@@ -6,7 +6,7 @@ generation time via LinkML's object model + documented lifecycle hooks (operatin
 on the generator's ``PydanticClass`` / ``PydanticAttribute`` template objects
 rather than post-processing generated text). A ``CETSPydanticGenerator`` subclass:
 
-  * injects hand-written mixin base classes (Pixel/VoxelSizeMixin) into Image2D/3D;
+  * injects configured hand-written mixin base classes;
   * wraps discriminated-union fields in ``Annotated[Union[...], Field(discriminator=...)]``;
   * converts subclass discriminator fields to ``Literal[...]``;
   * substitutes constrained-array fields with reusable type aliases.
@@ -126,9 +126,9 @@ def _build_imports() -> Imports:
     return imports
 
 
-def build_generator() -> CETSPydanticGenerator:
+def build_generator(schema_path: Path = SCHEMA_PATH) -> CETSPydanticGenerator:
     return CETSPydanticGenerator(
-        str(SCHEMA_PATH),
+        str(schema_path),
         # match the `gen-pydantic --meta None` CLI construction
         array_representations=[ArrayRepresentation.LIST],
         extra_fields="forbid",
@@ -151,20 +151,20 @@ def build_generator() -> CETSPydanticGenerator:
 
 def _format_with_ruff(path: Path) -> None:
     """Sort/prune imports and format (replaces the former patch step's ruff pass)."""
-    try:
-        subprocess.run(
-            ["ruff", "check", "--select", "I,F401", "--fix", str(path)],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        subprocess.run(
-            ["ruff", "format", str(path)], capture_output=True, text=True, check=True
-        )
-    except FileNotFoundError:
-        print("WARNING: ruff not found; output left unformatted", file=sys.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"WARNING: ruff failed: {e.stderr}", file=sys.stderr)
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "ruff",
+            "check",
+            "--select",
+            "I,F401",
+            "--fix",
+            str(path),
+        ],
+        check=True,
+    )
+    subprocess.run([sys.executable, "-m", "ruff", "format", str(path)], check=True)
 
 
 def _validate(path: Path) -> None:

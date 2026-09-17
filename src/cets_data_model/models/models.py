@@ -10,8 +10,6 @@ from pydantic import (
     RootModel,
 )
 
-from cets_data_model.models.mixins import PixelSizeMixin, VoxelSizeMixin
-
 metamodel_version = "1.11.0"
 version = "0.0.1"
 
@@ -181,7 +179,7 @@ class AnnotationType(str, Enum):
     """
 
 
-class Image2D(PixelSizeMixin, ConfiguredBaseModel):
+class Image2D(ConfiguredBaseModel):
     """
     A 2D image.
     """
@@ -207,7 +205,7 @@ class Image2D(PixelSizeMixin, ConfiguredBaseModel):
     )
 
 
-class Image3D(VoxelSizeMixin, ConfiguredBaseModel):
+class Image3D(ConfiguredBaseModel):
     """
     A 3D image.
     """

@@ -3,6 +3,7 @@ import importlib.util
 import pytest
 import re
 import subprocess
+import sys
 from pathlib import Path
 from pydantic import ValidationError
 
@@ -230,7 +231,11 @@ def test_can_regenerate_models():
     This ensures 'make gen-python' command succeeds.
     Skipped if schema files aren't available.
     """
-    result = subprocess.run(["make", "gen-python"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["make", "gen-python", f"PYTHON={sys.executable}"],
+        capture_output=True,
+        text=True,
+    )
 
     assert result.returncode == 0, f"Model generation failed:\n{result.stderr}"
     assert "Generated models validated" in result.stderr, (
@@ -242,55 +247,15 @@ def test_can_regenerate_models():
     assert "Field(discriminator=" in generated  # discriminated unions
     assert ": TypeAlias =" in generated  # type aliases
     assert "treat_empty_lists_as_none" not in generated  # serializer dropped
-    assert "class Image2D(PixelSizeMixin," in generated  # mixin injected
+    committed = Path("src/cets_data_model/models/models.py")
+    assert generated == committed.read_text()
 
 
-# ---------------------------------------------------------------------------
-# Injected mixin properties: PixelSizeMixin -> Image2D, VoxelSizeMixin -> Image3D
-# (added as base classes at generation time by generate_models.py / the
-# `injected_base_classes` registry in patch_config.yaml).
-# ---------------------------------------------------------------------------
-
-
-def _load_models(models_path):
+@pytest.mark.parametrize("class_name", ["Image2D", "Image3D", "MovieFrame", "Tomogram"])
+def test_public_models_do_not_expose_demo_properties(models_path, class_name):
     spec = importlib.util.spec_from_file_location("models", models_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module
-
-
-def test_injected_size_properties_present(models_path):
-    """Image2D exposes `pixel_size`, Image3D exposes `voxel_size` -- each a
-    read-only property and NOT a Pydantic field."""
-    m = _load_models(models_path)
-    assert isinstance(m.Image2D.pixel_size, property)
-    assert isinstance(m.Image3D.voxel_size, property)
-    assert "pixel_size" not in m.Image2D.model_fields
-    assert "voxel_size" not in m.Image3D.model_fields
-
-
-def test_injected_size_properties_dimensional_split(models_path):
-    """pixel_size only on 2D images, voxel_size only on 3D images."""
-    m = _load_models(models_path)
-    assert not hasattr(m.Image2D, "voxel_size")
-    assert not hasattr(m.Image3D, "pixel_size")
-
-
-def test_injected_size_properties_inherited_by_subclasses(models_path):
-    """Subclasses inherit the size property matching their dimensionality."""
-    m = _load_models(models_path)
-    for name in ("MovieFrame", "TiltImage"):
-        assert isinstance(getattr(m, name).pixel_size, property), name
-    for name in ("Tomogram", "ParticleMap"):
-        assert isinstance(getattr(m, name).voxel_size, property), name
-
-
-def test_injected_size_properties_not_serialized(models_path):
-    """Properties never appear in model_dump() or model_json_schema()."""
-    m = _load_models(models_path)
-    img2 = m.Image2D(width=4, height=4)
-    img3 = m.Image3D(width=4, height=4, depth=4)
-    assert "pixel_size" not in img2.model_dump()
-    assert "voxel_size" not in img3.model_dump()
-    assert "pixel_size" not in m.Image2D.model_json_schema().get("properties", {})
-    assert "voxel_size" not in m.Image3D.model_json_schema().get("properties", {})
+    model = getattr(module, class_name)
+    assert not hasattr(model, "pixel_size")
+    assert not hasattr(model, "voxel_size")

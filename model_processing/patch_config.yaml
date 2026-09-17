@@ -87,12 +87,6 @@ type_aliases:
 # Hand-written mixin base classes injected into generated classes at generation
 # time (see model_processing/generate_models.py). Each `mixin` is prepended to
 # the bases of every class in `into`, and imported from `import_from`.
-injected_base_classes:
-  - mixin: PixelSizeMixin
-    import_from: cets_data_model.models.mixins
-    into:
-      - Image2D
-  - mixin: VoxelSizeMixin
-    import_from: cets_data_model.models.mixins
-    into:
-      - Image3D
+# The public API has no demo mixins. Tests exercise injection with fixture classes;
+# functional convenience APIs can register their mixins when they are implemented.
+injected_base_classes: []
