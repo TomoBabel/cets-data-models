@@ -20,8 +20,7 @@
                     "ctf_metadata": {
                       "defocus_u": 25000.0,
                       "defocus_v": 24500.0,
-                      "defocus_angle": 45.0,
-                      "defocus_handedness": -1
+                      "defocus_angle": 45.0
                     },
                     "width": 4096,
                     "height": 4096,
@@ -52,8 +51,7 @@
                     "ctf_metadata": {
                       "defocus_u": 25000.0,
                       "defocus_v": 24500.0,
-                      "defocus_angle": 45.0,
-                      "defocus_handedness": -1
+                      "defocus_angle": 45.0
                     },
                     "width": 4096,
                     "height": 4096,
@@ -74,8 +72,7 @@
                     "ctf_metadata": {
                       "defocus_u": 24800.0,
                       "defocus_v": 24300.0,
-                      "defocus_angle": 46.0,
-                      "defocus_handedness": -1
+                      "defocus_angle": 46.0
                     },
                     "width": 4096,
                     "height": 4096,
@@ -120,8 +117,7 @@
               "ctf_metadata": {
                 "defocus_u": 25000.0,
                 "defocus_v": 24500.0,
-                "defocus_angle": 45.0,
-                "defocus_handedness": -1
+                "defocus_angle": 45.0
               },
               "width": 3840,
               "height": 3840,
@@ -179,8 +175,7 @@
               "ctf_metadata": {
                 "defocus_u": 24800.0,
                 "defocus_v": 24300.0,
-                "defocus_angle": 46.0,
-                "defocus_handedness": -1
+                "defocus_angle": 46.0
               },
               "width": 3840,
               "height": 3840,

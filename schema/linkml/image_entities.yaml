@@ -63,12 +63,9 @@ slots:
   ctf_metadata:
     description: A set of CTF patameters for an image.
     range: CTFMetadata
-  ctf_corrected: 
+  ctf_corrected:
     description: Flag to indicate if this was reconstructed from a tilt-series with the ctf corrected.
     range: boolean
-  defocus_handedness:
-    description: The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.
-    range: integer
   even_path:
     description: Path of the even file.
     range: string
@@ -85,10 +82,6 @@ classes:
       - defocus_v
       - defocus_angle
       - phase_shift
-      - defocus_handedness
-    slot_usage:
-      defocus_handedness:
-        ifabsent: -1
   AcquisitionMetadataMixin:
     description: Per-exposure acquisition metadata (varies from image to image).
     slots:

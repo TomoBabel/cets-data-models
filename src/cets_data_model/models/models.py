@@ -8,6 +8,7 @@ from pydantic import (
     ConfigDict,
     Field,
     RootModel,
+    model_validator,
 )
 
 # Type aliases
@@ -69,6 +70,30 @@ class AxisType(str, Enum):
     array = "array"
     """
     An array axis
+    """
+
+
+class AxisUnit(str, Enum):
+    """
+    Physical unit of a coordinate-system axis. Array (index) axes are unitless
+    (unit left unset); spatial axes default to angstrom.
+    """
+
+    angstrom = "angstrom"
+    """
+    Ångström (1e-10 m).
+    """
+    nanometer = "nanometer"
+    """
+    Nanometre (1e-9 m).
+    """
+    micrometer = "micrometer"
+    """
+    Micrometre (1e-6 m).
+    """
+    pixel = "pixel"
+    """
+    Pixel/voxel index spacing (used for array/index axes).
     """
 
 
@@ -182,6 +207,22 @@ class AnnotationType(str, Enum):
     """
 
 
+class Handedness(str, Enum):
+    """
+    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session.
+    right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
+    """
+
+    right_handed = "right_handed"
+    """
+    Right-handed tilt geometry (equivalent to defocus handedness +1).
+    """
+    left_handed = "left_handed"
+    """
+    Left-handed tilt geometry (equivalent to defocus handedness -1).
+    """
+
+
 class ElectronSource(str, Enum):
     """
     Type of electron source (mirrors OSC-EM permissible values).
@@ -288,12 +329,40 @@ class Axis(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    axis_unit: Optional[str] = Field(
-        default="angstrom", description="""The unit of the axis"""
+    axis_unit: Optional[AxisUnit] = Field(
+        default=AxisUnit.angstrom, description="""The unit of the axis"""
     )
     axis_type: Optional[AxisType] = Field(
         default=None, description="""The type of axis"""
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _enforce_array_axis_unit(cls, data: Any) -> Any:
+        """Array axes index a discrete grid, so their unit must be ``pixel``.
+
+        An omitted ``axis_unit`` on an array axis is defaulted to ``pixel``
+        (overriding the ``angstrom`` field default); an explicit non-pixel unit
+        raises a ValueError.
+        """
+        if isinstance(data, dict):
+            axis_type = data.get("axis_type")
+            axis_type = (
+                axis_type.value if isinstance(axis_type, AxisType) else axis_type
+            )
+            if axis_type == AxisType.array.value:
+                axis_unit = data.get("axis_unit")
+                axis_unit = (
+                    axis_unit.value if isinstance(axis_unit, AxisUnit) else axis_unit
+                )
+                if axis_unit is None:
+                    data["axis_unit"] = AxisUnit.pixel.value
+                elif axis_unit != AxisUnit.pixel.value:
+                    raise ValueError(
+                        f"Array axes must use the '{AxisUnit.pixel.value}' unit "
+                        f"(axis_type='array'); got '{axis_unit}'."
+                    )
+        return data
 
 
 class CoordinateSystem(ConfiguredBaseModel):
@@ -534,10 +603,6 @@ class CTFMetadata(ConfiguredBaseModel):
     phase_shift: Optional[float] = Field(
         default=None,
         description="""Phase shift value produced by the usage of a phase plate.""",
-    )
-    defocus_handedness: Optional[int] = Field(
-        default=-1,
-        description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
     )
 
 
@@ -1793,6 +1858,14 @@ class AcquisitionSession(ConfiguredBaseModel):
     spherical_aberration: Optional[float] = Field(
         default=None,
         description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    tilt_axis_angle: Optional[float] = Field(
+        default=None,
+        description="""Angle of the tilt axis relative to the detector x-axis, in degrees.""",
+    )
+    handedness: Optional[Handedness] = Field(
+        default=None,
+        description="""Handedness (parity) of the tilt geometry for this acquisition session. It is constant across the session and determines whether defocus increases or decreases with Z, i.e. it subsumes the former per-image CTFMetadata.defocus_handedness (right_handed == +1, left_handed == -1).""",
     )
 
 
