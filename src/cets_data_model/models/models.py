@@ -888,6 +888,10 @@ class TiltImage(BaseProjectionImage):
     movie_stack_id: Optional[str] = Field(
         default=None, description="""The ID of the movie stack for this tilt image."""
     )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Index giving the temporal order in which this tilt image was acquired during tilt-series collection (i.e. the dose-accumulation / tilt-scheme order), independent of its section index or nominal tilt angle within the stack.""",
+    )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     section: Optional[int] = Field(
         default=None,

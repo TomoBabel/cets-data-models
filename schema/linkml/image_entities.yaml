@@ -156,6 +156,12 @@ classes:
       movie_stack_id:
         description: The ID of the movie stack for this tilt image.
         range: string
+      acquisition_order:
+        description: >-
+          Index giving the temporal order in which this tilt image was acquired during
+          tilt-series collection (i.e. the dose-accumulation / tilt-scheme order),
+          independent of its section index or nominal tilt angle within the stack.
+        range: integer
   TiltSeries:
     description: A stack of projection images.
     slots:
