@@ -75,8 +75,7 @@ class AxisType(str, Enum):
 
 class AxisUnit(str, Enum):
     """
-    Physical unit of a coordinate-system axis. Array (index) axes are unitless
-    (unit left unset); spatial axes default to angstrom.
+    Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left unset); spatial axes default to angstrom.
     """
 
     angstrom = "angstrom"
@@ -209,8 +208,7 @@ class AnnotationType(str, Enum):
 
 class Handedness(str, Enum):
     """
-    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session.
-    right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
+    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
     """
 
     right_handed = "right_handed"
