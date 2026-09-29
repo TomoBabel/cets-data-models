@@ -10,6 +10,7 @@ from pydantic import (
     RootModel,
 )
 
+from cets_data_model.models.affine import AffineContextMixin, AffineValidationMixin
 from cets_data_model.models.axis import ArrayAxisUnitMixin
 
 metamodel_version = "1.11.0"
@@ -242,7 +243,7 @@ class ElectronSource(str, Enum):
     """
 
 
-class Image2D(ConfiguredBaseModel):
+class Image2D(AffineContextMixin, ConfiguredBaseModel):
     """
     A 2D image.
     """
@@ -268,7 +269,7 @@ class Image2D(ConfiguredBaseModel):
     )
 
 
-class Image3D(ConfiguredBaseModel):
+class Image3D(AffineContextMixin, ConfiguredBaseModel):
     """
     A 3D image.
     """
@@ -464,13 +465,25 @@ class Scale(CoordinateTransformation):
     )
 
 
-class Affine(CoordinateTransformation):
+class Affine(AffineValidationMixin, CoordinateTransformation):
     """
-    An affine transformation
+    A general linear transformation in two or three dimensions: the linear part of an affine map, without translation
     """
 
-    affine: Optional[Matrix3x3] = Field(
-        default=None, description="""The affine matrix"""
+    affine: Optional[
+        Union[
+            Annotated[
+                list[Annotated[list[float], Field(min_length=2, max_length=2)]],
+                Field(min_length=2, max_length=2),
+            ],
+            Annotated[
+                list[Annotated[list[float], Field(min_length=3, max_length=3)]],
+                Field(min_length=3, max_length=3),
+            ],
+        ]
+    ] = Field(
+        default=None,
+        description="""The matrix of a linear map, stored as a list of rows: 2x2 for a 2D transformation, 3x3 for a 3D transformation. It acts on column vectors: entry [i][j] is the contribution of input axis j to output axis i, with axes in their declared order. The matrix carries no translation; a shift is a separate Translation step, so that its order relative to the matrix is explicit in the Sequence. All entries are finite. A 3x3 matrix is always a 3D transformation; a 2D transformation that was stored as a 3x3 homogeneous matrix is written as its 2x2 block and a Translation.""",
     )
     transformation_type: Literal[TransformationType.affine] = Field(
         default=TransformationType.affine, description="""The type of transformation."""
@@ -1020,7 +1033,7 @@ class ParticleMap(Image3D):
     )
 
 
-class CoordMetaMixin(ConfiguredBaseModel):
+class CoordMetaMixin(AffineContextMixin, ConfiguredBaseModel):
     """
     Coordinate system mixins for annotations.
     """

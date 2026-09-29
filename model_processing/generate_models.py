@@ -9,12 +9,14 @@ rather than post-processing generated text). A ``CETSPydanticGenerator`` subclas
   * injects configured hand-written mixin base classes;
   * wraps discriminated-union fields in ``Annotated[Union[...], Field(discriminator=...)]``;
   * converts subclass discriminator fields to ``Literal[...]``;
-  * substitutes constrained-array fields with reusable type aliases.
+  * substitutes constrained-array fields with reusable type aliases;
+  * preserves exact square-matrix alternatives declared with ``any_of``.
 
 Module-level type-alias definitions and required imports are supplied via the
 generator's ``injected_classes`` / ``imports`` params; the ``treat_empty_lists_as_none``
 serializer is dropped via a serializer-free ``base_model.py.jinja`` template override.
-Everything is driven by ``patch_config.yaml`` (same config the regex patcher used).
+Mixin and alias configuration comes from ``patch_config.yaml``; matrix shapes
+come directly from the LinkML schema.
 
 Writes the formatted module to the path given as argv[1] (default:
 ``src/cets_data_model/models/generated_models.py``).
@@ -26,7 +28,7 @@ from pathlib import Path
 
 import yaml
 from linkml.generators.pydanticgen import PydanticGenerator
-from linkml.generators.pydanticgen.array import ArrayRepresentation
+from linkml.generators.pydanticgen.array import ArrayRepresentation, ArrayValidator
 from linkml.generators.pydanticgen.template import Import, Imports, ObjectImport
 
 HERE = Path(__file__).parent
@@ -76,8 +78,67 @@ for _alias in CONFIG.get("type_aliases", []) or []:
 class CETSPydanticGenerator(PydanticGenerator):
     """PydanticGenerator that applies all CETS transforms via ``after_generate_class``."""
 
+    def _matrix_union_range(self, slot, source_class):
+        """Compile exact square array alternatives that LinkML 1.11.1 drops.
+
+        Sizes come from the schema, not the alias registry. Restrict this hook to
+        shape-only alternatives; unsupported constraints must not disappear.
+        """
+        if slot.multivalued or (
+            slot.array is not None
+            and (
+                slot.array.dimensions
+                or slot.array.exact_number_dimensions not in (None, 2)
+                or slot.array.minimum_number_dimensions is not None
+                or slot.array.maximum_number_dimensions is not None
+            )
+        ):
+            raise ValueError(f"{slot.name}: put matrix dimensions inside any_of")
+        scalar = self.generate_python_range(slot.range, slot, source_class)
+        ranges = []
+        for option in slot.any_of:
+            array = option.array
+            if any(
+                value not in (None, [], {})
+                for key, value in vars(option).items()
+                if key != "array"
+            ):
+                raise ValueError(
+                    f"{slot.name}: matrix alternatives must contain only array"
+                )
+            if (
+                array is None
+                or array.exact_number_dimensions != 2
+                or len(array.dimensions) != 2
+            ):
+                raise ValueError(
+                    f"{slot.name}: expected exact two-dimensional matrix alternatives"
+                )
+            sizes = [dimension.exact_cardinality for dimension in array.dimensions]
+            if sizes[0] is None or sizes[0] <= 0 or sizes[0] != sizes[1]:
+                raise ValueError(
+                    f"{slot.name}: expected exact square matrix alternatives"
+                )
+            # Reuse LinkML's validation of contradictory dimension constraints.
+            ArrayValidator.validate(array)
+            size = sizes[0]
+            row = f"Annotated[list[{scalar}], Field(min_length={size}, max_length={size})]"
+            ranges.append(
+                f"Annotated[list[{row}], Field(min_length={size}, max_length={size})]"
+            )
+        union = "Union[" + ", ".join(dict.fromkeys(ranges)) + "]"
+        return (
+            union
+            if slot.required or slot.identifier or slot.key
+            else f"Optional[{union}]"
+        )
+
     def after_generate_class(self, cls, sv):
         c = cls.cls
+        slots = {
+            slot.alias or slot.name: slot
+            for slot in sv.class_induced_slots(cls.source.name)
+        }
 
         # 1) base-class (mixin) injection
         mixins = INJECT_MAP.get(c.name)
@@ -86,8 +147,11 @@ class CETSPydanticGenerator(PydanticGenerator):
             c.bases = list(mixins) + [b for b in bases if b not in mixins]
 
         for name, attr in (c.attributes or {}).items():
-            # 2) constrained-array field -> reusable type alias
-            if name in ALIAS_SUB:
+            # 2) schema matrix alternatives take precedence over fixed aliases.
+            slot = slots[attr.alias or name]
+            if any(option.array is not None for option in slot.any_of):
+                attr.range = self._matrix_union_range(slot, cls.source)
+            elif name in ALIAS_SUB:
                 attr.range = ALIAS_SUB[name]
 
             # 3) discriminated-union field (honor `for_classes` scoping)
@@ -117,7 +181,11 @@ def _build_imports() -> Imports:
     # typing names our injected type strings rely on (LinkML doesn't emit these)
     imports = imports + Import(
         module="typing",
-        objects=[ObjectImport(name="Annotated"), ObjectImport(name="TypeAlias")],
+        objects=[
+            ObjectImport(name="Annotated"),
+            ObjectImport(name="TypeAlias"),
+            ObjectImport(name="Union"),
+        ],
     )
     for module, names in MIXIN_IMPORTS.items():
         imports = imports + Import(
