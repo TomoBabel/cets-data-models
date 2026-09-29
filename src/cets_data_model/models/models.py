@@ -12,6 +12,7 @@ from pydantic import (
 
 from cets_data_model.models.affine import AffineValidationMixin
 from cets_data_model.models.axis import ArrayAxisUnitMixin
+from cets_data_model.models.image_frame import PixelSizeMixin, VoxelSizeMixin
 from cets_data_model.models.transforms import (
     ProjectAxisValidationMixin,
     ReflectionValidationMixin,
@@ -281,7 +282,7 @@ class ElectronSource(str, Enum):
     """
 
 
-class Image2D(TransformContextMixin, ConfiguredBaseModel):
+class Image2D(TransformContextMixin, PixelSizeMixin, ConfiguredBaseModel):
     """
     A 2D image.
     """
@@ -313,11 +314,12 @@ class Image2D(TransformContextMixin, ConfiguredBaseModel):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
-class Image3D(TransformContextMixin, ConfiguredBaseModel):
+class Image3D(TransformContextMixin, VoxelSizeMixin, ConfiguredBaseModel):
     """
     A 3D image.
     """
@@ -352,7 +354,8 @@ class Image3D(TransformContextMixin, ConfiguredBaseModel):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -796,7 +799,8 @@ class GainFile(Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -833,7 +837,8 @@ class DefectFile(Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -886,7 +891,8 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -966,7 +972,8 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1019,7 +1026,8 @@ class ProjectionImage(BaseProjectionImage):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1075,7 +1083,8 @@ class SubProjectionImage(ProjectionImage):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1136,7 +1145,8 @@ class TiltImage(BaseProjectionImage):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1220,7 +1230,8 @@ class Tomogram(Image3D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1272,7 +1283,8 @@ class ParticleMap(Image3D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
 
 
@@ -1364,7 +1376,8 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
@@ -1416,7 +1429,8 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
@@ -1465,7 +1479,8 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
@@ -1517,7 +1532,8 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
@@ -2230,7 +2246,8 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
             ]
         ]
     ] = Field(
-        default=[], description="""Named coordinate transformations for this entity"""
+        default=[],
+        description="""Named coordinate transformations for this image. The transformation named array_to_physical is the image frame. It maps the coordinate system named array (axes x, y and z by position, of type array, in pixel) to the one named physical (of type space, in angstrom). It is a Sequence of an optional Rot90, an optional Reflection, a Translation and a Scale, in that order and each at most once, so that physical = diag(scale) (F R index + translation). The translation is in pixels along the oriented axes, and the scale is the pixel or voxel spacing in angstrom along the final axes. A missing step means no rotation, no reflection, zero translation or unit spacing. Other named transformations are not restricted.""",
     )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")

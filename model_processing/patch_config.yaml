@@ -122,3 +122,11 @@ injected_base_classes:
       - Image2D
       - Image3D
       - CoordMetaMixin
+  - mixin: PixelSizeMixin
+    import_from: cets_data_model.models.image_frame
+    into:
+      - Image2D
+  - mixin: VoxelSizeMixin
+    import_from: cets_data_model.models.image_frame
+    into:
+      - Image3D
