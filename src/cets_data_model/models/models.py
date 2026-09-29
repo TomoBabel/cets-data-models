@@ -10,6 +10,8 @@ from pydantic import (
     RootModel,
 )
 
+from cets_data_model.models.axis import ArrayAxisUnitMixin
+
 metamodel_version = "1.11.0"
 version = "0.0.1"
 
@@ -71,7 +73,7 @@ class AxisType(str, Enum):
 
 class AxisUnit(str, Enum):
     """
-    Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left unset); spatial axes default to angstrom.
+    Unit of a coordinate-system axis. Array (index) axes use pixel, which the Python models fill in when an array axis has no unit; other axes default to angstrom.
     """
 
     angstrom = "angstrom"
@@ -315,7 +317,7 @@ class ImageStack3D(ConfiguredBaseModel):
     )
 
 
-class Axis(ConfiguredBaseModel):
+class Axis(ArrayAxisUnitMixin, ConfiguredBaseModel):
     """
     An axis in a coordinate system
     """
