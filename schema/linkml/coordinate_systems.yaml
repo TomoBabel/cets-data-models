@@ -31,7 +31,10 @@ classes:
     description: A coordinate system
     attributes:
       name:
-        description: The name of the coordinate system
+        description: >-
+          The name of the coordinate system. Free-form to allow per-entity and
+          intermediate systems; the canonical names are listed by
+          CoordinateSpaceName.
         range: string
         required: true
       axes:
@@ -62,3 +65,10 @@ enums:
         description: Micrometre (1e-6 m).
       pixel:
         description: Pixel/voxel index spacing (used for array/index axes).
+  CoordinateSpaceName:
+    description: Canonical names for an entity's standard coordinate systems.
+    permissible_values:
+      array:
+        description: Discrete index space (integer pixel coordinates).
+      physical:
+        description: Continuous physical space in Angstrom.

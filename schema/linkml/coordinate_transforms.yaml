@@ -25,6 +25,8 @@ classes:
     slots:
       - transformation_type
       - name
+    # `name` stays free-form: transformations include per-instance (per-tilt) and
+    # intermediate steps outside the canonical set listed by TransformationName.
     attributes:
       input:
         description: The source coordinate system name
@@ -251,3 +253,24 @@ enums:
         description: The second axis.
       z:
         description: The third axis.
+  TransformationName:
+    description: Canonical names for the standard transformations.
+    permissible_values:
+      array_to_physical:
+        description: An entity's array (pixel) space to its physical space.
+      calibration_to_movie_frame:
+        description: Calibration image to movie frame.
+      movie_frame_to_projection:
+        description: Movie frame to projection.
+      sub_projection_to_projection:
+        description: Sub-projection to projection.
+      annotation_to_tomogram:
+        description: Annotation to tomogram.
+      subtomogram_to_tomogram:
+        description: Subtomogram to tomogram.
+      particle_map_to_subtomogram:
+        description: Particle map to subtomogram.
+      particle_map_to_tomogram:
+        description: Particle map to tomogram (derived composition).
+      tomogram_to_projection:
+        description: Tomogram to projection (the tomographic projection, per tilt).
