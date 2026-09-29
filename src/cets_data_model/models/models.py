@@ -10,8 +10,15 @@ from pydantic import (
     RootModel,
 )
 
-from cets_data_model.models.affine import AffineContextMixin, AffineValidationMixin
+from cets_data_model.models.affine import AffineValidationMixin
 from cets_data_model.models.axis import ArrayAxisUnitMixin
+from cets_data_model.models.transforms import (
+    ProjectAxisValidationMixin,
+    ReflectionValidationMixin,
+    Rot90ValidationMixin,
+    ScaleValidationMixin,
+    TransformContextMixin,
+)
 
 metamodel_version = "1.11.0"
 version = "0.0.1"
@@ -116,6 +123,18 @@ class TransformationType(str, Enum):
     """
     An affine transformation.
     """
+    rot90 = "rot90"
+    """
+    A rotation by quarter turns about coordinate axes.
+    """
+    reflection = "reflection"
+    """
+    A reflection along one or more axes.
+    """
+    project_axis = "project_axis"
+    """
+    A change in the number of axes by dropping and creating axes.
+    """
     sequence = "sequence"
     """
     A sequence of transformations.
@@ -123,6 +142,25 @@ class TransformationType(str, Enum):
     projection_alignment = "projection_alignment"
     """
     A sequence specific to projection alignments.
+    """
+
+
+class ReflectionAxis(str, Enum):
+    """
+    An axis named by its position in a coordinate system.
+    """
+
+    x = "x"
+    """
+    The first axis.
+    """
+    y = "y"
+    """
+    The second axis.
+    """
+    z = "z"
+    """
+    The third axis.
     """
 
 
@@ -243,7 +281,7 @@ class ElectronSource(str, Enum):
     """
 
 
-class Image2D(AffineContextMixin, ConfiguredBaseModel):
+class Image2D(TransformContextMixin, ConfiguredBaseModel):
     """
     A 2D image.
     """
@@ -260,7 +298,17 @@ class Image2D(AffineContextMixin, ConfiguredBaseModel):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -269,7 +317,7 @@ class Image2D(AffineContextMixin, ConfiguredBaseModel):
     )
 
 
-class Image3D(AffineContextMixin, ConfiguredBaseModel):
+class Image3D(TransformContextMixin, ConfiguredBaseModel):
     """
     A 3D image.
     """
@@ -289,7 +337,17 @@ class Image3D(AffineContextMixin, ConfiguredBaseModel):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -443,13 +501,14 @@ class Translation(CoordinateTransformation):
     )
 
 
-class Scale(CoordinateTransformation):
+class Scale(ScaleValidationMixin, CoordinateTransformation):
     """
     A scaling transformation
     """
 
     scale: Optional[list[float]] = Field(
-        default=[], description="""The scaling vector"""
+        default=[],
+        description="""The scale factor along each axis. Factors are finite and strictly positive; a reversed axis is expressed with Reflection.""",
     )
     transformation_type: Literal[TransformationType.scale] = Field(
         default=TransformationType.scale, description="""The type of transformation."""
@@ -499,6 +558,91 @@ class Affine(AffineValidationMixin, CoordinateTransformation):
     )
 
 
+class Rot90(Rot90ValidationMixin, CoordinateTransformation):
+    """
+    A rotation by quarter turns about coordinate axes, in two or three dimensions
+    """
+
+    rot90: Union[
+        Annotated[
+            list[Annotated[list[int], Field(min_length=2, max_length=2)]],
+            Field(min_length=2, max_length=2),
+        ],
+        Annotated[
+            list[Annotated[list[int], Field(min_length=3, max_length=3)]],
+            Field(min_length=3, max_length=3),
+        ],
+    ] = Field(
+        default=...,
+        description="""An integer matrix stored as a list of rows, with the same layout as an affine matrix: 2x2 for a 2D rotation, 3x3 for a 3D rotation. Each row and each column has exactly one nonzero entry, 1 or -1, and the determinant is +1. The rotation is about the coordinate origin and carries no translation.""",
+    )
+    transformation_type: Literal[TransformationType.rot90] = Field(
+        default=TransformationType.rot90, description="""The type of transformation."""
+    )
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    input: Optional[str] = Field(
+        default=None, description="""The source coordinate system name"""
+    )
+    output: Optional[str] = Field(
+        default=None, description="""The target coordinate system name"""
+    )
+
+
+class Reflection(ReflectionValidationMixin, CoordinateTransformation):
+    """
+    A reflection that negates the coordinates along one or more axes
+    """
+
+    axes: list[ReflectionAxis] = Field(
+        default=...,
+        description="""The axes whose coordinates are negated, each listed once. Axes are named by position: x is the first axis of the coordinate system, y the second and z the third. The reflection is about the origin, and the coordinates along the other axes are unchanged.""",
+        min_length=1,
+    )
+    transformation_type: Literal[TransformationType.reflection] = Field(
+        default=TransformationType.reflection,
+        description="""The type of transformation.""",
+    )
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    input: Optional[str] = Field(
+        default=None, description="""The source coordinate system name"""
+    )
+    output: Optional[str] = Field(
+        default=None, description="""The target coordinate system name"""
+    )
+
+
+class ProjectAxis(ProjectAxisValidationMixin, CoordinateTransformation):
+    """
+    A change in the number of axes, by dropping input axes and creating output axes at given positions
+    """
+
+    dropped_inputs: Optional[list[int]] = Field(
+        default=[],
+        description="""Positions of the input axes that are dropped, counted from 0, each listed once.""",
+    )
+    created_outputs: Optional[list[int]] = Field(
+        default=[],
+        description="""Positions of the output axes that are created, counted from 0, each listed once. Their coordinate is 0. The other output positions take the kept input axes in their order, so the output has as many axes as the input, minus the dropped and plus the created ones.""",
+    )
+    transformation_type: Literal[TransformationType.project_axis] = Field(
+        default=TransformationType.project_axis,
+        description="""The type of transformation.""",
+    )
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    input: Optional[str] = Field(
+        default=None, description="""The source coordinate system name"""
+    )
+    output: Optional[str] = Field(
+        default=None, description="""The target coordinate system name"""
+    )
+
+
 class Sequence(CoordinateTransformation):
     """
     A sequence of transformations
@@ -507,7 +651,16 @@ class Sequence(CoordinateTransformation):
     sequence: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -628,7 +781,17 @@ class GainFile(Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -655,7 +818,17 @@ class DefectFile(Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -698,7 +871,17 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -768,7 +951,17 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -811,7 +1004,17 @@ class ProjectionImage(BaseProjectionImage):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -857,7 +1060,17 @@ class SubProjectionImage(ProjectionImage):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -908,7 +1121,17 @@ class TiltImage(BaseProjectionImage):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -982,7 +1205,17 @@ class Tomogram(Image3D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1024,7 +1257,17 @@ class ParticleMap(Image3D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1033,7 +1276,7 @@ class ParticleMap(Image3D):
     )
 
 
-class CoordMetaMixin(AffineContextMixin, ConfiguredBaseModel):
+class CoordMetaMixin(TransformContextMixin, ConfiguredBaseModel):
     """
     Coordinate system mixins for annotations.
     """
@@ -1044,7 +1287,17 @@ class CoordMetaMixin(AffineContextMixin, ConfiguredBaseModel):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1096,7 +1349,17 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1138,7 +1401,17 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1177,7 +1450,17 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1219,7 +1502,17 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1255,7 +1548,17 @@ class PointSet2D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1289,7 +1592,17 @@ class PointSet3D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1327,7 +1640,17 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1366,7 +1689,17 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1405,7 +1738,17 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1444,7 +1787,17 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1476,7 +1829,17 @@ class TriMesh(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1513,7 +1876,17 @@ class SphereSet(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1550,7 +1923,17 @@ class CircleSet(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1588,7 +1971,17 @@ class CylinderSet(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1629,7 +2022,17 @@ class CuboidSet(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1670,7 +2073,17 @@ class BoxSet(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1704,7 +2117,17 @@ class Spline2D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1738,7 +2161,17 @@ class Spline3D(Annotation, CoordMetaMixin):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1782,7 +2215,17 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     coordinate_transformations: Optional[
         list[
             Annotated[
-                Union[Identity, MapAxis, Translation, Scale, Affine, Sequence],
+                Union[
+                    Identity,
+                    MapAxis,
+                    Translation,
+                    Scale,
+                    Affine,
+                    Rot90,
+                    Reflection,
+                    ProjectAxis,
+                    Sequence,
+                ],
                 Field(discriminator="transformation_type"),
             ]
         ]
@@ -1980,6 +2423,9 @@ MapAxis.model_rebuild()
 Translation.model_rebuild()
 Scale.model_rebuild()
 Affine.model_rebuild()
+Rot90.model_rebuild()
+Reflection.model_rebuild()
+ProjectAxis.model_rebuild()
 Sequence.model_rebuild()
 ProjectionAlignment.model_rebuild()
 Alignment.model_rebuild()
