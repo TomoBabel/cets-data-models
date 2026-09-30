@@ -174,6 +174,7 @@ def test_discriminated_union_validation_works(models_path):
             Identity(name="identity_transform"),
             Scale(scale=[2.0, 2.0], name="scale_transform"),
         ],
+        id="1",
     )
 
     assert len(img.coordinate_transformations) == 2
