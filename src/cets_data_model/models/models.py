@@ -468,8 +468,10 @@ class ProjectionAlignment(CoordinateTransformation):
     The tomographic alignment for a single projection.
     """
 
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity the annotation applies to"""
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    tilt_image_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
     )
     sequence: Optional[list[Union[Affine, Translation]]] = Field(
         default=[], description="""The sequence of transformations""", max_length=2
@@ -494,6 +496,10 @@ class Alignment(ConfiguredBaseModel):
     The tomographic alignment for a tilt series.
     """
 
+    tilt_series_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tilt-series this alignment set applies to. Multiple Alignments (e.g.  from different algorithms) may reference the same tilt-series.""",
+    )
     projection_alignments: Optional[list[ProjectionAlignment]] = Field(
         default=[], description="""alignment for a specific projection"""
     )
@@ -795,6 +801,7 @@ class TiltImage(BaseProjectionImage):
     A projection image that belongs to a tilt series.
     """
 
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     movie_stack_id: Optional[str] = Field(
         default=None, description="""The ID of the movie stack for this tilt image."""
     )
@@ -910,6 +917,18 @@ class ParticleMap(Image3D):
     """
 
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    source_region_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the region containing the source annotation used to extract this particle map.""",
+    )
+    source_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the source annotation used to extract this particle map.""",
+    )
+    coord_index: Optional[int] = Field(
+        default=None,
+        description="""0-based index of the coordinate inside the resolved source annotation.""",
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -968,11 +987,16 @@ class Annotation(ConfiguredBaseModel):
     A primitive annotation.
     """
 
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: AnnotationType = Field(
         default=..., description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1002,11 +1026,16 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_2D] = Field(
         AnnotationType.segmentation_mask_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1039,11 +1068,16 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1073,11 +1107,16 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1110,11 +1149,16 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1139,11 +1183,16 @@ class PointSet2D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_set_2D] = Field(
         AnnotationType.point_set_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1168,11 +1217,16 @@ class PointSet3D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_set_3D] = Field(
         AnnotationType.point_set_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1201,11 +1255,16 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_vector_set_2D] = Field(
         AnnotationType.point_vector_set_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1234,11 +1293,16 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_vector_set_3D] = Field(
         AnnotationType.point_vector_set_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1267,11 +1331,16 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_matrix_set_2D] = Field(
         AnnotationType.point_matrix_set_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1300,11 +1369,16 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_matrix_set_3D] = Field(
         AnnotationType.point_matrix_set_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1326,11 +1400,16 @@ class TriMesh(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.tri_mesh] = Field(
         AnnotationType.tri_mesh, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1358,11 +1437,16 @@ class SphereSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.sphere_set] = Field(
         AnnotationType.sphere_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1390,11 +1474,16 @@ class CircleSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.circle_set] = Field(
         AnnotationType.circle_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1423,11 +1512,16 @@ class CylinderSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.cylinder_set] = Field(
         AnnotationType.cylinder_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1459,11 +1553,16 @@ class CuboidSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.cuboid_set] = Field(
         AnnotationType.cuboid_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1495,11 +1594,16 @@ class BoxSet(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.box_set] = Field(
         AnnotationType.box_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1524,11 +1628,16 @@ class Spline2D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.spline_2D] = Field(
         AnnotationType.spline_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1553,11 +1662,16 @@ class Spline3D(Annotation, CoordMetaMixin):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.spline_3D] = Field(
         AnnotationType.spline_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1594,11 +1708,16 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.density_map] = Field(
         AnnotationType.density_map, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
+    )
+    source_tomogram_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
 
 
@@ -1665,34 +1784,6 @@ class Average(ConfiguredBaseModel):
     particle_maps: Optional[list[ParticleMap]] = Field(
         default=[], description="""The particle maps"""
     )
-    annotations: Optional[
-        list[
-            Annotated[
-                Union[
-                    SegmentationMask2D,
-                    SegmentationMask3D,
-                    ProbabilityMap2D,
-                    ProbabilityMap3D,
-                    PointSet2D,
-                    PointSet3D,
-                    PointVectorSet2D,
-                    PointVectorSet3D,
-                    PointMatrixSet2D,
-                    PointMatrixSet3D,
-                    TriMesh,
-                    SphereSet,
-                    CircleSet,
-                    CylinderSet,
-                    CuboidSet,
-                    BoxSet,
-                    Spline2D,
-                    Spline3D,
-                    DensityMap,
-                ],
-                Field(discriminator="annotation_type"),
-            ]
-        ]
-    ] = Field(default=[], description="""The annotations""")
 
 
 class MovieStackCollection(ConfiguredBaseModel):

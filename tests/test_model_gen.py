@@ -194,6 +194,7 @@ def test_type_alias_validation_works(models_path):
     PointSet3D = module.PointSet3D
 
     valid_points = PointSet3D(
+        id="test_points",
         annotation_type="point_set_3D",
         origin3D=[
             [1.0, 2.0, 3.0],
@@ -204,6 +205,7 @@ def test_type_alias_validation_works(models_path):
 
     with pytest.raises(ValidationError):
         PointSet3D(
+            id="bad_points_missing_z",
             annotation_type="point_set_3D",
             origin3D=[
                 [1.0, 2.0],  # Only 2 elements, should be 3
@@ -212,6 +214,7 @@ def test_type_alias_validation_works(models_path):
 
     with pytest.raises(ValidationError):
         PointSet3D(
+            id="bad_points_extra_coord",
             annotation_type="point_set_3D",
             origin3D=[
                 [1.0, 2.0, 3.0, 4.0],  # 4 elements, should be 3
