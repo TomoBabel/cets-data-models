@@ -112,6 +112,7 @@
           "movie_stack_series_id": "movie_stack_series_01",
           "images": [
             {
+              "id": "tilt_image_01",
               "movie_stack_id": "movie_stack_01",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 0,
@@ -171,6 +172,7 @@
               ]
             },
             {
+              "id": "tilt_image_02",
               "movie_stack_id": "movie_stack_02",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 1,
@@ -192,8 +194,11 @@
       ],
       "alignments": [
         {
+          "tilt_series_id": "tilt_series_01",
           "projection_alignments": [
             {
+              "id": "projection_alignment_01",
+              "tilt_image_id": "tilt_image_01",
               "transformation_type": "projection_alignment",
               "name": "align_tilt_neg60",
               "input": "tilt_image_angstroms",
@@ -236,6 +241,8 @@
               ]
             },
             {
+              "id": "projection_alignment_02",
+              "tilt_image_id": "tilt_image_02",
               "transformation_type": "projection_alignment",
               "name": "align_tilt_neg30",
               "input": "tilt_image_angstroms",
