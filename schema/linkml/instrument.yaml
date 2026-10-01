@@ -61,6 +61,18 @@ slots:
   amplitude_contrast:
     description: Amplitude contrast fraction (dimensionless, typically 0.07-0.1). CTF-model parameter.
     range: float
+  tilt_axis_angle:
+    description: Angle of the tilt axis relative to the detector x-axis, in degrees.
+    range: float
+    aliases:
+      - Tilt_Axis_Angle
+  handedness:
+    description: >-
+      Handedness (parity) of the tilt geometry for this acquisition session. It is constant
+      across the session and determines whether defocus increases or decreases with Z, i.e. it
+      subsumes the former per-image CTFMetadata.defocus_handedness (right_handed == +1,
+      left_handed == -1).
+    range: Handedness
 
 classes:
   Instrument:
@@ -82,8 +94,20 @@ classes:
       - detector_dose_rate
       - amplitude_contrast
       - spherical_aberration
+      - tilt_axis_angle
+      - handedness
 
 enums:
+  Handedness:
+    description: >-
+      Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition
+      session. right_handed == +1, left_handed == -1 (the sign the former
+      CTFMetadata.defocus_handedness carried).
+    permissible_values:
+      right_handed:
+        description: Right-handed tilt geometry (equivalent to defocus handedness +1).
+      left_handed:
+        description: Left-handed tilt geometry (equivalent to defocus handedness -1).
   ElectronSource:
     description: Type of electron source (mirrors OSC-EM permissible values).
     permissible_values:
