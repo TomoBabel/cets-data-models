@@ -461,8 +461,8 @@ class Sequence(CoordinateTransformation):
     A sequence of transformations
     """
 
-    transformation_type: Literal[TransformationType.sequence] = Field(
-        TransformationType.sequence, description="""The type of transformation."""
+    target_id: Optional[str] = Field(
+        default=None, description="""The id of the entity this transformation targets"""
     )
     sequence: Optional[
         list[
@@ -472,8 +472,8 @@ class Sequence(CoordinateTransformation):
             ]
         ]
     ] = Field(default=[], description="""The sequence of transformations""")
-    target_id: Optional[str] = Field(
-        default=None, description="""The entity this transformation creates"""
+    transformation_type: Literal[TransformationType.sequence] = Field(
+        TransformationType.sequence, description="""The type of transformation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -492,6 +492,9 @@ class ProjectionAlignment(CoordinateTransformation):
     """
 
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    target_id: Optional[str] = Field(
+        default=None, description="""The id of the entity this transformation targets"""
+    )
     tilt_image_id: Optional[str] = Field(
         default=None,
         description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
@@ -883,7 +886,6 @@ class TiltImage(BaseProjectionImage):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class TiltSeries(ConfiguredBaseModel):
@@ -1075,7 +1077,6 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_2D] = Field(
         AnnotationType.segmentation_mask_2D, description="""The type of annotation."""
     )
@@ -1117,7 +1118,6 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
     )
@@ -1156,7 +1156,6 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
     )
@@ -1198,7 +1197,6 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""
     )
@@ -1757,7 +1755,6 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
-    id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.density_map] = Field(
         AnnotationType.density_map, description="""The type of annotation."""
     )
@@ -1887,6 +1884,9 @@ class Average(ConfiguredBaseModel):
     )
     particle_maps: Optional[list[ParticleMap]] = Field(
         default=[], description="""The particle maps"""
+    )
+    annotations: Optional[list[Annotation]] = Field(
+        default=[], description="""The annotations"""
     )
 
 

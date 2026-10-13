@@ -19,7 +19,6 @@ slots:
     range: TransformationType
     required: true
 
-
 classes:
   CoordinateTransformation:
     description: A coordinate transformation
@@ -103,7 +102,7 @@ classes:
     description: A sequence of transformations
     is_a: CoordinateTransformation
     slots:
-      - transformation_type
+      - target_id
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(sequence)
@@ -112,11 +111,6 @@ classes:
         description: The sequence of transformations
         range: CoordinateTransformation
         multivalued: true
-      target_id:
-        description: The entity this transformation creates
-        range: string
-        required: false
-
 
 enums:
   TransformationType:
