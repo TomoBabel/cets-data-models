@@ -354,8 +354,9 @@ class Axis(ConfiguredBaseModel):
                     axis_unit.value if isinstance(axis_unit, AxisUnit) else axis_unit
                 )
                 if axis_unit is None:
-                    data["axis_unit"] = AxisUnit.pixel.value
-                elif axis_unit != AxisUnit.pixel.value:
+                    # Return a copy: the caller's dictionary is not modified.
+                    return {**data, "axis_unit": AxisUnit.pixel.value}
+                if axis_unit != AxisUnit.pixel.value:
                     raise ValueError(
                         f"Array axes must use the '{AxisUnit.pixel.value}' unit "
                         f"(axis_type='array'); got '{axis_unit}'."
