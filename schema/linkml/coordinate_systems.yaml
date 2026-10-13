@@ -18,6 +18,16 @@ classes:
     description: An axis in a coordinate system
     slots:
       - name
+    rules:
+      - description: Array axes index a discrete grid, so their unit is pixel.
+        preconditions:
+          slot_conditions:
+            axis_type:
+              equals_string: array
+        postconditions:
+          slot_conditions:
+            axis_unit:
+              equals_string: pixel
     attributes:
       axis_unit:
         description: The unit of the axis
