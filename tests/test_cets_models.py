@@ -179,6 +179,7 @@ class TestRoundTripSerialization:
     def test_particle_map_coordinate_reference_roundtrip(self):
         """Particle maps should preserve links to source annotations"""
         original = ParticleMap(
+            id="particle_map_01",
             path="/data/subtomograms/particle_001.mrc",
             source_region_id="region_01",
             source_annotation_id="ribosome_picks",
@@ -198,9 +199,11 @@ class TestRoundTripSerialization:
     def test_average_without_source_annotations_roundtrip(self):
         """Averages may contain particle maps without source annotation links"""
         original = Average(
+            id="average_01",
             name="subtomograms_only",
             particle_maps=[
                 ParticleMap(
+                    id="particle_map_01",
                     path="/data/subtomograms/particle_001.mrc",
                     width=64,
                     height=64,

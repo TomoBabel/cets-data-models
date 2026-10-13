@@ -7,10 +7,10 @@
       "movie_stack_collection": {
         "movie_stacks": [
           {
-            "id": "tomogram_01",
+            "id": "movie_stack_series_01",
             "stacks": [
               {
-                "id": "no stack",
+                "id": "movie_stack_01",
                 "path": "/data/movies/tilt_00.tif",
                 "images": [
                   {
@@ -47,7 +47,7 @@
                     "coordinate_transformations": []
                   },
                   {
-                    "id": "999",
+                    "id": "2",
                     "path": "/data/movies/tilt_00.tif",
                     "section": 1,
                     "nominal_tilt_angle": -60.0,
@@ -115,10 +115,10 @@
           "ctf_corrected": false,
           "even_path": "/data/tilt_series/ts_01_even.mrc",
           "odd_path": "/data/tilt_series/ts_01_odd.mrc",
-          "movie_stack_series_id": "movie_stack_series_01",
+          "movie_stack_series_id": "no such series",
           "images": [
             {
-              "id": "7",
+              "id": "tilt_image_01",
               "movie_stack_id": "tomogram_01",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 0,
@@ -178,7 +178,7 @@
               ]
             },
             {
-              "id": "9",
+              "id": "tilt_image_01",
               "movie_stack_id": "movie_stack_02",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 1,
@@ -200,8 +200,11 @@
       ],
       "alignments": [
         {
+          "tilt_series_id": "tilt_series_01",
           "projection_alignments": [
             {
+              "id": "projection_alignment_01",
+              "tilt_image_id": "tilt_image_01",
               "transformation_type": "projection_alignment",
               "name": "align_tilt_neg60",
               "input": "tilt_image_angstroms",
@@ -245,6 +248,8 @@
               ]
             },
             {
+              "id": "projection_alignment_02",
+              "tilt_image_id": "tilt_image_02",
               "transformation_type": "projection_alignment",
               "target_id": "non-existent target",
               "name": "align_tilt_neg30",
@@ -337,8 +342,10 @@
       ],
       "annotations": [
         {
+          "id": "ribosome_picks",
           "annotation_type": "point_set_3D",
           "name": "ribosome_picks",
+          "source_tomogram_id": "tomogram_01",
           "origin3D": [
             [
               100.5,
@@ -393,6 +400,7 @@
           ]
         },
         {
+          "id": "oriented_particles",
           "annotation_type": "point_vector_set_3D",
           "name": "oriented_particles",
           "origin3D": [
@@ -423,6 +431,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "rotated_particles",
           "annotation_type": "point_matrix_set_3D",
           "name": "rotated_particles",
           "origin3D": [
@@ -455,6 +464,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "membrane_segmentation",
           "annotation_type": "segmentation_mask_3D",
           "name": "membrane_segmentation",
           "path": "/data/annotations/membrane_mask.mrc",
@@ -465,6 +475,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "ribosome_probability",
           "annotation_type": "probability_map_3D",
           "name": "ribosome_probability",
           "path": "/data/annotations/probability_map.mrc",
@@ -475,6 +486,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "fiducial_markers",
           "annotation_type": "point_set_2D",
           "name": "fiducial_markers",
           "origin2D": [
@@ -495,6 +507,7 @@
           "coordinate_transformations": []
         },
         {
+          "id": "membrane_surface",
           "annotation_type": "tri_mesh",
           "name": "membrane_surface",
           "coordinate_systems": [],
@@ -509,7 +522,11 @@
       "name": "ribosome_average_01",
       "particle_maps": [
         {
+          "id": "particle_map_01",
           "path": "/data/averages/ribosome_map.mrc",
+          "source_region_id": "region_01",
+          "source_annotation_id": "ribosome_picks",
+          "coord_index": 0,
           "width": 256,
           "height": 256,
           "depth": 256,
@@ -568,21 +585,6 @@
               ]
             }
           ]
-        }
-      ],
-      "annotations": [
-        {
-          "annotation_type": "point_set_3D",
-          "name": "symmetry_points",
-          "origin3D": [
-            [
-              128.0,
-              128.0,
-              128.0
-            ]
-          ],
-          "coordinate_systems": [],
-          "coordinate_transformations": []
         }
       ]
     }

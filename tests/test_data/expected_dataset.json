@@ -118,7 +118,7 @@
           "movie_stack_series_id": "movie_stack_series_01",
           "images": [
             {
-              "id": "7",
+              "id": "tilt_image_01",
               "movie_stack_id": "movie_stack_01",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 0,
@@ -178,7 +178,7 @@
               ]
             },
             {
-              "id": "9",
+              "id": "tilt_image_02",
               "movie_stack_id": "movie_stack_02",
               "path": "/data/tilt_series/ts_01.mrc",
               "section": 1,
@@ -200,8 +200,11 @@
       ],
       "alignments": [
         {
+          "tilt_series_id": "tilt_series_01",
           "projection_alignments": [
             {
+              "id": "projection_alignment_01",
+              "tilt_image_id": "tilt_image_01",
               "transformation_type": "projection_alignment",
               "name": "align_tilt_neg60",
               "input": "tilt_image_angstroms",
@@ -245,6 +248,8 @@
               ]
             },
             {
+              "id": "projection_alignment_02",
+              "tilt_image_id": "tilt_image_02",
               "transformation_type": "projection_alignment",
               "target_id": "tomogram_01",
               "name": "align_tilt_neg30",
@@ -517,6 +522,7 @@
       "name": "ribosome_average_01",
       "particle_maps": [
         {
+          "id": "particle_map_01",
           "path": "/data/averages/ribosome_map.mrc",
           "source_region_id": "region_01",
           "source_annotation_id": "ribosome_picks",
