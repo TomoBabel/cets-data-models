@@ -50,8 +50,9 @@ enums:
         description: An array axis
   AxisUnit:
     description: >-
-      Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left
-      unset); spatial axes default to angstrom.
+      Unit of a coordinate-system axis. Array (index) axes use pixel, which the
+      Python models fill in when an array axis has no unit; other axes default
+      to angstrom.
     permissible_values:
       angstrom:
         description: Ångström (1e-10 m).

@@ -75,7 +75,7 @@ class AxisType(str, Enum):
 
 class AxisUnit(str, Enum):
     """
-    Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left unset); spatial axes default to angstrom.
+    Unit of a coordinate-system axis. Array (index) axes use pixel, which the Python models fill in when an array axis has no unit; other axes default to angstrom.
     """
 
     angstrom = "angstrom"
