@@ -1,27 +1,39 @@
-from cets_data_model.models.models import Axis, CoordinateSystem, AxisType
+from cets_data_model.models.models import Axis, CoordinateSystem, AxisType, AxisUnit
 from typing import Optional
 
 """Helper functions for generating CoordinateSystem objects"""
 
 # Axis definitions
 X_AXIS_LOGICAL = Axis(
-    name="logical coordinates x axis", axis_unit="pixel/voxel", axis_type=AxisType.array
+    name="logical coordinates x axis",
+    axis_unit=AxisUnit.pixel,
+    axis_type=AxisType.array,
 )
 Y_AXIS_LOGICAL = Axis(
-    name="logical coordinates y axis", axis_unit="pixel/voxel", axis_type=AxisType.array
+    name="logical coordinates y axis",
+    axis_unit=AxisUnit.pixel,
+    axis_type=AxisType.array,
 )
 Z_AXIS_LOGICAL = Axis(
-    name="logical coordinates z axis", axis_unit="pixel/voxel", axis_type=AxisType.array
+    name="logical coordinates z axis",
+    axis_unit=AxisUnit.pixel,
+    axis_type=AxisType.array,
 )
 
 X_AXIS_PHYSICAL = Axis(
-    name="physical coordinates x axis", axis_unit="Ångstrom", axis_type=AxisType.space
+    name="physical coordinates x axis",
+    axis_unit=AxisUnit.angstrom,
+    axis_type=AxisType.space,
 )
 Y_AXIS_PHYSICAL = Axis(
-    name="physical coordinates y axis", axis_unit="Ångstrom", axis_type=AxisType.space
+    name="physical coordinates y axis",
+    axis_unit=AxisUnit.angstrom,
+    axis_type=AxisType.space,
 )
 Z_AXIS_PHYSICAL = Axis(
-    name="physical coordinates z axis", axis_unit="Ångstrom", axis_type=AxisType.space
+    name="physical coordinates z axis",
+    axis_unit=AxisUnit.angstrom,
+    axis_type=AxisType.space,
 )
 
 
