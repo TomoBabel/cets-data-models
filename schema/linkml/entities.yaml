@@ -15,6 +15,7 @@ imports:
 - linkml:types
 - ./image_entities
 - ./annotation
+- ./instrument
 - ./common
 
 classes:
@@ -77,6 +78,16 @@ classes:
     slots:
       - name
     attributes:
+      instruments:
+        description: The instruments used in this dataset.
+        range: Instrument
+        multivalued: true
+        inlined_as_list: true
+      acquisition_sessions:
+        description: The acquisition sessions in this dataset.
+        range: AcquisitionSession
+        multivalued: true
+        inlined_as_list: true
       regions:
         description: The regions in the dataset
         range: Region

@@ -69,6 +69,29 @@ class AxisType(str, Enum):
     """
 
 
+class AxisUnit(str, Enum):
+    """
+    Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left unset); spatial axes default to angstrom.
+    """
+
+    angstrom = "angstrom"
+    """
+    Ångström (1e-10 m).
+    """
+    nanometer = "nanometer"
+    """
+    Nanometre (1e-9 m).
+    """
+    micrometer = "micrometer"
+    """
+    Micrometre (1e-6 m).
+    """
+    pixel = "pixel"
+    """
+    Pixel/voxel index spacing (used for array/index axes).
+    """
+
+
 class TransformationType(str, Enum):
     identity = "identity"
     """
@@ -179,6 +202,44 @@ class AnnotationType(str, Enum):
     """
 
 
+class Handedness(str, Enum):
+    """
+    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
+    """
+
+    right_handed = "right_handed"
+    """
+    Right-handed tilt geometry (equivalent to defocus handedness +1).
+    """
+    left_handed = "left_handed"
+    """
+    Left-handed tilt geometry (equivalent to defocus handedness -1).
+    """
+
+
+class ElectronSource(str, Enum):
+    """
+    Type of electron source (mirrors OSC-EM permissible values).
+    """
+
+    FEG = "FEG"
+    """
+    Field emission gun
+    """
+    cold_FEG = "cold_FEG"
+    """
+    Cold field emission gun
+    """
+    LaB6 = "LaB6"
+    """
+    Lanthanum hexaboride
+    """
+    tungsten = "tungsten"
+    """
+    Tungsten filament
+    """
+
+
 class Image2D(ConfiguredBaseModel):
     """
     A 2D image.
@@ -262,8 +323,8 @@ class Axis(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
-    axis_unit: Optional[str] = Field(
-        default="angstrom", description="""The unit of the axis"""
+    axis_unit: Optional[AxisUnit] = Field(
+        default=AxisUnit.angstrom, description="""The unit of the axis"""
     )
     axis_type: Optional[AxisType] = Field(
         default=None, description="""The type of axis"""
@@ -513,15 +574,11 @@ class CTFMetadata(ConfiguredBaseModel):
         default=None,
         description="""Phase shift value produced by the usage of a phase plate.""",
     )
-    defocus_handedness: Optional[int] = Field(
-        default=-1,
-        description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
-    )
 
 
 class AcquisitionMetadataMixin(ConfiguredBaseModel):
     """
-    Metadata concerning the acquisition process.
+    Per-exposure acquisition metadata (varies from image to image).
     """
 
     nominal_tilt_angle: Optional[float] = Field(
@@ -532,6 +589,9 @@ class AcquisitionMetadataMixin(ConfiguredBaseModel):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
 
 
@@ -608,6 +668,9 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -650,6 +713,10 @@ class MovieStackSeries(ConfiguredBaseModel):
     stacks: Optional[list[MovieStack]] = Field(
         default=[], description="""The movie stacks."""
     )
+    acquisition_session_id: Optional[str] = Field(
+        default=None,
+        description="""The ID of the acquisition session this movie stack series was collected in.""",
+    )
 
 
 class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
@@ -670,6 +737,9 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -710,6 +780,9 @@ class ProjectionImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -754,6 +827,9 @@ class SubProjectionImage(ProjectionImage):
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
     )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -784,6 +860,10 @@ class TiltImage(BaseProjectionImage):
     movie_stack_id: Optional[str] = Field(
         default=None, description="""The ID of the movie stack for this tilt image."""
     )
+    acquisition_order: Optional[int] = Field(
+        default=None,
+        description="""Index giving the temporal order in which this tilt image was acquired during tilt-series collection (i.e. the dose-accumulation / tilt-scheme order), independent of its section index or nominal tilt angle within the stack.""",
+    )
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     section: Optional[int] = Field(
         default=None,
@@ -797,6 +877,9 @@ class TiltImage(BaseProjectionImage):
     )
     ctf_metadata: Optional[CTFMetadata] = Field(
         default=None, description="""A set of CTF patameters for an image."""
+    )
+    exposure_time: Optional[float] = Field(
+        default=None, description="""Total exposure time per movie/record in seconds."""
     )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
@@ -842,6 +925,10 @@ class TiltSeries(ConfiguredBaseModel):
     movie_stack_series_id: Optional[str] = Field(
         default=None,
         description="""The ID of the movie stack series for this tilt series.""",
+    )
+    acquisition_session_id: Optional[str] = Field(
+        default=None,
+        description="""The ID of the acquisition session this tilt series was collected in.""",
     )
 
 
@@ -1701,6 +1788,69 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     )
 
 
+class Instrument(ConfiguredBaseModel):
+    """
+    A microscope/instrument used to acquire data. Physical, rarely-changing hardware.
+    """
+
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    microscope_model: Optional[str] = Field(
+        default=None,
+        description="""Manufacturer/model of the microscope, e.g. \"Titan Krios G4\".""",
+    )
+    voltage: Optional[float] = Field(
+        default=None, description="""Acceleration voltage of the microscope in kV."""
+    )
+    electron_source: Optional[ElectronSource] = Field(
+        default=None, description="""Type of electron source."""
+    )
+    detector_model: Optional[str] = Field(
+        default=None, description="""Manufacturer/model of the detector/camera."""
+    )
+
+
+class AcquisitionSession(ConfiguredBaseModel):
+    """
+    Parameters constant within one data-collection session; links to the Instrument used.
+    """
+
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    instrument_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the Instrument used for this acquisition session.""",
+    )
+    dose_rate: Optional[float] = Field(
+        default=None,
+        description="""Dose rate on the specimen during acquisition in e-/A^2/s (pre-specimen fluence).""",
+    )
+    detector_dose_rate: Optional[float] = Field(
+        default=None,
+        description="""Dose rate at the detector in e-/pixel/s (post-specimen; counting-mode calibration).""",
+    )
+    amplitude_contrast: Optional[float] = Field(
+        default=None,
+        description="""Amplitude contrast fraction (dimensionless, typically 0.07-0.1). CTF-model parameter.""",
+    )
+    spherical_aberration: Optional[float] = Field(
+        default=None,
+        description="""Spherical aberration (Cs) of the objective lens in mm.""",
+    )
+    tilt_axis_angle: Optional[float] = Field(
+        default=None,
+        description="""Angle of the tilt axis relative to the detector x-axis, in degrees.""",
+    )
+    handedness: Optional[Handedness] = Field(
+        default=None,
+        description="""Handedness (parity) of the tilt geometry for this acquisition session. It is constant across the session and determines whether defocus increases or decreases with Z, i.e. it subsumes the former per-image CTFMetadata.defocus_handedness (right_handed == +1, left_handed == -1).""",
+    )
+
+
 class Region(ConfiguredBaseModel):
     """
     Raw data (movie stacks) and derived data (tilt series, tomograms, annotations) from a single region of a specimen.
@@ -1786,6 +1936,12 @@ class Dataset(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
+    instruments: Optional[list[Instrument]] = Field(
+        default=[], description="""The instruments used in this dataset."""
+    )
+    acquisition_sessions: Optional[list[AcquisitionSession]] = Field(
+        default=[], description="""The acquisition sessions in this dataset."""
+    )
     regions: Optional[list[Region]] = Field(
         default=[], description="""The regions in the dataset"""
     )
@@ -1848,6 +2004,8 @@ BoxSet.model_rebuild()
 Spline2D.model_rebuild()
 Spline3D.model_rebuild()
 DensityMap.model_rebuild()
+Instrument.model_rebuild()
+AcquisitionSession.model_rebuild()
 Region.model_rebuild()
 Average.model_rebuild()
 MovieStackCollection.model_rebuild()
