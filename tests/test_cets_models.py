@@ -262,13 +262,13 @@ class TestConstraintValidation:
             )
 
     def test_reject_invalid_matrix_dimensions(self):
-        """3x3 matrices must have correct shape"""
+        """Affine matrices must be square: 2x2 for 2D or 3x3 for 3D"""
         with pytest.raises(ValidationError):
             Affine(
                 transformation_type="affine",
                 affine=[
-                    [1.0, 0.0],  # Only 2 elements, should be 3
-                    [0.0, 1.0],
+                    [1.0, 0.0, 0.0],  # 2x3 is neither 2x2 nor 3x3
+                    [0.0, 1.0, 0.0],
                 ],
             )
 

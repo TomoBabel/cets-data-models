@@ -1,0 +1,35 @@
+id: https://example.org/cets-matrix-shapes
+name: matrix_shapes
+prefixes:
+  linkml: https://w3id.org/linkml/
+imports:
+  - linkml:types
+
+classes:
+  MatrixExample:
+    description: Shape-only fixture for optional and required square matrices.
+    attributes:
+      optional_matrix:
+        range: float
+        array:
+          exact_number_dimensions: 2
+        any_of: &square_shapes
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 2
+                - exact_cardinality: 2
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 3
+                - exact_cardinality: 3
+      required_matrix:
+        range: float
+        required: true
+        array:
+          exact_number_dimensions: 2
+        any_of: *square_shapes
+
+  DerivedMatrixExample:
+    is_a: MatrixExample

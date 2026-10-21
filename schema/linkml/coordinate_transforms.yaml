@@ -82,22 +82,49 @@ classes:
         range: float
         multivalued: true
   Affine:
-    description: An affine transformation
+    description: >-
+      A general linear transformation in two or three dimensions: the linear
+      part of an affine map, without translation
     is_a: CoordinateTransformation
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(affine)
     attributes:
       affine:
-        description: The affine matrix
+        description: >-
+          The matrix of a linear map, stored as a list of rows: 2x2 for a 2D
+          transformation, 3x3 for a 3D transformation. It acts on column
+          vectors: entry [i][j] is the contribution of input axis j to output
+          axis i, with axes in their declared order. The matrix carries no
+          translation; a shift is a separate Translation step, so that its
+          order relative to the matrix is explicit in the Sequence. All entries
+          are finite. A 3x3 matrix is always a 3D transformation; a 2D
+          transformation that was stored as a 3x3 homogeneous matrix is written
+          as its 2x2 block and a Translation.
+        comments:
+          - >-
+            OME-Zarr 0.6 stores an affine as the linear block with the
+            translation column appended. The two forms convert by appending or
+            splitting that column.
+          - >-
+            The Python models check the matrix size against input and output
+            coordinate systems declared on the same image or annotation.
+        # Exact shapes live in any_of. LinkML 1.11.1 ignores array alternatives;
+        # model_processing/generate_models.py compiles them into the models.
         range: float
         array:
           exact_number_dimensions: 2
-          dimensions:
-            - alias: exact_card
-              exact_cardinality: 3
-            - alias: exact_card
-              exact_cardinality: 3
+        any_of:
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 2
+                - exact_cardinality: 2
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 3
+                - exact_cardinality: 3
   Sequence:
     description: A sequence of transformations
     is_a: CoordinateTransformation

@@ -40,6 +40,7 @@ optional-dependencies.dev = [
     "mypy==1.8.0",  # this version should match the one in .pre-commit-config.yaml
     "pre-commit",
     "pytest",
+    "jsonschema",  # validates generated JSON Schema in tests
     "types-setuptools",
     "ruff==0.11.12", # this version should match the one in .pre-commit-config.yaml
     "linkml==1.11.1",

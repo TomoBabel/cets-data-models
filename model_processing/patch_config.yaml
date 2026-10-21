@@ -66,8 +66,6 @@ type_aliases:
     for_field: 
       as_list:
         - matrix3D
-      as_single:
-        - affine
   - name: Radii
     definition: "Annotated[list[float], Field(min_length=1)]"
     for_field:
@@ -92,3 +90,13 @@ injected_base_classes:
     import_from: cets_data_model.models.axis
     into:
       - Axis
+  - mixin: AffineValidationMixin
+    import_from: cets_data_model.models.affine
+    into:
+      - Affine
+  - mixin: AffineContextMixin
+    import_from: cets_data_model.models.affine
+    into:
+      - Image2D
+      - Image3D
+      - CoordMetaMixin
