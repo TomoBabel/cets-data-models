@@ -372,6 +372,84 @@ def ensure_typing_imports(model_def: str) -> str:
     return model_def
 
 
+def ensure_model_validator_import(model_def: str) -> str:
+    """Ensure ``model_validator`` is imported from pydantic (header section only)."""
+    header = model_def.split("class ", 1)[0]
+    if "model_validator" in header:
+        return model_def
+
+    pattern = r"from pydantic import \((.*?)\)"
+    match = re.search(pattern, model_def, re.DOTALL)
+    if not match:
+        logger.warning("Could not find pydantic imports to add model_validator")
+        return model_def
+
+    old_block = match.group(0)
+    new_block = old_block.rstrip("\n)").rstrip(",")
+    new_block += ",\n    model_validator\n)"
+    return model_def.replace(old_block, new_block, 1)
+
+
+def inject_array_axis_unit_validator(model_def: str) -> str:
+    """Inject a ``model_validator`` on ``Axis`` enforcing ``axis_unit == pixel`` for
+    array axes.
+
+    Array axes index a discrete image/volume grid, so their logical unit must be
+    ``pixel``. LinkML cannot express this cross-field rule, so it is patched in here:
+    when ``axis_type`` is ``array`` an omitted ``axis_unit`` is defaulted to ``pixel``
+    (overriding the ``angstrom`` field default) and an explicit non-pixel unit raises.
+    """
+    validator_src = '''
+    @model_validator(mode="before")
+    @classmethod
+    def _enforce_array_axis_unit(cls, data: Any) -> Any:
+        """Array axes index a discrete grid, so their unit must be ``pixel``.
+
+        An omitted ``axis_unit`` on an array axis is defaulted to ``pixel``
+        (overriding the ``angstrom`` field default); an explicit non-pixel unit
+        raises a ValueError.
+        """
+        if isinstance(data, dict):
+            axis_type = data.get("axis_type")
+            axis_type = (
+                axis_type.value if isinstance(axis_type, AxisType) else axis_type
+            )
+            if axis_type == AxisType.array.value:
+                axis_unit = data.get("axis_unit")
+                axis_unit = (
+                    axis_unit.value if isinstance(axis_unit, AxisUnit) else axis_unit
+                )
+                if axis_unit is None:
+                    data["axis_unit"] = AxisUnit.pixel.value
+                elif axis_unit != AxisUnit.pixel.value:
+                    raise ValueError(
+                        f"Array axes must use the '{AxisUnit.pixel.value}' unit "
+                        f"(axis_type='array'); got '{axis_unit}'."
+                    )
+        return data'''
+
+    lines = model_def.split("\n")
+    start = next(
+        (i for i, line in enumerate(lines) if line.startswith("class Axis(")), None
+    )
+    if start is None:
+        logger.warning("  ⚠ Axis class not found; skipping array axis_unit validator")
+        return model_def
+
+    end = next(
+        (j for j in range(start + 1, len(lines)) if lines[j].startswith("class ")),
+        len(lines),
+    )
+    # Back up over trailing blank lines that belong between classes.
+    insert_at = end
+    while insert_at - 1 > start and lines[insert_at - 1].strip() == "":
+        insert_at -= 1
+
+    logger.info("Injecting array-axis unit validator into Axis...")
+    new_lines = lines[:insert_at] + validator_src.split("\n") + lines[insert_at:]
+    return "\n".join(new_lines)
+
+
 def remove_treat_empty_lists_serializer(model_def: str) -> str:
     """
     Remove the treat_empty_lists_as_none model_serializer method that causes mypy errors.
@@ -565,6 +643,8 @@ def patch_models(input_path: Path, output_path: Path) -> None:
 
     model_def = ensure_typing_imports(model_def)
     model_def = remove_treat_empty_lists_serializer(model_def)
+    model_def = ensure_model_validator_import(model_def)
+    model_def = inject_array_axis_unit_validator(model_def)
 
     for title, config in patch_config.items():
         if title == "type_aliases":
