@@ -19,6 +19,7 @@ Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=
 Radii: TypeAlias = Annotated[list[float], Field(min_length=1)]
 Dimensions2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
 Dimensions3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
+InstanceIds: TypeAlias = Annotated[list[int], Field(min_length=1)]
 
 
 metamodel_version = "None"
@@ -206,18 +207,64 @@ class AnnotationType(str, Enum):
     """
 
 
-class Handedness(str, Enum):
+class SegmentationType(str, Enum):
     """
-    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
+    How the values of a segmentation mask are to be interpreted.
     """
 
-    right_handed = "right_handed"
+    semantic = "semantic"
     """
-    Right-handed tilt geometry (equivalent to defocus handedness +1).
+    Each value is a class; all the pixels/voxels of a class share the same value.
     """
-    left_handed = "left_handed"
+    instance = "instance"
     """
-    Left-handed tilt geometry (equivalent to defocus handedness -1).
+    Each non-background value is a distinct object instance (e.g. labelled connected components).
+    """
+
+
+class ProbabilityMapValueType(str, Enum):
+    """
+    Kind of values stored in a probability map.
+    """
+
+    probability = "probability"
+    """
+    Probabilities in the range [0, 1].
+    """
+    logit = "logit"
+    """
+    Unbounded logits (raw network outputs before the sigmoid/softmax).
+    """
+    score = "score"
+    """
+    Any other real-valued score.
+    """
+
+
+class SegmentedFeatureType(str, Enum):
+    """
+    Biological objects or features that can be segmented. New values can be added without affecting the existing ones; objects not covered yet are annotated as other.
+    """
+
+    membrane = "membrane"
+    """
+    A lipid bilayer membrane.
+    """
+    microtubule = "microtubule"
+    """
+    A microtubule.
+    """
+    actin_filament = "actin_filament"
+    """
+    An actin filament (F-actin).
+    """
+    filament = "filament"
+    """
+    A cytoskeletal filament of unspecified type.
+    """
+    other = "other"
+    """
+    Any other object or feature, described in the name of the annotated object.
     """
 
 
@@ -1074,6 +1121,37 @@ class AssociatedFile(ConfiguredBaseModel):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
+class AnnotatedObject(ConfiguredBaseModel):
+    """
+    A biological object or structure that is annotated, e.g. membacquistionrane, microtubule or actin.
+    """
+
+    feature_type: SegmentedFeatureType = Field(
+        default=...,
+        description="""Kind of biological object or feature that is segmented, e.g. membrane or microtubule. Objects without a specific value are annotated as other, described in name.""",
+    )
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
+    description: Optional[str] = Field(
+        default=None, description="""A free-text description of this entity."""
+    )
+
+
+class SegmentationLabel(ConfiguredBaseModel):
+    """
+    The meaning of one value of a segmentation mask.
+    """
+
+    label_value: int = Field(
+        default=..., description="""Voxel/pixel value of a segmentation mask."""
+    )
+    annotated_object: AnnotatedObject = Field(
+        default=...,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+
+
 class Annotation(ConfiguredBaseModel):
     """
     A primitive annotation.
@@ -1090,6 +1168,14 @@ class Annotation(ConfiguredBaseModel):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
@@ -1097,6 +1183,14 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     An annotation image with categorical labels.
     """
 
+    segmentation_type: Optional[SegmentationType] = Field(
+        default=None,
+        description="""Whether the values of a segmentation mask are classes (semantic) or object instances (instance).""",
+    )
+    labels: Optional[list[SegmentationLabel]] = Field(
+        default=[],
+        description="""Meaning of the values of a segmentation mask. For semantic segmentations, one entry per segmented class. For instance segmentations it can be omitted, every non-background value being an instance of the annotated_object. Values not listed (typically 0) are background.""",
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -1128,6 +1222,14 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
@@ -1135,6 +1237,14 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     An annotation volume with categorical labels.
     """
 
+    segmentation_type: Optional[SegmentationType] = Field(
+        default=None,
+        description="""Whether the values of a segmentation mask are classes (semantic) or object instances (instance).""",
+    )
+    labels: Optional[list[SegmentationLabel]] = Field(
+        default=[],
+        description="""Meaning of the values of a segmentation mask. For semantic segmentations, one entry per segmented class. For instance segmentations it can be omitted, every non-background value being an instance of the annotated_object. Values not listed (typically 0) are background.""",
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -1169,6 +1279,14 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
@@ -1176,6 +1294,13 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     An annotation image with real-valued labels.
     """
 
+    value_type: Optional[ProbabilityMapValueType] = Field(
+        default=None, description="""Kind of values stored in a probability map."""
+    )
+    threshold: Optional[float] = Field(
+        default=None,
+        description="""Value above which a pixel/voxel of a probability map was considered part of the annotated object (foreground).""",
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -1207,6 +1332,14 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
@@ -1214,6 +1347,13 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     An annotation volume with real-valued labels.
     """
 
+    value_type: Optional[ProbabilityMapValueType] = Field(
+        default=None, description="""Kind of values stored in a probability map."""
+    )
+    threshold: Optional[float] = Field(
+        default=None,
+        description="""Value above which a pixel/voxel of a probability map was considered part of the annotated object (foreground).""",
+    )
     width: Optional[int] = Field(
         default=None, description="""The width of the image (x-axis) in pixels"""
     )
@@ -1248,15 +1388,27 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class PointSet2D(Annotation, CoordMetaMixin):
     """
-    A set of 2D point annotations.
+    A set of 2D point annotations, optionally grouped into object instances.
     """
 
     origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 2D image (Nx2)."""
+    )
+    instance_ids: Optional[InstanceIds] = Field(
+        default=None,
+        description="""Instance identifier of each point (N), aligned with the point coordinates (the i-th id belongs to the i-th point, so it must have the same length). Points sharing an id belong to the same object instance (e.g. the same membrane or filament). When absent, all the points belong to a single instance.""",
     )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
@@ -1282,15 +1434,27 @@ class PointSet2D(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class PointSet3D(Annotation, CoordMetaMixin):
     """
-    A set of 3D point annotations.
+    A set of 3D point annotations, optionally grouped into object instances (e.g. the points of each segmented membrane).
     """
 
     origin3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 3D image (Nx3)."""
+    )
+    instance_ids: Optional[InstanceIds] = Field(
+        default=None,
+        description="""Instance identifier of each point (N), aligned with the point coordinates (the i-th id belongs to the i-th point, so it must have the same length). Points sharing an id belong to the same object instance (e.g. the same membrane or filament). When absent, all the points belong to a single instance.""",
     )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
@@ -1315,6 +1479,14 @@ class PointSet3D(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1354,6 +1526,14 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class PointVectorSet3D(Annotation, CoordMetaMixin):
@@ -1391,6 +1571,14 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1430,6 +1618,14 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class PointMatrixSet3D(Annotation, CoordMetaMixin):
@@ -1468,6 +1664,14 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class TriMesh(Annotation, CoordMetaMixin):
@@ -1498,6 +1702,14 @@ class TriMesh(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1536,6 +1748,14 @@ class SphereSet(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class CircleSet(Annotation, CoordMetaMixin):
@@ -1572,6 +1792,14 @@ class CircleSet(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1610,6 +1838,14 @@ class CylinderSet(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1652,6 +1888,14 @@ class CuboidSet(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class BoxSet(Annotation, CoordMetaMixin):
@@ -1693,15 +1937,27 @@ class BoxSet(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class Spline2D(Annotation, CoordMetaMixin):
     """
-    A 2D spline.
+    A 2D spline, given by its ordered points. With instance_ids, a set of splines: the points sharing an id, in order, form one spline.
     """
 
     origin2D: Optional[Annotated[list[Vector2D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 2D image (Nx2)."""
+    )
+    instance_ids: Optional[InstanceIds] = Field(
+        default=None,
+        description="""Instance identifier of each point (N), aligned with the point coordinates (the i-th id belongs to the i-th point, so it must have the same length). Points sharing an id belong to the same object instance (e.g. the same membrane or filament). When absent, all the points belong to a single instance.""",
     )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
@@ -1727,15 +1983,27 @@ class Spline2D(Annotation, CoordMetaMixin):
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
     )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
+    )
 
 
 class Spline3D(Annotation, CoordMetaMixin):
     """
-    A 3D spline.
+    A 3D spline, given by its ordered points. With instance_ids, a set of splines (e.g. filaments): the points sharing an id, in order, form one spline.
     """
 
     origin3D: Optional[Annotated[list[Vector3D], Field(min_length=1)]] = Field(
         default=None, description="""Location on a 3D image (Nx3)."""
+    )
+    instance_ids: Optional[InstanceIds] = Field(
+        default=None,
+        description="""Instance identifier of each point (N), aligned with the point coordinates (the i-th id belongs to the i-th point, so it must have the same length). Points sharing an id belong to the same object instance (e.g. the same membrane or filament). When absent, all the points belong to a single instance.""",
     )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
@@ -1760,6 +2028,14 @@ class Spline3D(Annotation, CoordMetaMixin):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1805,6 +2081,14 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     source_tomogram_id: Optional[str] = Field(
         default=None,
         description="""ID of the tomogram from which this annotation was derived, such as the tomogram containing picked coordinates.""",
+    )
+    annotated_object: Optional[AnnotatedObject] = Field(
+        default=None,
+        description="""The biological object or structure represented by this annotation, e.g. membrane or microtubule.""",
+    )
+    derived_from_annotation_id: Optional[str] = Field(
+        default=None,
+        description="""ID of the annotation, in the same region, this annotation was derived from, e.g. the segmentation mask a skeleton or an instance segmentation was computed from.""",
     )
 
 
@@ -1864,10 +2148,6 @@ class AcquisitionSession(ConfiguredBaseModel):
     tilt_axis_angle: Optional[float] = Field(
         default=None,
         description="""Angle of the tilt axis relative to the detector x-axis, in degrees.""",
-    )
-    handedness: Optional[Handedness] = Field(
-        default=None,
-        description="""Handedness (parity) of the tilt geometry for this acquisition session. It is constant across the session and determines whether defocus increases or decreases with Z, i.e. it subsumes the former per-image CTFMetadata.defocus_handedness (right_handed == +1, left_handed == -1).""",
     )
 
 
@@ -2004,6 +2284,8 @@ Tomogram.model_rebuild()
 ParticleMap.model_rebuild()
 CoordMetaMixin.model_rebuild()
 AssociatedFile.model_rebuild()
+AnnotatedObject.model_rebuild()
+SegmentationLabel.model_rebuild()
 Annotation.model_rebuild()
 SegmentationMask2D.model_rebuild()
 SegmentationMask3D.model_rebuild()

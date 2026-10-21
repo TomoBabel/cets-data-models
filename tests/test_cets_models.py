@@ -17,6 +17,12 @@ from cets_data_model.models.models import (
     PointSet3D,
     ParticleMap,
     Average,
+    AnnotatedObject,
+    SegmentationLabel,
+    SegmentationMask3D,
+    ProbabilityMap3D,
+    Spline3D,
+    SegmentedFeatureType,
 )
 
 
@@ -326,3 +332,129 @@ class TestConstraintValidation:
             origin3D=[[1.0, 2.0, 3.0]],
         )
         assert len(ps.origin3D) == 1
+
+
+# ============================================================================
+# 4. SEGMENTATION EXTENSIONS TESTS
+# ============================================================================
+
+
+MEMBRANE = {"feature_type": "membrane"}
+
+
+class TestSegmentationExtensions:
+    """Test the semantic/instance segmentation metadata (masks, probability maps and
+    instance-grouped points)"""
+
+    def test_legacy_annotations_still_valid(self):
+        """Annotations without any of the new optional fields must keep validating"""
+        mask = SegmentationMask3D(id="mask", path="mask.mrc")
+        points = PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]])
+        assert mask.segmentation_type is None
+        assert mask.labels == []  # multivalued fields default to an empty list
+        assert points.instance_ids is None
+        assert points.annotated_object is None
+
+    def test_semantic_mask_with_labels_roundtrip(self):
+        """A multi-class semantic mask keeps the meaning of each label value"""
+        region = Region(
+            id="region_01",
+            annotations=[
+                {
+                    "id": "semantic_mask",
+                    "annotation_type": "segmentation_mask_3D",
+                    "path": "TS_01_semantic.mrc",
+                    "source_tomogram_id": "TS_01",
+                    "segmentation_type": "semantic",
+                    "labels": [
+                        {"label_value": 1, "annotated_object": MEMBRANE},
+                        {
+                            "label_value": 2,
+                            "annotated_object": {"feature_type": "microtubule"},
+                        },
+                    ],
+                }
+            ],
+        )
+        reconstructed = Region.model_validate_json(region.model_dump_json())
+        mask = reconstructed.annotations[0]
+        assert isinstance(mask, SegmentationMask3D)
+        assert mask.segmentation_type == "semantic"
+        assert [label.label_value for label in mask.labels] == [1, 2]
+        assert mask.labels[0].annotated_object.feature_type == "membrane"
+        assert mask.labels[1].annotated_object.feature_type == "microtubule"
+
+    def test_instance_mask_derived_from_another_annotation(self):
+        """An instance (connected components) mask can point to the mask it derives from"""
+        mask = SegmentationMask3D(
+            id="instances",
+            path="TS_01_instances.mrc",
+            segmentation_type="instance",
+            annotated_object=AnnotatedObject(**MEMBRANE),
+            derived_from_annotation_id="semantic_mask",
+        )
+        reconstructed = SegmentationMask3D.model_validate_json(mask.model_dump_json())
+        assert reconstructed == mask
+        assert (
+            reconstructed.annotated_object.feature_type == SegmentedFeatureType.membrane
+        )
+
+    def test_probability_map_value_type_and_threshold(self):
+        """Probability maps record the kind of values and the segmentation threshold"""
+        scores = ProbabilityMap3D(
+            id="scores", path="TS_01_scores.mrc", value_type="logit", threshold=0.0
+        )
+        reconstructed = ProbabilityMap3D.model_validate_json(scores.model_dump_json())
+        assert reconstructed.value_type == "logit"
+        assert reconstructed.threshold == 0.0
+
+    def test_point_set_grouped_into_instances(self):
+        """Points of several instances (e.g. membranes) fit in a single PointSet3D"""
+        points = PointSet3D(
+            id="membrane_points",
+            origin3D=[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [5.0, 5.0, 5.0]],
+            instance_ids=[0, 0, 1],
+            annotated_object=AnnotatedObject(**MEMBRANE),
+        )
+        reconstructed = PointSet3D.model_validate_json(points.model_dump_json())
+        assert reconstructed.instance_ids == [0, 0, 1]
+
+    def test_spline_set_grouped_into_instances(self):
+        """Several filaments fit in a single Spline3D, one spline per instance id"""
+        splines = Spline3D(
+            id="microtubules",
+            origin3D=[[0.0, 0.0, 0.0], [1.0, 1.0, 1.0], [9.0, 0.0, 0.0]],
+            instance_ids=[3, 3, 7],
+            annotated_object=AnnotatedObject(
+                feature_type=SegmentedFeatureType.microtubule
+            ),
+        )
+        reconstructed = Spline3D.model_validate_json(splines.model_dump_json())
+        assert reconstructed.instance_ids == [3, 3, 7]
+
+    def test_reject_invalid_segmentation_metadata(self):
+        """Invalid enum values, untyped objects and empty/non-integer ids are rejected"""
+        with pytest.raises(ValidationError):
+            SegmentationMask3D(id="mask", segmentation_type="panoptic")
+        with pytest.raises(ValidationError):
+            ProbabilityMap3D(id="scores", value_type="percentage")
+        with pytest.raises(ValidationError):
+            AnnotatedObject(name="membrane")  # feature_type is required
+        with pytest.raises(ValidationError):
+            AnnotatedObject(feature_type="lipid_droplet")  # not a SegmentedFeatureType
+        with pytest.raises(ValidationError):
+            AnnotatedObject(feature_type="membrane", ontology_id="membrane")  # removed
+        with pytest.raises(ValidationError):
+            SegmentationLabel(label_value=1)  # annotated_object is required
+        with pytest.raises(ValidationError):
+            PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[])
+        with pytest.raises(ValidationError):
+            PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[0.5])
+
+    def test_other_feature_type_described_by_name(self):
+        """Objects without a specific SegmentedFeatureType are annotated as other + name"""
+        obj = AnnotatedObject(feature_type="other", name="lipid droplet")
+        reconstructed = AnnotatedObject.model_validate_json(obj.model_dump_json())
+        assert reconstructed.feature_type == SegmentedFeatureType.other
+        assert reconstructed.name == "lipid droplet"
+        assert obj.model_dump(mode="json")["feature_type"] == "other"
