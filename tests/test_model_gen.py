@@ -251,11 +251,23 @@ def test_can_regenerate_models():
     assert generated == committed.read_text()
 
 
-@pytest.mark.parametrize("class_name", ["Image2D", "Image3D", "MovieFrame", "Tomogram"])
-def test_public_models_do_not_expose_demo_properties(models_path, class_name):
+@pytest.mark.parametrize(
+    "class_name,size,other",
+    [
+        ("Image2D", "pixel_size", "voxel_size"),
+        ("MovieFrame", "pixel_size", "voxel_size"),
+        ("Image3D", "voxel_size", "pixel_size"),
+        ("Tomogram", "voxel_size", "pixel_size"),
+    ],
+)
+def test_public_image_models_expose_frame_properties(
+    models_path, class_name, size, other
+):
     spec = importlib.util.spec_from_file_location("models", models_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     model = getattr(module, class_name)
-    assert not hasattr(model, "pixel_size")
-    assert not hasattr(model, "voxel_size")
+    for name in (size, "translation"):
+        assert isinstance(getattr(model, name), property)
+        assert name not in model.model_fields
+    assert not hasattr(model, other)
