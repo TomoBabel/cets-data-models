@@ -103,6 +103,21 @@ class AxisUnit(str, Enum):
     """
 
 
+class CoordinateSpaceName(str, Enum):
+    """
+    Canonical names for an entity's standard coordinate systems.
+    """
+
+    array = "array"
+    """
+    Discrete index space (integer pixel coordinates).
+    """
+    physical = "physical"
+    """
+    Continuous physical space in Angstrom.
+    """
+
+
 class TransformationType(str, Enum):
     identity = "identity"
     """
@@ -162,6 +177,49 @@ class ReflectionAxis(str, Enum):
     z = "z"
     """
     The third axis.
+    """
+
+
+class TransformationName(str, Enum):
+    """
+    Canonical names for the standard transformations.
+    """
+
+    array_to_physical = "array_to_physical"
+    """
+    An entity's array (pixel) space to its physical space.
+    """
+    calibration_to_movie_frame = "calibration_to_movie_frame"
+    """
+    Calibration image to movie frame.
+    """
+    movie_frame_to_projection = "movie_frame_to_projection"
+    """
+    Movie frame to projection.
+    """
+    sub_projection_to_projection = "sub_projection_to_projection"
+    """
+    Sub-projection to projection.
+    """
+    annotation_to_tomogram = "annotation_to_tomogram"
+    """
+    Annotation to tomogram.
+    """
+    subtomogram_to_tomogram = "subtomogram_to_tomogram"
+    """
+    Subtomogram to tomogram.
+    """
+    particle_map_to_subtomogram = "particle_map_to_subtomogram"
+    """
+    Particle map to subtomogram.
+    """
+    particle_map_to_tomogram = "particle_map_to_tomogram"
+    """
+    Particle map to tomogram (derived composition).
+    """
+    tomogram_to_projection = "tomogram_to_projection"
+    """
+    Tomogram to projection (the tomographic projection, per tilt).
     """
 
 
@@ -400,7 +458,10 @@ class CoordinateSystem(ConfiguredBaseModel):
     A coordinate system
     """
 
-    name: str = Field(default=..., description="""The name of the coordinate system""")
+    name: str = Field(
+        default=...,
+        description="""The name of the coordinate system. Free-form to allow per-entity and intermediate systems; the canonical names are listed by CoordinateSpaceName.""",
+    )
     axes: list[Axis] = Field(
         default=..., description="""The axes of the coordinate system"""
     )
@@ -693,8 +754,10 @@ class ProjectionAlignment(CoordinateTransformation):
         default=None,
         description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
     )
-    sequence: Optional[list[Union[Affine, Translation]]] = Field(
-        default=[], description="""The sequence of transformations""", max_length=2
+    sequence: Optional[list[Union[Affine, ProjectAxis, Translation]]] = Field(
+        default=[],
+        description="""The ordered steps from the tomogram to the projection: a tilt, a projection that drops the beam axis, an in-plane rotation and a shift. A 3D step before the projection is a 3x3 affine; the 2D steps after it are a 2x2 affine and a two-component translation.""",
+        max_length=4,
     )
     transformation_type: Literal[TransformationType.projection_alignment] = Field(
         default=TransformationType.projection_alignment,

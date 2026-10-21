@@ -31,12 +31,21 @@ classes:
           by different algorithms) may reference the same tilt-image.
         range: string
       sequence:
-        description: The sequence of transformations
+        description: >-
+          The ordered steps from the tomogram to the projection: a tilt, a
+          projection that drops the beam axis, an in-plane rotation and a shift.
+          A 3D step before the projection is a 3x3 affine; the 2D steps after
+          it are a 2x2 affine and a two-component translation.
+        comments:
+          - >-
+            Writers that store only the 2D in-plane part may omit the tilt and
+            the projection.
         range: CoordinateTransformation
-        maximum_cardinality: 2
+        maximum_cardinality: 4
         any_of:
           - range: Affine
           - range: Translation
+          - range: ProjectAxis
         multivalued: true
 
   Alignment:

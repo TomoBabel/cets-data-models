@@ -55,6 +55,26 @@ def _signed_permutation_determinant(block: list[list[int]], columns: list[int]) 
     return determinant
 
 
+def validate_rot90(matrix: list[list[int]]) -> None:
+    """Raise unless ``matrix`` is a quarter-turn rotation.
+
+    ``matrix`` is a square integer matrix with 2 or 3 rows. It must be a signed
+    permutation matrix with determinant +1: exactly one nonzero entry, 1 or -1,
+    in each row and each column. That is exactly a composition of quarter turns
+    about coordinate axes, about the origin, with no translation.
+    """
+    columns = _signed_permutation_columns(matrix)
+    if columns is None:
+        raise ValueError(
+            "rot90 must have exactly one nonzero entry, 1 or -1, in each row and column"
+        )
+    if _signed_permutation_determinant(matrix, columns) != 1:
+        raise ValueError(
+            "rot90 must be a proper rotation (determinant +1); "
+            "express a mirror image with Reflection"
+        )
+
+
 class Rot90ValidationMixin:
     """Restrict ``Rot90.rot90`` to rotations by quarter turns about axes."""
 
@@ -74,19 +94,7 @@ class Rot90ValidationMixin:
     @classmethod
     def _validate_rot90(cls, matrix: list[list[int]]) -> list[list[int]]:
         # The generated field type has already enforced an integer 2x2 or 3x3.
-        # A signed permutation with determinant +1 is exactly a composition of
-        # quarter turns about coordinate axes.
-        columns = _signed_permutation_columns(matrix)
-        if columns is None:
-            raise ValueError(
-                "rot90 must have exactly one nonzero entry, 1 or -1, in each row "
-                "and column"
-            )
-        if _signed_permutation_determinant(matrix, columns) != 1:
-            raise ValueError(
-                "rot90 must be a proper rotation (determinant +1); "
-                "express a mirror image with Reflection"
-            )
+        validate_rot90(matrix)
         return matrix
 
 

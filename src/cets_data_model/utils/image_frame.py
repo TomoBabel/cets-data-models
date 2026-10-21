@@ -11,6 +11,10 @@ order and each at most once. For column vectors, with ``R`` the Rot90 matrix and
 Indices, shapes and vectors are in x/y(/z) order. Translation is in pixels (or
 voxels) along the oriented axes; spacing is in Angstrom along the final axes.
 
+The alignment (Fourier) center of an image is ``floor(N/2)`` on every axis of
+the oriented array. An array reversal moves the origin by ``N - 1``; centering
+accounts for it in the translation.
+
 These helpers read and write the serialized fields only. They do not import the
 generated models: ``models.py`` imports the mixins that use them, and updates
 are validated with the image's own class.
@@ -21,10 +25,12 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from math import isfinite
-from numbers import Real
+from numbers import Integral, Real
 from typing import Any
 
 from pydantic import BaseModel
+
+from cets_data_model.models.transforms import validate_rot90
 
 ARRAY = "array"
 PHYSICAL = "physical"
@@ -155,6 +161,138 @@ def _stored_spacing(factors: list[float] | None, ndim: int) -> tuple[float, ...]
     if factors is not None and len(factors) == 1:
         factors = factors * ndim
     return _vector(factors, ndim, "array_to_physical scale", positive=True)
+
+
+#: Right-handed quarter turn about each axis, for column vectors.
+_QUARTER_TURNS = {
+    "x": ((1, 0, 0), (0, 0, -1), (0, 1, 0)),
+    "y": ((0, 0, 1), (0, 1, 0), (-1, 0, 0)),
+    "z": ((0, -1, 0), (1, 0, 0), (0, 0, 1)),
+}
+
+
+def quarter_turn_rotation(turns: int, *, ndim: int, axis: str = "z") -> list[list[int]]:
+    """Return the Rot90 matrix for ``turns`` quarter turns about ``axis``.
+
+    Turns are right-handed and counted modulo 4, so negative turns rotate the
+    other way. A 2D rotation (``ndim=2``) turns in the x-y plane, about ``z``.
+    """
+    if isinstance(turns, bool) or not isinstance(turns, Integral):
+        raise ValueError(f"turns must be an integer; got {turns!r}")
+    if ndim not in (2, 3):
+        raise ValueError(f"rotations have 2 or 3 axes; got ndim={ndim}")
+    if axis not in _QUARTER_TURNS or (ndim == 2 and axis != "z"):
+        allowed = "'z'" if ndim == 2 else "'x', 'y' or 'z'"
+        raise ValueError(f"a {ndim}D rotation turns about {allowed}; got {axis!r}")
+    turn = _QUARTER_TURNS[axis]
+    block = [[int(row == column) for column in range(3)] for row in range(3)]
+    for _ in range(int(turns) % 4):
+        block = [
+            [sum(turn[i][k] * block[k][j] for k in range(3)) for j in range(3)]
+            for i in range(3)
+        ]
+    return [row[:ndim] for row in block[:ndim]]
+
+
+def _shape(shape: object) -> tuple[int, ...]:
+    values = list(shape) if isinstance(shape, Iterable) else []
+    if len(values) not in (2, 3) or any(
+        isinstance(n, bool) or not isinstance(n, Integral) or n <= 0 for n in values
+    ):
+        raise ValueError(
+            f"shape requires 2 or 3 positive integers in x/y(/z) order; got {shape!r}"
+        )
+    return tuple(int(n) for n in values)
+
+
+def alignment_center(shape: object) -> tuple[int, ...]:
+    """Return the alignment (Fourier) center ``floor(N/2)`` of each axis.
+
+    ``shape`` lists the sizes in x/y(/z) order.
+    """
+    return tuple(n // 2 for n in _shape(shape))
+
+
+def _orientation(
+    rotation: object, reflection: Iterable[str], ndim: int
+) -> list[list[int]]:
+    """Return ``F @ R``: the rotation, then the reflection."""
+    matrix = identity_rotation(ndim) if rotation is None else _rotation(rotation, ndim)
+    reflected = _reflection(reflection, ndim)
+    return [
+        [-entry if AXES[i] in reflected else entry for entry in row]
+        for i, row in enumerate(matrix)
+    ]
+
+
+def centered_translation(
+    shape: object, *, rotation: object = None, reflection: Iterable[str] = ()
+) -> list[int]:
+    """Return the translation that puts the alignment center at the origin.
+
+    ``shape`` is the size of the stored array in x/y(/z) order; ``rotation`` is a
+    Rot90 matrix (identity if ``None``) and ``reflection`` the
+    reflected axes. With ``O = F @ R``, the oriented array has shape
+    ``abs(O) @ shape``; an axis reversed by ``O`` starts at ``N - 1``, recorded
+    in ``b``; and the result is ``b - floor(oriented_shape / 2)``.
+    """
+    sizes = _shape(shape)
+    orientation = _orientation(rotation, reflection, len(sizes))
+    translation = []
+    for row in orientation:
+        (column,) = (j for j, entry in enumerate(row) if entry != 0)
+        size = sizes[column]
+        start = size - 1 if row[column] < 0 else 0
+        translation.append(start - size // 2)
+    return translation
+
+
+def _rotation(value: object, ndim: int) -> tuple[tuple[int, ...], ...]:
+    """Return a validated Rot90 matrix for ``ndim`` axes."""
+    rows = list(value) if isinstance(value, Iterable) else []
+    entries = [
+        list(row) if isinstance(row, Iterable) and not isinstance(row, str) else []
+        for row in rows
+    ]
+    if len(entries) != ndim or any(len(row) != ndim for row in entries):
+        raise ValueError(
+            f"rotation of a {ndim}D image must be a {ndim}x{ndim} matrix; got {value!r}"
+        )
+    if any(
+        isinstance(v, bool)
+        or not isinstance(v, Real)
+        or not (isinstance(v, Integral) or float(v).is_integer())
+        for row in entries
+        for v in row
+    ):
+        raise ValueError(f"rotation entries must be integers; got {value!r}")
+    matrix = [[int(v) for v in row] for row in entries]
+    validate_rot90(matrix)
+    return tuple(tuple(row) for row in matrix)
+
+
+def _reflection(value: object, ndim: int) -> tuple[str, ...]:
+    """Return validated, distinct reflection axis names for ``ndim`` axes."""
+    if isinstance(value, str) or not isinstance(value, Iterable):
+        raise ValueError(f"reflection must be a list of axis names; got {value!r}")
+    axes = tuple(_value(axis) for axis in value)
+    if not set(axes) <= set(AXES[:ndim]) or len(set(axes)) != len(axes):
+        raise ValueError(
+            f"reflection of a {ndim}D image lists distinct axes from "
+            f"{AXES[:ndim]}; got {list(axes)}"
+        )
+    return axes
+
+
+def _image_shape(image: BaseModel, ndim: int) -> tuple[int, ...]:
+    names = ("width", "height", "depth")[:ndim]
+    try:
+        return _shape([getattr(image, name, None) for name in names])
+    except ValueError:
+        raise ValueError(
+            f"centering requires positive {'/'.join(names)}; got "
+            f"{[getattr(image, name, None) for name in names]}"
+        ) from None
 
 
 def _canonical_transform(image: BaseModel) -> Any | None:
@@ -345,26 +483,39 @@ def update_frame(
     image: BaseModel,
     ndim: int,
     *,
+    rotation: object = UNSET,
+    reflection: object = UNSET,
     translation: object = UNSET,
     spacing: object = UNSET,
+    center: bool = False,
 ) -> None:
     """Replace the supplied frame components and keep all others.
 
-    Translation accepts a finite scalar (applied to every axis) or ``ndim``
-    values; spacing must also be positive.
+    ``rotation`` is a Rot90 matrix (the identity removes the step)
+    and ``reflection`` a list of distinct axis names (an empty list removes the
+    step). Translation accepts a finite scalar (applied to every axis) or
+    ``ndim`` values; spacing must also be positive. With ``center``, the
+    translation is recomputed from the image shape and the new orientation so
+    that the alignment center is at the origin.
     """
     current = read_frame(image, ndim)
-    write_frame(
-        image,
-        ndim,
-        Frame(
-            current.rotation,
-            current.reflection,
-            current.translation
-            if translation is UNSET
-            else _vector(translation, ndim, "translation"),
-            current.spacing
-            if spacing is UNSET
-            else _vector(spacing, ndim, "spacing", positive=True),
-        ),
+    frame = Frame(
+        current.rotation if rotation is UNSET else _rotation(rotation, ndim),
+        current.reflection if reflection is UNSET else _reflection(reflection, ndim),
+        current.translation
+        if translation is UNSET
+        else _vector(translation, ndim, "translation"),
+        current.spacing
+        if spacing is UNSET
+        else _vector(spacing, ndim, "spacing", positive=True),
     )
+    if center:
+        offset = centered_translation(
+            _image_shape(image, ndim),
+            rotation=frame.rotation,
+            reflection=frame.reflection,
+        )
+        frame = Frame(
+            frame.rotation, frame.reflection, tuple(map(float, offset)), frame.spacing
+        )
+    write_frame(image, ndim, frame)
