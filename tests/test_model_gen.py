@@ -3,6 +3,7 @@ import importlib.util
 import pytest
 import re
 import subprocess
+import sys
 from pathlib import Path
 from pydantic import ValidationError
 
@@ -230,12 +231,31 @@ def test_can_regenerate_models():
     This ensures 'make gen-python' command succeeds.
     Skipped if schema files aren't available.
     """
-    result = subprocess.run(["make", "gen-python"], capture_output=True, text=True)
-    print(result.stdout)
+    result = subprocess.run(
+        ["make", "gen-python", f"PYTHON={sys.executable}"],
+        capture_output=True,
+        text=True,
+    )
 
     assert result.returncode == 0, f"Model generation failed:\n{result.stderr}"
-
-    assert "✅ Patched models validated successfully" in result.stderr, (
-        f"Validation should have passed during generation.\n"
-        f"Full stderr: {result.stderr}"
+    assert "Generated models validated" in result.stderr, (
+        f"Generation should have validated successfully.\nFull stderr: {result.stderr}"
     )
+
+    # the freshly generated module should carry all generation-time transforms
+    generated = Path("src/cets_data_model/models/generated_models.py").read_text()
+    assert "Field(discriminator=" in generated  # discriminated unions
+    assert ": TypeAlias =" in generated  # type aliases
+    assert "treat_empty_lists_as_none" not in generated  # serializer dropped
+    committed = Path("src/cets_data_model/models/models.py")
+    assert generated == committed.read_text()
+
+
+@pytest.mark.parametrize("class_name", ["Image2D", "Image3D", "MovieFrame", "Tomogram"])
+def test_public_models_do_not_expose_demo_properties(models_path, class_name):
+    spec = importlib.util.spec_from_file_location("models", models_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    model = getattr(module, class_name)
+    assert not hasattr(model, "pixel_size")
+    assert not hasattr(model, "voxel_size")

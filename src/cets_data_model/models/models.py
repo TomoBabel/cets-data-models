@@ -8,20 +8,11 @@ from pydantic import (
     ConfigDict,
     Field,
     RootModel,
-    model_validator,
 )
 
-# Type aliases
-Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
-Vector3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
-Matrix2x2: TypeAlias = Annotated[list[Vector2D], Field(min_length=2, max_length=2)]
-Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=3)]
-Radii: TypeAlias = Annotated[list[float], Field(min_length=1)]
-Dimensions2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
-Dimensions3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
+from cets_data_model.models.axis import ArrayAxisUnitMixin
 
-
-metamodel_version = "None"
+metamodel_version = "1.11.0"
 version = "0.0.1"
 
 
@@ -55,6 +46,13 @@ class LinkMLMeta(RootModel):
         return key in self.root
 
 
+Vector2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
+Vector3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
+Matrix2x2: TypeAlias = Annotated[list[Vector2D], Field(min_length=2, max_length=2)]
+Matrix3x3: TypeAlias = Annotated[list[Vector3D], Field(min_length=3, max_length=3)]
+Radii: TypeAlias = Annotated[list[float], Field(min_length=1)]
+Dimensions2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
+Dimensions3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
 linkml_meta = None
 
 
@@ -75,7 +73,7 @@ class AxisType(str, Enum):
 
 class AxisUnit(str, Enum):
     """
-    Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left unset); spatial axes default to angstrom.
+    Unit of a coordinate-system axis. Array (index) axes use pixel, which the Python models fill in when an array axis has no unit; other axes default to angstrom.
     """
 
     angstrom = "angstrom"
@@ -319,7 +317,7 @@ class ImageStack3D(ConfiguredBaseModel):
     )
 
 
-class Axis(ConfiguredBaseModel):
+class Axis(ArrayAxisUnitMixin, ConfiguredBaseModel):
     """
     An axis in a coordinate system
     """
@@ -333,34 +331,6 @@ class Axis(ConfiguredBaseModel):
     axis_type: Optional[AxisType] = Field(
         default=None, description="""The type of axis"""
     )
-
-    @model_validator(mode="before")
-    @classmethod
-    def _enforce_array_axis_unit(cls, data: Any) -> Any:
-        """Array axes index a discrete grid, so their unit must be ``pixel``.
-
-        An omitted ``axis_unit`` on an array axis is defaulted to ``pixel``
-        (overriding the ``angstrom`` field default); an explicit non-pixel unit
-        raises a ValueError.
-        """
-        if isinstance(data, dict):
-            axis_type = data.get("axis_type")
-            axis_type = (
-                axis_type.value if isinstance(axis_type, AxisType) else axis_type
-            )
-            if axis_type == AxisType.array.value:
-                axis_unit = data.get("axis_unit")
-                axis_unit = (
-                    axis_unit.value if isinstance(axis_unit, AxisUnit) else axis_unit
-                )
-                if axis_unit is None:
-                    data["axis_unit"] = AxisUnit.pixel.value
-                elif axis_unit != AxisUnit.pixel.value:
-                    raise ValueError(
-                        f"Array axes must use the '{AxisUnit.pixel.value}' unit "
-                        f"(axis_type='array'); got '{axis_unit}'."
-                    )
-        return data
 
 
 class CoordinateSystem(ConfiguredBaseModel):
@@ -399,7 +369,8 @@ class Identity(CoordinateTransformation):
     """
 
     transformation_type: Literal[TransformationType.identity] = Field(
-        TransformationType.identity, description="""The type of transformation."""
+        default=TransformationType.identity,
+        description="""The type of transformation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -434,7 +405,8 @@ class MapAxis(CoordinateTransformation):
         default=[], description="""The permutation of the axes"""
     )
     transformation_type: Literal[TransformationType.map_axis] = Field(
-        TransformationType.map_axis, description="""The type of transformation."""
+        default=TransformationType.map_axis,
+        description="""The type of transformation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -456,7 +428,8 @@ class Translation(CoordinateTransformation):
         default=[], description="""The translation vector"""
     )
     transformation_type: Literal[TransformationType.translation] = Field(
-        TransformationType.translation, description="""The type of transformation."""
+        default=TransformationType.translation,
+        description="""The type of transformation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -478,7 +451,7 @@ class Scale(CoordinateTransformation):
         default=[], description="""The scaling vector"""
     )
     transformation_type: Literal[TransformationType.scale] = Field(
-        TransformationType.scale, description="""The type of transformation."""
+        default=TransformationType.scale, description="""The type of transformation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -500,7 +473,7 @@ class Affine(CoordinateTransformation):
         default=None, description="""The affine matrix"""
     )
     transformation_type: Literal[TransformationType.affine] = Field(
-        TransformationType.affine, description="""The type of transformation."""
+        default=TransformationType.affine, description="""The type of transformation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -527,7 +500,8 @@ class Sequence(CoordinateTransformation):
         ]
     ] = Field(default=[], description="""The sequence of transformations""")
     transformation_type: Literal[TransformationType.sequence] = Field(
-        TransformationType.sequence, description="""The type of transformation."""
+        default=TransformationType.sequence,
+        description="""The type of transformation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -554,7 +528,7 @@ class ProjectionAlignment(CoordinateTransformation):
         default=[], description="""The sequence of transformations""", max_length=2
     )
     transformation_type: Literal[TransformationType.projection_alignment] = Field(
-        TransformationType.projection_alignment,
+        default=TransformationType.projection_alignment,
         description="""The type of transformation.""",
     )
     name: Optional[str] = Field(
@@ -1119,7 +1093,8 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_2D] = Field(
-        AnnotationType.segmentation_mask_2D, description="""The type of annotation."""
+        default=AnnotationType.segmentation_mask_2D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1160,7 +1135,8 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
-        AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
+        default=AnnotationType.segmentation_mask_3D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1198,7 +1174,8 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
-        AnnotationType.probability_map_2D, description="""The type of annotation."""
+        default=AnnotationType.probability_map_2D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1239,7 +1216,8 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
-        AnnotationType.probability_map_3D, description="""The type of annotation."""
+        default=AnnotationType.probability_map_3D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1273,7 +1251,7 @@ class PointSet2D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_set_2D] = Field(
-        AnnotationType.point_set_2D, description="""The type of annotation."""
+        default=AnnotationType.point_set_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1307,7 +1285,7 @@ class PointSet3D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_set_3D] = Field(
-        AnnotationType.point_set_3D, description="""The type of annotation."""
+        default=AnnotationType.point_set_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1345,7 +1323,8 @@ class PointVectorSet2D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_vector_set_2D] = Field(
-        AnnotationType.point_vector_set_2D, description="""The type of annotation."""
+        default=AnnotationType.point_vector_set_2D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1383,7 +1362,8 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_vector_set_3D] = Field(
-        AnnotationType.point_vector_set_3D, description="""The type of annotation."""
+        default=AnnotationType.point_vector_set_3D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1421,7 +1401,8 @@ class PointMatrixSet2D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_matrix_set_2D] = Field(
-        AnnotationType.point_matrix_set_2D, description="""The type of annotation."""
+        default=AnnotationType.point_matrix_set_2D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1459,7 +1440,8 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.point_matrix_set_3D] = Field(
-        AnnotationType.point_matrix_set_3D, description="""The type of annotation."""
+        default=AnnotationType.point_matrix_set_3D,
+        description="""The type of annotation.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1490,7 +1472,7 @@ class TriMesh(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.tri_mesh] = Field(
-        AnnotationType.tri_mesh, description="""The type of annotation."""
+        default=AnnotationType.tri_mesh, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1527,7 +1509,7 @@ class SphereSet(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.sphere_set] = Field(
-        AnnotationType.sphere_set, description="""The type of annotation."""
+        default=AnnotationType.sphere_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1564,7 +1546,7 @@ class CircleSet(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.circle_set] = Field(
-        AnnotationType.circle_set, description="""The type of annotation."""
+        default=AnnotationType.circle_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1602,7 +1584,7 @@ class CylinderSet(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.cylinder_set] = Field(
-        AnnotationType.cylinder_set, description="""The type of annotation."""
+        default=AnnotationType.cylinder_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1643,7 +1625,7 @@ class CuboidSet(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.cuboid_set] = Field(
-        AnnotationType.cuboid_set, description="""The type of annotation."""
+        default=AnnotationType.cuboid_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1684,7 +1666,7 @@ class BoxSet(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.box_set] = Field(
-        AnnotationType.box_set, description="""The type of annotation."""
+        default=AnnotationType.box_set, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1718,7 +1700,7 @@ class Spline2D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.spline_2D] = Field(
-        AnnotationType.spline_2D, description="""The type of annotation."""
+        default=AnnotationType.spline_2D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1752,7 +1734,7 @@ class Spline3D(Annotation, CoordMetaMixin):
     )
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.spline_3D] = Field(
-        AnnotationType.spline_3D, description="""The type of annotation."""
+        default=AnnotationType.spline_3D, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
@@ -1797,7 +1779,7 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
     annotation_type: Literal[AnnotationType.density_map] = Field(
-        AnnotationType.density_map, description="""The type of annotation."""
+        default=AnnotationType.density_map, description="""The type of annotation."""
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
