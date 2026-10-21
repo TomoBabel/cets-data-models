@@ -21,8 +21,8 @@ classes:
     attributes:
       axis_unit:
         description: The unit of the axis
-        range: string
-        ifabsent: angstrom
+        range: AxisUnit
+        ifabsent: AxisUnit(angstrom)
       axis_type:
         description: The type of axis
         range: AxisType
@@ -48,3 +48,16 @@ enums:
         description: A spatial axis
       array:
         description: An array axis
+  AxisUnit:
+    description: >-
+      Physical unit of a coordinate-system axis. Array (index) axes are unitless (unit left
+      unset); spatial axes default to angstrom.
+    permissible_values:
+      angstrom:
+        description: Ångström (1e-10 m).
+      nanometer:
+        description: Nanometre (1e-9 m).
+      micrometer:
+        description: Micrometre (1e-6 m).
+      pixel:
+        description: Pixel/voxel index spacing (used for array/index axes).
