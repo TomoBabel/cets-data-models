@@ -207,6 +207,21 @@ class AnnotationType(str, Enum):
     """
 
 
+class Handedness(str, Enum):
+    """
+    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
+    """
+
+    right_handed = "right_handed"
+    """
+    Right-handed tilt geometry (equivalent to defocus handedness +1).
+    """
+    left_handed = "left_handed"
+    """
+    Left-handed tilt geometry (equivalent to defocus handedness -1).
+    """
+
+
 class SegmentationType(str, Enum):
     """
     How the values of a segmentation mask are to be interpreted.
@@ -663,6 +678,10 @@ class CTFMetadata(ConfiguredBaseModel):
     phase_shift: Optional[float] = Field(
         default=None,
         description="""Phase shift value produced by the usage of a phase plate.""",
+    )
+    defocus_handedness: Optional[int] = Field(
+        default=-1,
+        description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
     )
 
 
