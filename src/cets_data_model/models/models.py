@@ -207,21 +207,6 @@ class AnnotationType(str, Enum):
     """
 
 
-class Handedness(str, Enum):
-    """
-    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
-    """
-
-    right_handed = "right_handed"
-    """
-    Right-handed tilt geometry (equivalent to defocus handedness +1).
-    """
-    left_handed = "left_handed"
-    """
-    Left-handed tilt geometry (equivalent to defocus handedness -1).
-    """
-
-
 class SegmentationType(str, Enum):
     """
     How the values of a segmentation mask are to be interpreted.
@@ -280,21 +265,6 @@ class SegmentedFeatureType(str, Enum):
     other = "other"
     """
     Any other object or feature, described in the name of the annotated object.
-    """
-
-
-class Handedness(str, Enum):
-    """
-    Handedness (parity) of the tilt geometry / coordinate frame, constant for an acquisition session. right_handed == +1, left_handed == -1 (the sign the former CTFMetadata.defocus_handedness carried).
-    """
-
-    right_handed = "right_handed"
-    """
-    Right-handed tilt geometry (equivalent to defocus handedness +1).
-    """
-    left_handed = "left_handed"
-    """
-    Left-handed tilt geometry (equivalent to defocus handedness -1).
     """
 
 
@@ -678,10 +648,6 @@ class CTFMetadata(ConfiguredBaseModel):
     phase_shift: Optional[float] = Field(
         default=None,
         description="""Phase shift value produced by the usage of a phase plate.""",
-    )
-    defocus_handedness: Optional[int] = Field(
-        default=-1,
-        description="""The handedness of the tilt geometry used to describe whether the focus increases or decreases as a function of Z distance.""",
     )
 
 
@@ -1157,7 +1123,7 @@ class AssociatedFile(ConfiguredBaseModel):
 
 class AnnotatedObject(ConfiguredBaseModel):
     """
-    A biological object or structure that is annotated, e.g. membrane, microtubule or actin.
+    A biological object or structure that is annotated, e.g. membacquistionrane, microtubule or actin.
     """
 
     feature_type: SegmentedFeatureType = Field(
@@ -2182,10 +2148,6 @@ class AcquisitionSession(ConfiguredBaseModel):
     tilt_axis_angle: Optional[float] = Field(
         default=None,
         description="""Angle of the tilt axis relative to the detector x-axis, in degrees.""",
-    )
-    handedness: Optional[Handedness] = Field(
-        default=None,
-        description="""Handedness (parity) of the tilt geometry for this acquisition session. It is constant across the session and determines whether defocus increases or decreases with Z, i.e. it subsumes the former per-image CTFMetadata.defocus_handedness (right_handed == +1, left_handed == -1).""",
     )
 
 
