@@ -31,6 +31,9 @@ discriminated_fields:
       - Translation
       - Scale
       - Affine
+      - Rot90
+      - Reflection
+      - ProjectAxis
       - Sequence
   - field_name: sequence
     for_classes:
@@ -42,6 +45,9 @@ discriminated_fields:
       - Translation
       - Scale
       - Affine
+      - Rot90
+      - Reflection
+      - ProjectAxis
 
 type_aliases:
   - name: Vector2D
@@ -94,8 +100,24 @@ injected_base_classes:
     import_from: cets_data_model.models.affine
     into:
       - Affine
-  - mixin: AffineContextMixin
-    import_from: cets_data_model.models.affine
+  - mixin: Rot90ValidationMixin
+    import_from: cets_data_model.models.transforms
+    into:
+      - Rot90
+  - mixin: ReflectionValidationMixin
+    import_from: cets_data_model.models.transforms
+    into:
+      - Reflection
+  - mixin: ScaleValidationMixin
+    import_from: cets_data_model.models.transforms
+    into:
+      - Scale
+  - mixin: ProjectAxisValidationMixin
+    import_from: cets_data_model.models.transforms
+    into:
+      - ProjectAxis
+  - mixin: TransformContextMixin
+    import_from: cets_data_model.models.transforms
     into:
       - Image2D
       - Image3D

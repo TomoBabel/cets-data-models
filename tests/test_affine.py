@@ -7,7 +7,7 @@ from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
 from cets_data_model.models import models
-from cets_data_model.models.affine import AffineContextMixin
+from cets_data_model.models.transforms import TransformContextMixin
 
 
 def identity(size):
@@ -41,6 +41,11 @@ def test_affine_remains_optional():
         affine = models.Affine(**data)
         assert affine.affine is None
         assert models.Affine.model_validate_json(affine.model_dump_json()) == affine
+    # Without a matrix there is no dimension to check against named systems.
+    assert models.Image3D(
+        coordinate_systems=[coordinate_system("volume", 3)],
+        coordinate_transformations=[models.Affine(input="volume")],
+    )
 
 
 @pytest.mark.parametrize(
@@ -253,7 +258,7 @@ def test_annotation_matrix_sizes_match_the_affine_sizes(dimension):
         model(id="annotation", **{field: [identity(dimension + 1)]})
 
 
-def test_every_model_with_transformations_checks_affine_context():
+def test_every_model_with_transformations_checks_context():
     owners = [
         cls
         for cls in vars(models).values()
@@ -262,17 +267,17 @@ def test_every_model_with_transformations_checks_affine_context():
         and "coordinate_transformations" in cls.model_fields
     ]
     missing = [
-        cls.__name__ for cls in owners if not issubclass(cls, AffineContextMixin)
+        cls.__name__ for cls in owners if not issubclass(cls, TransformContextMixin)
     ]
     assert owners and not missing
 
 
-def test_unrelated_transform_validation_is_unchanged():
-    # The affine checks leave other transformation types and their lengths alone.
+def test_vector_lengths_are_not_checked_against_coordinate_systems():
+    # Vector lengths are not checked against coordinate systems.
     instance = models.Image2D(
         coordinate_systems=[coordinate_system("plane", 2)],
         coordinate_transformations=[
-            models.Scale(scale=[-1, 0, 2], input="plane"),
+            models.Scale(scale=[0.5, 1, 2], input="plane"),
             models.Translation(translation=[1, 2, 3], output="plane"),
         ],
     )

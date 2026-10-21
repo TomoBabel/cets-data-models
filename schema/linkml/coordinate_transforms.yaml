@@ -78,7 +78,9 @@ classes:
         ifabsent: TransformationType(scale)
     attributes:
       scale:
-        description: The scaling vector
+        description: >-
+          The scale factor along each axis. Factors are finite and strictly
+          positive; a reversed axis is expressed with Reflection.
         range: float
         multivalued: true
   Affine:
@@ -125,6 +127,86 @@ classes:
               dimensions:
                 - exact_cardinality: 3
                 - exact_cardinality: 3
+  Rot90:
+    description: >-
+      A rotation by quarter turns about coordinate axes, in two or three
+      dimensions
+    is_a: CoordinateTransformation
+    slot_usage:
+      transformation_type:
+        ifabsent: TransformationType(rot90)
+    attributes:
+      rot90:
+        description: >-
+          An integer matrix stored as a list of rows, with the same layout as
+          an affine matrix: 2x2 for a 2D rotation, 3x3 for a 3D rotation. Each
+          row and each column has exactly one nonzero entry, 1 or -1, and the
+          determinant is +1. The rotation is about the coordinate origin and
+          carries no translation.
+        comments:
+          - >-
+            A mirror image (determinant -1) is expressed with Reflection, and a
+            rotation by any other angle with Affine.
+        # Same shape alternatives as Affine.affine; see the comment there.
+        range: integer
+        required: true
+        array:
+          exact_number_dimensions: 2
+        any_of:
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 2
+                - exact_cardinality: 2
+          - array:
+              exact_number_dimensions: 2
+              dimensions:
+                - exact_cardinality: 3
+                - exact_cardinality: 3
+  Reflection:
+    description: A reflection that negates the coordinates along one or more axes
+    is_a: CoordinateTransformation
+    slot_usage:
+      transformation_type:
+        ifabsent: TransformationType(reflection)
+    attributes:
+      axes:
+        description: >-
+          The axes whose coordinates are negated, each listed once. Axes are
+          named by position: x is the first axis of the coordinate system, y the
+          second and z the third. The reflection is about the origin, and the
+          coordinates along the other axes are unchanged.
+        range: ReflectionAxis
+        required: true
+        multivalued: true
+        minimum_cardinality: 1
+  ProjectAxis:
+    description: >-
+      A change in the number of axes, by dropping input axes and creating
+      output axes at given positions
+    is_a: CoordinateTransformation
+    slot_usage:
+      transformation_type:
+        ifabsent: TransformationType(project_axis)
+    attributes:
+      dropped_inputs:
+        description: >-
+          Positions of the input axes that are dropped, counted from 0, each
+          listed once.
+        range: integer
+        multivalued: true
+      created_outputs:
+        description: >-
+          Positions of the output axes that are created, counted from 0, each
+          listed once. Their coordinate is 0. The other output positions take
+          the kept input axes in their order, so the output has as many axes as
+          the input, minus the dropped and plus the created ones.
+        range: integer
+        multivalued: true
+    comments:
+      - >-
+        OME-Zarr 0.6 projectAxis, with droppedInputs and createdOutputs. A
+        transformation that drops an axis is not invertible.
   Sequence:
     description: A sequence of transformations
     is_a: CoordinateTransformation
@@ -150,7 +232,22 @@ enums:
         description: A scaling transformation.
       affine:
         description: An affine transformation.
+      rot90:
+        description: A rotation by quarter turns about coordinate axes.
+      reflection:
+        description: A reflection along one or more axes.
+      project_axis:
+        description: A change in the number of axes by dropping and creating axes.
       sequence:
         description: A sequence of transformations.
       projection_alignment:
         description: A sequence specific to projection alignments.
+  ReflectionAxis:
+    description: An axis named by its position in a coordinate system.
+    permissible_values:
+      x:
+        description: The first axis.
+      y:
+        description: The second axis.
+      z:
+        description: The third axis.
