@@ -11,6 +11,7 @@ default_prefix: image
 imports:
 - linkml:types
 - ./coordinate_systems
+- ./common
 
 slots:
   width:
@@ -39,6 +40,8 @@ classes:
       - height
       - coordinate_systems
       - coordinate_transformations
+      - id
+      - path
 
   Image3D:
     description: A 3D image.
@@ -48,6 +51,8 @@ classes:
       - depth
       - coordinate_systems
       - coordinate_transformations
+      - id
+      - path
 
   ImageStack2D:
     description: A stack of 2D images.
@@ -56,6 +61,16 @@ classes:
         description: The images in the stack
         range: Image2D
         multivalued: true
+        inlined_as_list: true
+      id:
+        description: The id of the stack
+        range: string
+      name:
+        description: Name for the stack
+        range: string
+      path:
+        description: Path to the stack file
+        range: string
 
   ImageStack3D:
     description: A stack of 3D images.
@@ -64,4 +79,14 @@ classes:
         description: The images in the stack
         range: Image3D
         multivalued: true
+        inlined_as_list: true
+      id:
+        description: The id of the stack
+        range: string
+      name:
+        description: Name for the stack
+        range: string
+      path:
+        description: Path to the stack file
+        range: string
 

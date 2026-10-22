@@ -268,6 +268,8 @@ class Image2D(ConfiguredBaseModel):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
 class Image3D(ConfiguredBaseModel):
@@ -297,6 +299,8 @@ class Image3D(ConfiguredBaseModel):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
 
 
 class ImageStack2D(ConfiguredBaseModel):
@@ -307,6 +311,9 @@ class ImageStack2D(ConfiguredBaseModel):
     images: Optional[list[Image2D]] = Field(
         default=[], description="""The images in the stack"""
     )
+    id: Optional[str] = Field(default=None, description="""The id of the stack""")
+    name: Optional[str] = Field(default=None, description="""Name for the stack""")
+    path: Optional[str] = Field(default=None, description="""Path to the stack file""")
 
 
 class ImageStack3D(ConfiguredBaseModel):
@@ -317,6 +324,9 @@ class ImageStack3D(ConfiguredBaseModel):
     images: Optional[list[Image3D]] = Field(
         default=[], description="""The images in the stack"""
     )
+    id: Optional[str] = Field(default=None, description="""The id of the stack""")
+    name: Optional[str] = Field(default=None, description="""Name for the stack""")
+    path: Optional[str] = Field(default=None, description="""Path to the stack file""")
 
 
 class Axis(ConfiguredBaseModel):
@@ -518,6 +528,9 @@ class Sequence(CoordinateTransformation):
     A sequence of transformations
     """
 
+    target_id: Optional[str] = Field(
+        default=None, description="""The id of the entity this transformation targets"""
+    )
     sequence: Optional[
         list[
             Annotated[
@@ -546,6 +559,9 @@ class ProjectionAlignment(CoordinateTransformation):
     """
 
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    target_id: Optional[str] = Field(
+        default=None, description="""The id of the entity this transformation targets"""
+    )
     tilt_image_id: Optional[str] = Field(
         default=None,
         description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
@@ -648,6 +664,7 @@ class GainFile(Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class DefectFile(Image2D):
@@ -675,6 +692,7 @@ class DefectFile(Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class MovieFrame(AcquisitionMetadataMixin, Image2D):
@@ -718,6 +736,7 @@ class MovieFrame(AcquisitionMetadataMixin, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class MovieStack(ConfiguredBaseModel):
@@ -738,6 +757,9 @@ class MovieStackSeries(ConfiguredBaseModel):
     """
 
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     stacks: Optional[list[MovieStack]] = Field(
         default=[], description="""The movie stacks."""
     )
@@ -788,6 +810,7 @@ class BaseProjectionImage(AcquisitionMetadataMixin, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class ProjectionImage(BaseProjectionImage):
@@ -831,6 +854,7 @@ class ProjectionImage(BaseProjectionImage):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class SubProjectionImage(ProjectionImage):
@@ -877,6 +901,7 @@ class SubProjectionImage(ProjectionImage):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class TiltImage(BaseProjectionImage):
@@ -1044,6 +1069,7 @@ class ParticleMap(Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
 
 
 class CoordMetaMixin(ConfiguredBaseModel):
@@ -1116,8 +1142,8 @@ class SegmentationMask2D(Annotation, AssociatedFile, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.segmentation_mask_2D] = Field(
         AnnotationType.segmentation_mask_2D, description="""The type of annotation."""
     )
@@ -1157,8 +1183,8 @@ class SegmentationMask3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.segmentation_mask_3D] = Field(
         AnnotationType.segmentation_mask_3D, description="""The type of annotation."""
     )
@@ -1195,8 +1221,8 @@ class ProbabilityMap2D(Annotation, AssociatedFile, Image2D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_2D] = Field(
         AnnotationType.probability_map_2D, description="""The type of annotation."""
     )
@@ -1236,8 +1262,8 @@ class ProbabilityMap3D(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.probability_map_3D] = Field(
         AnnotationType.probability_map_3D, description="""The type of annotation."""
     )
@@ -1794,8 +1820,8 @@ class DensityMap(Annotation, AssociatedFile, Image3D):
     ] = Field(
         default=[], description="""Named coordinate transformations for this entity"""
     )
-    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    path: Optional[str] = Field(default=None, description="""Path to a file.""")
     annotation_type: Literal[AnnotationType.density_map] = Field(
         AnnotationType.density_map, description="""The type of annotation."""
     )
@@ -1877,6 +1903,9 @@ class Region(ConfiguredBaseModel):
     """
 
     id: str = Field(default=..., description="""Unique identifier for this entity""")
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     movie_stack_collection: Optional[MovieStackCollection] = Field(
         default=None, description="""The movie stack"""
     )
@@ -1924,11 +1953,15 @@ class Average(ConfiguredBaseModel):
     A particle averaging experiment.
     """
 
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
     particle_maps: Optional[list[ParticleMap]] = Field(
         default=[], description="""The particle maps"""
+    )
+    annotations: Optional[list[Annotation]] = Field(
+        default=[], description="""The annotations"""
     )
 
 
@@ -1937,6 +1970,9 @@ class MovieStackCollection(ConfiguredBaseModel):
     A collection of movie stacks using the same gain and defect files.
     """
 
+    name: Optional[str] = Field(
+        default=None, description="""A human-readable name or title for this entity"""
+    )
     movie_stacks: Optional[list[MovieStackSeries]] = Field(
         default=[], description="""The movie stacks in the collection"""
     )
@@ -1956,6 +1992,7 @@ class Dataset(ConfiguredBaseModel):
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""
     )
+    id: str = Field(default=..., description="""Unique identifier for this entity""")
     instruments: Optional[list[Instrument]] = Field(
         default=[], description="""The instruments used in this dataset."""
     )

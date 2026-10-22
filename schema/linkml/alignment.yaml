@@ -21,6 +21,7 @@ classes:
     description: The tomographic alignment for a single projection.
     slots:
       - id
+      - target_id
     slot_usage:
       transformation_type:
         ifabsent: TransformationType(projection_alignment)

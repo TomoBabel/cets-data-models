@@ -136,7 +136,6 @@ slots:
             minimum_cardinality: 1
           - alias: xyz
             minimum_cardinality: 3
-
 classes:
   CoordMetaMixin:
     description: Coordinate system mixins for annotations.
@@ -174,6 +173,8 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(segmentation_mask_3D)
+      id:
+        required: true
   ProbabilityMap2D:
     is_a: Annotation
     mixins:
@@ -183,6 +184,8 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(probability_map_2D)
+      id:
+        required: true
   ProbabilityMap3D:
     is_a: Annotation
     mixins:
@@ -192,6 +195,8 @@ classes:
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(probability_map_3D)
+      id:
+        required: true
   PointSet2D:
     is_a: Annotation
     mixins:

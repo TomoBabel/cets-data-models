@@ -23,3 +23,6 @@ slots:
   path:
     description: Path to a file.
     range: string
+  target_id:
+    description: The id of the entity this transformation targets
+    range: string

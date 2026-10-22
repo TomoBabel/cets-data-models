@@ -1,5 +1,6 @@
 {
   "name": "example_cets_dataset",
+  "id": "999",
   "regions": [
     {
       "id": "region_01",
@@ -14,6 +15,7 @@
                 "images": [
                   {
                     "path": "/data/movies/tilt_00.tif",
+                    "id": "1",
                     "section": 0,
                     "nominal_tilt_angle": -60.0,
                     "accumulated_dose": 2.5,
@@ -44,6 +46,7 @@
                     "coordinate_transformations": []
                   },
                   {
+                    "id": "2",
                     "path": "/data/movies/tilt_00.tif",
                     "section": 1,
                     "nominal_tilt_angle": -60.0,
@@ -65,6 +68,7 @@
                 "path": "/data/movies/tilt_01.tif",
                 "images": [
                   {
+                    "id": "4",
                     "path": "/data/movies/tilt_01.tif",
                     "section": 0,
                     "nominal_tilt_angle": -30.0,
@@ -85,6 +89,7 @@
           }
         ],
         "gain_file": {
+          "id": "5",
           "path": "/data/gain_reference.mrc",
           "width": 4096,
           "height": 4096,
@@ -92,6 +97,7 @@
           "coordinate_transformations": []
         },
         "defect_file": {
+          "id": "6",
           "path": "/data/defect_map.mrc",
           "width": 4096,
           "height": 4096,
@@ -198,6 +204,7 @@
               "name": "align_tilt_neg60",
               "input": "tilt_image_angstroms",
               "output": "tomogram_angstroms",
+              "target_id": "tomogram_01",
               "sequence": [
                 {
                   "transformation_type": "translation",
@@ -239,6 +246,7 @@
               "id": "projection_alignment_02",
               "tilt_image_id": "tilt_image_02",
               "transformation_type": "projection_alignment",
+              "target_id": "tomogram_01",
               "name": "align_tilt_neg30",
               "input": "tilt_image_angstroms",
               "output": "tomogram_angstroms",
@@ -505,9 +513,11 @@
   ],
   "averages": [
     {
+      "id": "16",
       "name": "ribosome_average_01",
       "particle_maps": [
         {
+          "id": "particle_map_01",
           "path": "/data/averages/ribosome_map.mrc",
           "source_region_id": "region_01",
           "source_annotation_id": "ribosome_picks",
