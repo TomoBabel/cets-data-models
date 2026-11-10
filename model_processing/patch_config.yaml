@@ -82,3 +82,8 @@ type_aliases:
     for_field:
       as_list:
         - dimensions3D
+  - name: InstanceIds
+    definition: "Annotated[list[int], Field(min_length=1)]"
+    for_field:
+      as_single:
+        - instance_ids
