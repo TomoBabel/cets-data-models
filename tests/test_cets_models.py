@@ -339,7 +339,7 @@ class TestConstraintValidation:
 # ============================================================================
 
 
-MEMBRANE = {"feature_type": "membrane"}
+MEMBRANE = {"feature_type": "GO:0016020"}
 
 
 class TestSegmentationExtensions:
@@ -370,7 +370,7 @@ class TestSegmentationExtensions:
                         {"label_value": 1, "annotated_object": MEMBRANE},
                         {
                             "label_value": 2,
-                            "annotated_object": {"feature_type": "microtubule"},
+                            "annotated_object": {"feature_type": "GO:0005874"},
                         },
                     ],
                 }
@@ -381,8 +381,11 @@ class TestSegmentationExtensions:
         assert isinstance(mask, SegmentationMask3D)
         assert mask.segmentation_type == "semantic"
         assert [label.label_value for label in mask.labels] == [1, 2]
-        assert mask.labels[0].annotated_object.feature_type == "membrane"
-        assert mask.labels[1].annotated_object.feature_type == "microtubule"
+        feature_types = [label.annotated_object.feature_type for label in mask.labels]
+        assert feature_types == [
+            SegmentedFeatureType.membrane,
+            SegmentedFeatureType.microtubule,
+        ]
 
     def test_instance_mask_derived_from_another_annotation(self):
         """An instance (connected components) mask can point to the mask it derives from"""
@@ -441,15 +444,30 @@ class TestSegmentationExtensions:
         with pytest.raises(ValidationError):
             AnnotatedObject(name="membrane")  # feature_type is required
         with pytest.raises(ValidationError):
-            AnnotatedObject(feature_type="lipid_droplet")  # not a SegmentedFeatureType
+            AnnotatedObject(feature_type="GO:0005811")  # not a SegmentedFeatureType
         with pytest.raises(ValidationError):
-            AnnotatedObject(feature_type="membrane", ontology_id="membrane")  # removed
+            AnnotatedObject(feature_type="membrane")  # the GO term id is expected
+        with pytest.raises(ValidationError):
+            AnnotatedObject(**MEMBRANE, ontology_id="GO:0016020")  # removed
         with pytest.raises(ValidationError):
             SegmentationLabel(label_value=1)  # annotated_object is required
         with pytest.raises(ValidationError):
             PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[])
         with pytest.raises(ValidationError):
             PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[0.5])
+
+    def test_feature_types_are_gene_ontology_terms(self):
+        """Feature types are serialized as their Gene Ontology term identifier"""
+        expected = {
+            "membrane": "GO:0016020",
+            "microtubule": "GO:0005874",
+            "actin_filament": "GO:0005884",
+            "filament": "GO:0099513",
+            "other": "other",
+        }
+        assert {t.name: t.value for t in SegmentedFeatureType} == expected
+        obj = AnnotatedObject(feature_type=SegmentedFeatureType.actin_filament)
+        assert obj.model_dump(mode="json")["feature_type"] == "GO:0005884"
 
     def test_other_feature_type_described_by_name(self):
         """Objects without a specific SegmentedFeatureType are annotated as other + name"""

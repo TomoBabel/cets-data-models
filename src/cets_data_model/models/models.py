@@ -243,28 +243,28 @@ class ProbabilityMapValueType(str, Enum):
 
 class SegmentedFeatureType(str, Enum):
     """
-    Biological objects or features that can be segmented. New values can be added without affecting the existing ones; objects not covered yet are annotated as other.
+    Biological objects or features that can be segmented, identified by their Gene Ontology (GO) cellular component term: the value is the GO term identifier, and the name of each one is its readable label. New terms can be added without affecting the existing ones; objects not covered yet are annotated as other.
     """
 
-    membrane = "membrane"
+    membrane = "GO:0016020"
     """
-    A lipid bilayer membrane.
+    GO membrane. A lipid bilayer along with all the proteins and protein complexes embedded in it and attached to it.
     """
-    microtubule = "microtubule"
+    microtubule = "GO:0005874"
     """
-    A microtubule.
+    GO microtubule. A hollow tube of polymerized tubulin.
     """
-    actin_filament = "actin_filament"
+    actin_filament = "GO:0005884"
     """
-    An actin filament (F-actin).
+    GO actin filament. A filamentous structure formed of a two-stranded helical polymer of the protein actin (F-actin).
     """
-    filament = "filament"
+    filament = "GO:0099513"
     """
-    A cytoskeletal filament of unspecified type.
+    GO polymeric cytoskeletal fiber. A cytoskeletal filament of unspecified type.
     """
     other = "other"
     """
-    Any other object or feature, described in the name of the annotated object.
+    Any other object or feature, described in the name of the annotated object. It is not a Gene Ontology term.
     """
 
 
@@ -1128,7 +1128,7 @@ class AnnotatedObject(ConfiguredBaseModel):
 
     feature_type: SegmentedFeatureType = Field(
         default=...,
-        description="""Kind of biological object or feature that is segmented, e.g. membrane or microtubule. Objects without a specific value are annotated as other, described in name.""",
+        description="""Kind of biological object or feature that is segmented, as a Gene Ontology (GO) term, e.g. GO:0016020 (membrane) or GO:0005874 (microtubule). Objects without a specific value are annotated as other, described in name.""",
     )
     name: Optional[str] = Field(
         default=None, description="""A human-readable name or title for this entity"""

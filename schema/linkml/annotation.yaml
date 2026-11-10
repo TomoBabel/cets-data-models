@@ -159,8 +159,9 @@ slots:
       range: string
   - feature_type:
       description: >-
-        Kind of biological object or feature that is segmented, e.g. membrane or microtubule.
-        Objects without a specific value are annotated as other, described in name.
+        Kind of biological object or feature that is segmented, as a Gene Ontology (GO) term,
+        e.g. GO:0016020 (membrane) or GO:0005874 (microtubule). Objects without a specific
+        value are annotated as other, described in name.
       range: SegmentedFeatureType
   - description:
       description: A free-text description of this entity.
@@ -514,16 +515,29 @@ enums:
         description: Any other real-valued score.
   SegmentedFeatureType:
     description: >-
-      Biological objects or features that can be segmented. New values can be added without
-      affecting the existing ones; objects not covered yet are annotated as other.
+      Biological objects or features that can be segmented, identified by their Gene Ontology
+      (GO) cellular component term: the value is the GO term identifier, and the name of each
+      one is its readable label. New terms can be added without affecting the existing ones;
+      objects not covered yet are annotated as other.
     permissible_values:
-      membrane:
-        description: A lipid bilayer membrane.
-      microtubule:
-        description: A microtubule.
-      actin_filament:
-        description: An actin filament (F-actin).
-      filament:
-        description: A cytoskeletal filament of unspecified type.
+      "GO:0016020":
+        title: membrane
+        description: >-
+          GO membrane. A lipid bilayer along with all the proteins and protein complexes
+          embedded in it and attached to it.
+      "GO:0005874":
+        title: microtubule
+        description: GO microtubule. A hollow tube of polymerized tubulin.
+      "GO:0005884":
+        title: actin_filament
+        description: >-
+          GO actin filament. A filamentous structure formed of a two-stranded helical polymer
+          of the protein actin (F-actin).
+      "GO:0099513":
+        title: filament
+        description: >-
+          GO polymeric cytoskeletal fiber. A cytoskeletal filament of unspecified type.
       other:
-        description: Any other object or feature, described in the name of the annotated object.
+        description: >-
+          Any other object or feature, described in the name of the annotated object. It is
+          not a Gene Ontology term.
