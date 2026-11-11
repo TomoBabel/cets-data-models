@@ -62,6 +62,7 @@ def test_type_aliases_present(model_code):
         "Dimensions2D",
         "Dimensions3D",
         "InstanceIds",
+        "Scores",
     ]
 
     for alias in expected_aliases:

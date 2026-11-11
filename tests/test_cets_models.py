@@ -14,7 +14,9 @@ from cets_data_model.models.models import (
     Scale,
     Affine,
     Sequence,
+    PointMatrixSet3D,
     PointSet3D,
+    PointVectorSet3D,
     ParticleMap,
     Average,
     AnnotatedObject,
@@ -353,6 +355,7 @@ class TestSegmentationExtensions:
         assert mask.segmentation_type is None
         assert mask.labels == []  # multivalued fields default to an empty list
         assert points.instance_ids is None
+        assert points.scores is None
         assert points.annotated_object is None
 
     def test_semantic_mask_with_labels_roundtrip(self):
@@ -455,6 +458,35 @@ class TestSegmentationExtensions:
             PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[])
         with pytest.raises(ValidationError):
             PointSet3D(id="points", origin3D=[[1.0, 2.0, 3.0]], instance_ids=[0.5])
+
+    def test_picked_points_with_scores(self):
+        """3D point annotations can store the score the picking program gave to each point"""
+        identity = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        origin = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]
+        scores = [0.31, 0.12]
+        annotations = [
+            PointSet3D(id="points", origin3D=origin, scores=scores),
+            PointVectorSet3D(
+                id="vectors", origin3D=origin, vector3D=origin, scores=scores
+            ),
+            PointMatrixSet3D(
+                id="particles", origin3D=origin, matrix3D=[identity] * 2, scores=scores
+            ),
+        ]
+        region = Region(id="region", annotations=annotations)
+        reconstructed = Region.model_validate_json(region.model_dump_json())
+        for annotation in reconstructed.annotations:
+            assert annotation.scores == scores
+        assert (
+            PointMatrixSet3D(id="p", origin3D=origin, matrix3D=[identity] * 2).scores
+            is None
+        )
+        with pytest.raises(ValidationError):
+            PointMatrixSet3D(
+                id="p", origin3D=origin, matrix3D=[identity] * 2, scores=[]
+            )
+        with pytest.raises(ValidationError):
+            PointSet3D(id="p", origin3D=origin, scores=["high", "low"])
 
     def test_feature_types_are_gene_ontology_terms(self):
         """Feature types are serialized as their Gene Ontology term identifier"""

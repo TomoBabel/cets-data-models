@@ -20,6 +20,7 @@ Radii: TypeAlias = Annotated[list[float], Field(min_length=1)]
 Dimensions2D: TypeAlias = Annotated[list[float], Field(min_length=2, max_length=2)]
 Dimensions3D: TypeAlias = Annotated[list[float], Field(min_length=3, max_length=3)]
 InstanceIds: TypeAlias = Annotated[list[int], Field(min_length=1)]
+Scores: TypeAlias = Annotated[list[float], Field(min_length=1)]
 
 
 metamodel_version = "None"
@@ -1456,6 +1457,10 @@ class PointSet3D(Annotation, CoordMetaMixin):
         default=None,
         description="""Instance identifier of each point (N), aligned with the point coordinates (the i-th id belongs to the i-th point, so it must have the same length). Points sharing an id belong to the same object instance (e.g. the same membrane or filament). When absent, all the points belong to a single instance.""",
     )
+    scores: Optional[Scores] = Field(
+        default=None,
+        description="""Score assigned to each point (N) by the program that picked it (e.g. the template matching score of GAPSTOP(TM)), aligned with the point coordinates (the i-th score belongs to the i-th point, so it must have the same length). Its range and meaning depend on the picking program; in general, the higher the score, the more reliable the point.""",
+    )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
     )
@@ -1548,6 +1553,10 @@ class PointVectorSet3D(Annotation, CoordMetaMixin):
         default=None,
         description="""Orientation vector associated with a point on a 3D image (Nx3).""",
     )
+    scores: Optional[Scores] = Field(
+        default=None,
+        description="""Score assigned to each point (N) by the program that picked it (e.g. the template matching score of GAPSTOP(TM)), aligned with the point coordinates (the i-th score belongs to the i-th point, so it must have the same length). Its range and meaning depend on the picking program; in general, the higher the score, the more reliable the point.""",
+    )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""
     )
@@ -1639,6 +1648,10 @@ class PointMatrixSet3D(Annotation, CoordMetaMixin):
     matrix3D: Optional[Annotated[list[Matrix3x3], Field(min_length=1)]] = Field(
         default=None,
         description="""Rotation matrix associated with a point on a 3D image (Nx3x3).""",
+    )
+    scores: Optional[Scores] = Field(
+        default=None,
+        description="""Score assigned to each point (N) by the program that picked it (e.g. the template matching score of GAPSTOP(TM)), aligned with the point coordinates (the i-th score belongs to the i-th point, so it must have the same length). Its range and meaning depend on the picking program; in general, the higher the score, the more reliable the point.""",
     )
     coordinate_systems: Optional[list[CoordinateSystem]] = Field(
         default=[], description="""Named coordinate systems for this entity"""

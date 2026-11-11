@@ -87,3 +87,8 @@ type_aliases:
     for_field:
       as_single:
         - instance_ids
+  - name: Scores
+    definition: "Annotated[list[float], Field(min_length=1)]"
+    for_field:
+      as_single:
+        - scores

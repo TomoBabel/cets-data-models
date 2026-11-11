@@ -148,6 +148,19 @@ slots:
         dimensions:
           - alias: N
             minimum_cardinality: 1
+  - scores:
+      description: >-
+        Score assigned to each point (N) by the program that picked it (e.g. the template
+        matching score of GAPSTOP(TM)), aligned with the point coordinates (the i-th score
+        belongs to the i-th point, so it must have the same length). Its range and meaning
+        depend on the picking program; in general, the higher the score, the more reliable
+        the point.
+      range: float
+      array:
+        exact_number_dimensions: 1
+        dimensions:
+          - alias: N
+            minimum_cardinality: 1
   - annotated_object:
       description: The biological object or structure represented by this annotation, e.g. membrane or microtubule.
       range: AnnotatedObject
@@ -298,6 +311,7 @@ classes:
     slots:
       - origin3D
       - instance_ids
+      - scores
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(point_set_3D)
@@ -320,6 +334,7 @@ classes:
     slots:
       - origin3D
       - vector3D
+      - scores
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(point_vector_set_3D)
@@ -342,6 +357,7 @@ classes:
     slots:
       - origin3D
       - matrix3D
+      - scores
     slot_usage:
       annotation_type:
         ifabsent: AnnotationType(point_matrix_set_3D)
