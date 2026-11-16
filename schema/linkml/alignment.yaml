@@ -30,6 +30,11 @@ classes:
           ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced 
           by different algorithms) may reference the same tilt-image.
         range: string
+      refined_tilt_angle:
+        description: >-
+          Tilt angle of the projection in degrees, as refined by this alignment. The
+          tilt angle reported by the microscope is the nominal_tilt_angle of the tilt-image.
+        range: float
       sequence:
         description: The sequence of transformations
         range: CoordinateTransformation

@@ -598,6 +598,10 @@ class ProjectionAlignment(CoordinateTransformation):
         default=None,
         description="""ID of the tilt-image this alignment applies to. Multiple alignments (e.g. produced  by different algorithms) may reference the same tilt-image.""",
     )
+    refined_tilt_angle: Optional[float] = Field(
+        default=None,
+        description="""Tilt angle of the projection in degrees, as refined by this alignment. The tilt angle reported by the microscope is the nominal_tilt_angle of the tilt-image.""",
+    )
     sequence: Optional[list[Union[Affine, Translation]]] = Field(
         default=[], description="""The sequence of transformations""", max_length=2
     )
