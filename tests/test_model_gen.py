@@ -61,6 +61,8 @@ def test_type_aliases_present(model_code):
         "Radii",
         "Dimensions2D",
         "Dimensions3D",
+        "InstanceIds",
+        "Scores",
     ]
 
     for alias in expected_aliases:
@@ -141,6 +143,11 @@ def test_key_classes_exist(models_path):
         "MovieStack",
         "Annotation",
         "PointSet3D",
+        "AnnotatedObject",
+        "SegmentationLabel",
+        "SegmentationType",
+        "ProbabilityMapValueType",
+        "SegmentedFeatureType",
         "Region",
         "Dataset",
     ]
