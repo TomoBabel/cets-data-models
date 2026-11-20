@@ -32,7 +32,8 @@ classifiers = [
 dependencies = [
     "pydantic>=2",
     "mrcfile",
-    "pillow"
+    "pillow",
+    "pyyaml"
 ]
 
 optional-dependencies.dev = [
@@ -70,5 +71,7 @@ module = [
     "networkx", 
     "matplotlib.pyplot", 
     "deepdiff",
+    "yaml.*",
+    "yaml",
 ]
 ignore_missing_imports = true
